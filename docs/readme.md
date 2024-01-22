@@ -3,18 +3,19 @@
 
 DynamicBridge enhances player customization by automating character appearance changes through rule-based presets, utilizing integration with other popular customization plugins. This enables seamless and context-sensitive transformations, enriching gameplay and increasing immersion. 
 
+&nbsp;
+
 Wouldn't it be cool if you could automatically change into your swimsuit when you're swimming in the Ruby Sea? 
 Or automatically put on a winter coat when you're going to a snowy place? With DynamicBridge, this is now possible! You can set your customization settings to automatically apply to new presets based on various rules YOU choose! Time of day, weather, biomes, in game zones, job, even emotes! You can even register your in game house so you can automatically change into a cozy glam upon entering your abode.
 
-
-
+&nbsp;
 
 **Note: DynamicBridge enables advanced automation of the plugins listed below:**
 
- - Glamourer - https://github.com/Ottermandias/Glamourer
- - Customize+ - https://github.com/XIV-Tools/CustomizePlus/
- - Honorific - https://github.com/Caraxi/Honorific/
- - Palette+ (Deprecated) - https://github.com/chirpxiv/PalettePlus
+ - [Glamourer](https://github.com/Ottermandias/Glamourer)
+ - [Customize+](https://github.com/XIV-Tools/CustomizePlus/)
+ - [Honorific](https://github.com/Caraxi/Honorific/)
+ - [Palette+ (Deprecated)](https://github.com/chirpxiv/PalettePlus)
 
 ## Installation
 DynamicBridge is a FFXIV Dalamud plugin. This requires you to use xivlauncher. To install DynamicBridge, follow the below instructions.
