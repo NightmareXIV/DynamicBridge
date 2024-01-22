@@ -23,3 +23,7 @@ DynamicBridge is a FFXIV Dalamud plugin. This requires you to use xivlauncher. T
  6. Press the `+` button to the right and then hit the save icon
  7. You should now be able to search for `DynamicBridge` and install it
 
+
+## FAQ
+
+ - In Progress
