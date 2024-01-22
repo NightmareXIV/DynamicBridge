@@ -18,7 +18,7 @@ public static unsafe class ComplexGlamourer
             ImGuiEx.Text(EColor.RedBright, "Glamourer disabled in settings. Function unavailable.");
             return;
         }
-        ImGuiEx.Text($"Here you can create complex Glamourer entries. Upon application, they will be applied sequentially one after another. You will be able to select complex entries for profiles together with normal entries.");
+        ImGuiEx.TextWrapped($"Here you can create layered designs for Glamourer. Upon application, they will be applied sequentially one after another. You will be able to select layered designs for profiles together with normal entries.");
         if(ImGui.Button("Add new entry"))
         {
             C.ComplexGlamourerEntries.Add(new());
@@ -28,7 +28,7 @@ public static unsafe class ComplexGlamourer
             ImGui.PushID(gEntry.GUID);
             if (ImGui.CollapsingHeader($"{gEntry.Name}###entry"))
             {
-                ImGuiEx.TextV($"1. Name complex Glamourer entry:");
+                ImGuiEx.TextV($"1. Name Layered Design:");
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemFullWidth();
                 ImGui.InputText($"##name", ref gEntry.Name, 100);

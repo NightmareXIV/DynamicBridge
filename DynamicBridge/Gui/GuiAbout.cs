@@ -11,7 +11,7 @@ public static class GuiAbout
     {
         ImGuiEx.LineCentered("about1", () =>
         {
-            ImGuiEx.Text($"Made by NightmareXIV");
+            ImGuiEx.Text($"Made by NightmareXIV in collaboration with AsunaTsuki");
         });
         ImGuiEx.LineCentered("about2", () =>
         {
@@ -20,12 +20,12 @@ public static class GuiAbout
                 ShellStart("https://discord.gg/m8NRt4X8Gf");
             }
         });
-        /*ImGuiEx.LineCentered("about3", () =>
+        ImGuiEx.LineCentered("about3", () =>
         {
             if (ImGui.Button("Read instructions and FAQ"))
             {
-                ShellStart("https://");
+                ShellStart("https://github.com/NightmareXIV/DynamicBridge/tree/main/docs");
             }
-        });*/
+        });
     }
 }

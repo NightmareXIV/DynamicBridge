@@ -22,6 +22,8 @@ public static class GuiSettings
         ImGui.Separator();
         ImGui.Checkbox("Honorific", ref C.EnableHonorific);
         DrawPluginCheck("Honorific", "1.4.2.0");
+        ImGui.Separator();
+        GuiAbout.Draw();
     }
 
     static void DrawPluginCheck(string name, string minVersion = "0.0.0.0")
