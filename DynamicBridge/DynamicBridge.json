@@ -1,0 +1,11 @@
+{
+    "Author": "NightmareXIV",
+    "Name": "DynamicBridge",
+    "InternalName": "DynamicBridge",
+    "Description": "Enhances player customization by automating character appearance changes through rule-based presets, utilizing integration with other popular customization plugins. This enables seamless and context-sensitive transformations, enriching gameplay and increasing immersion.",
+    "ApplicableVersion": "any",
+    "Punchline": "Allows you to automatically change your appearance based on various conditions.",
+    "RepoUrl": "https://github.com/",
+    "AcceptsFeedback": false,
+    "DalamudApiLevel": 9
+}
