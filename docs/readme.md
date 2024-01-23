@@ -29,10 +29,14 @@ DynamicBridge is a FFXIV Dalamud plugin. This requires you to use xivlauncher. T
  7. You should now be able to search for `DynamicBridge` and install it
 
 
-
 ## FAQ
-Note: You may have issues with conflicts if you leave Glamourer's built in automation enabled.
 
- - In Progress
+- How do I set rule priority?
+	- Rules are applied from the top down. 
+	For example, the following rules would be listed in this order:
+	1) "If I am in water, put on my swimsuit" 
+	2) "If I am in a tropical biome, put on X"
+	This way, when I go into the water it will put on my swimsuit and when I come out (if i am in a tropical area) it will put on my tropical outfit. 
+
 
    
