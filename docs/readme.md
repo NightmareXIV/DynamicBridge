@@ -29,6 +29,10 @@ DynamicBridge is a FFXIV Dalamud plugin. This requires you to use xivlauncher. T
  7. You should now be able to search for `DynamicBridge` and install it
 
 
+
 ## FAQ
+Note: You may have issues with conflicts if you leave Glamourer's built in automation enabled.
 
  - In Progress
+
+   
