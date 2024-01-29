@@ -72,6 +72,10 @@ public static unsafe class ComplexGlamourer
                     ImGuiEx.Text($"{design}");
                     ImGui.PopID();
                 }
+                if (ImGuiEx.ButtonCtrl("Delete"))
+                {
+                    new TickScheduler(() => C.ComplexGlamourerEntries.RemoveAll(x => x.GUID == gEntry.GUID));
+                }
             }
             ImGui.PopID();
         }

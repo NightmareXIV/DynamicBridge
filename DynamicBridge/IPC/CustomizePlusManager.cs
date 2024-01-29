@@ -6,16 +6,14 @@ namespace DynamicBridge.IPC;
 public static class CustomizePlusManager
 {
     public static bool WasSet = false;
-    public static List<MiniCPlusProfile> GetProfiles()
+    public static CustomizePlusProfile[] GetProfiles(string chara = null)
     {
         try
         {
-            var ret = new List<MiniCPlusProfile>();
-            foreach(var x in Svc.PluginInterface.GetIpcSubscriber<string[]>("CustomizePlus.GetProfiles").InvokeFunc())
+            var ret = Svc.PluginInterface.GetIpcSubscriber<CustomizePlusProfile[]>("CustomizePlus.GetRegisteredProfileList").InvokeFunc();
+            if(chara != null)
             {
-                var element = JsonConvert.DeserializeObject<MiniCPlusProfile>(x);
-                element.JsonData = x;
-                ret.Add(element);
+                ret = ret.Where(x => x.characterName == chara).ToArray();
             }
             return ret;
         }
@@ -31,9 +29,9 @@ public static class CustomizePlusManager
         WasSet = true;
         try
         {
-            if (GetProfiles().TryGetFirst(x => x.ProfileName == profileName && (charName == null || x.CharacterName == charName), out var profile))
+            if (GetProfiles().TryGetFirst(x => x.Name == profileName && (charName == null || x.characterName == charName), out var profile))
             {
-                Svc.PluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter").InvokeAction(profile.JsonData, Player.Object);
+                Svc.PluginInterface.GetIpcSubscriber<Guid, Character?, object>("CustomizePlus.SetProfileToCharacterByUniqueId").InvokeAction(profile.ID, Player.Object);
             }
         }
         catch(Exception e)

@@ -76,9 +76,9 @@ namespace DynamicBridge.Gui
             {
                 foreach (var d in CustomizePlusManager.GetProfiles())
                 {
-                    if (ImGui.Selectable($"{d.ProfileName}"))
+                    if (ImGui.Selectable($"{d.Name}"))
                     {
-                        CustomizePlusManager.SetProfile(d.ProfileName);
+                        CustomizePlusManager.SetProfile(d.Name);
                     }
                 }
                 if (ImGui.Button("Revert c+")) CustomizePlusManager.RevertProfile();

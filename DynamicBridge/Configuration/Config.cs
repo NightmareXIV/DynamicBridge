@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DynamicBridge.Configuration
 {
+    [Serializable]
     public class Config : IEzConfig
     {
         public HashSet<ulong> Blacklist = [];
@@ -17,7 +18,7 @@ namespace DynamicBridge.Configuration
         public bool EnableGlamourer = true;
         public bool EnableCustomize = true;
         public bool EnableHonorific = true;
-        public bool EnablePalette = true;
+        [NonSerialized] internal bool EnablePalette = false;
         public bool GlamourerResetBeforeApply = false;
     }
 }

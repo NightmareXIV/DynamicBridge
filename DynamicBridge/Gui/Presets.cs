@@ -255,21 +255,21 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##customize", preset.Customize.PrintRange(out var fullList, "- None -")))
                             {
                                 FiltersSelection();
-                                var profiles = CustomizePlusManager.GetProfiles().OrderBy(x => x.ProfileName);
+                                var profiles = CustomizePlusManager.GetProfiles(Profile.Name.Split("@")[0]).OrderBy(x => x.Name);
                                 var index = 0;
                                 foreach (var x in profiles)
                                 {
                                     index++;
                                     ImGui.PushID(index);
-                                    var name = x.ProfileName;
+                                    var name = x.Name;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !preset.Customize.Contains(name)) continue;
-                                    ImGuiEx.CollectionCheckbox($"{name}", x.ProfileName, preset.Customize);
+                                    ImGuiEx.CollectionCheckbox($"{name}", x.Name, preset.Customize);
                                     ImGui.PopID();
                                 }
                                 foreach (var x in preset.Customize)
                                 {
-                                    if (profiles.Any(d => d.ProfileName == x)) continue;
+                                    if (profiles.Any(d => d.Name == x)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                     ImGuiEx.CollectionCheckbox($"{x}", x, preset.Customize, false, true);
                                     ImGui.PopStyleColor();
