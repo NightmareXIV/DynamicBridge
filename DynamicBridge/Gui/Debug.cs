@@ -1,8 +1,12 @@
 ﻿using DynamicBridge.IPC;
+using ECommons.GameHelpers;
+using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,21 +22,6 @@ namespace DynamicBridge.Gui
         static string cont = "Test button";
         public static void Draw()
         {
-            ImGuiEx.TextWrapped(GetCallStackID());
-            ImGuiEx.RightFloat(() =>
-            {
-                if (ImGui.Button(cont))
-                {
-                    //
-                    cont = "A".Repeat(Random.Shared.Next(20) + 2);
-                }
-            });
-            ImGuiEx.CollectionCheckbox("Test", [0, 1, 2], TestCollection);
-            ImGuiEx.CollectionCheckbox("Testall", [0, 1, 2, 3, 4, 5], TestCollection);
-            ImGuiEx.CollectionCheckbox("1", 1, TestCollection);
-            ImGuiEx.CollectionCheckbox("2", 2, TestCollection);
-            ImGuiEx.Checkbox("TestBool2", ref TestBool2);
-            ImGuiEx.Text($"{TestCollection.Print()}");
             if (ImGui.CollapsingHeader("Time"))
             {
                 var time = *ETimeChecker.ET;
@@ -46,7 +35,6 @@ namespace DynamicBridge.Gui
                 }
             }
 
-            ImGuiEx.CheckboxBullet("Test", ref TestBool);
             if(ImGui.CollapsingHeader("Glamourer test"))
             {
                 foreach (var d in GlamourerManager.GetDesigns()) 
@@ -74,14 +62,39 @@ namespace DynamicBridge.Gui
 
             if (ImGui.CollapsingHeader("C+ test"))
             {
+                ImGuiEx.Text($"Saved: {CustomizePlusManager.SavedProfileID}");
+                ImGuiEx.Text($"wasset: {CustomizePlusManager.WasSet}");
                 foreach (var d in CustomizePlusManager.GetProfiles())
                 {
                     if (ImGui.Selectable($"{d.Name}"))
                     {
-                        CustomizePlusManager.SetProfile(d.Name);
+                        CustomizePlusManager.SetProfile(d.Name, Player.Name);
                     }
                 }
-                if (ImGui.Button("Revert c+")) CustomizePlusManager.RevertProfile();
+                if (ImGui.Button("Revert c+")) CustomizePlusManager.RestoreState();
+            }
+
+            if(ImGui.CollapsingHeader("C+ reflector"))
+            {
+                try
+                {
+                    if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, false, true) && DalamudReflector.TryGetLocalPlugin(plugin, out var lp, out var lpType))
+                    {
+                        var context = lp.GetFoP("loader").GetFoP<AssemblyLoadContext>("context");
+                        ImGuiEx.Text(context.Assemblies.Select(x => x).Print("\n"));
+                        var profileManager = ReflectionHelper.CallGenericStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions", "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
+                        ImGuiEx.TextWrapped(profileManager.GetType().GetMethods().Select(x => x.Name).Print());
+                    }
+                    else
+                    {
+                        ImGuiEx.Text($"Could not find plugin");
+                    }
+                }
+                catch(Exception e)
+                {
+                    e.Log();
+                    ImGuiEx.Text(e.ToString());
+                }
             }
 
             if (ImGui.CollapsingHeader("P+ test"))

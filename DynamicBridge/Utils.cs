@@ -3,6 +3,7 @@ using DynamicBridge.IPC;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -144,5 +145,19 @@ namespace DynamicBridge
             FullList = list.Select(x => x.ToString()).Join("\n");
             return $"{list.Length} selected";
         }
+
+        public static List<uint> GetArmor()
+        {
+            var im = InventoryManager.Instance();
+            var cont = im->GetInventoryContainer(InventoryType.EquippedItems);
+            var ret = new List<uint>();
+            for (int i = 0; i < cont->Size; i++)
+            {
+                ret.Add(cont->GetInventorySlot(i)->ItemID);
+            }
+            return ret;
+        }
+
+        public static bool? WaitUntilInteractable() => Player.Interactable;
     }
 }

@@ -110,6 +110,7 @@ namespace DynamicBridge
         void Logout()
         {
             MyOldDesign = null;
+            if (C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
         }
 
         private void OnUpdate()
@@ -201,6 +202,8 @@ namespace DynamicBridge
                                                 } 
                                                 isNull = false;
                                                 MyOldDesign ??= GlamourerManager.GetMyCustomization();
+                                                //TaskManager.DelayNext(60, true);
+                                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                                 TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
                                                 PluginLog.Debug($"Applying design {design}");
                                             }
@@ -222,6 +225,7 @@ namespace DynamicBridge
                                     if (preset.Honorific.Count > 0)
                                     {
                                         var randomTitle = preset.Honorific[Random.Next(preset.Honorific.Count)];
+                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                         TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
                                     }
                                     else
@@ -234,6 +238,7 @@ namespace DynamicBridge
                                     if (preset.Palette.Count > 0)
                                     {
                                         var randomPalette = preset.Palette[Random.Next(preset.Palette.Count)];
+                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                         TaskManager.Enqueue(() => PalettePlusManager.SetPalette(randomPalette));
                                     }
                                     else
@@ -246,7 +251,8 @@ namespace DynamicBridge
                                     if (preset.Customize.Count > 0)
                                     {
                                         var randomCusProfile = preset.Customize[Random.Next(preset.Customize.Count)];
-                                        TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile));
+                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                        TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
                                     }
                                     else
                                     {
@@ -277,19 +283,22 @@ namespace DynamicBridge
                         void NullHonorific()
                         {
                             if (!C.EnableHonorific) return;
-                            if(HonorificManager.WasSet) TaskManager.Enqueue(() => HonorificManager.SetTitle());
+                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                            if (HonorificManager.WasSet) TaskManager.Enqueue(() => HonorificManager.SetTitle());
                         }
 
                         void NullPalette()
                         {
                             if (!C.EnablePalette) return;
+                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
                             if (PalettePlusManager.WasSet) TaskManager.Enqueue(() => PalettePlusManager.RevertPalette());
                         }
 
                         void NullCustomize()
                         {
                             if (!C.EnableCustomize) return;
-                            if (CustomizePlusManager.WasSet) TaskManager.Enqueue(() => CustomizePlusManager.RevertProfile());
+                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                            TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
                         }
 
                         void NullGlamourer()
@@ -298,6 +307,7 @@ namespace DynamicBridge
                             if (MyOldDesign != null)
                             {
                                 //TaskManager.DelayNext(DelayMS);
+                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                 TaskManager.Enqueue(() =>
                                 {
                                     GlamourerManager.SetMyCustomization(MyOldDesign);
@@ -308,6 +318,7 @@ namespace DynamicBridge
                             else
                             {
                                 //TaskManager.DelayNext(DelayMS);
+                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                 TaskManager.Enqueue(GlamourerManager.Revert);
                                 PluginLog.Debug($"No saved design found, reverting");
                             }

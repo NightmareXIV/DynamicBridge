@@ -104,44 +104,14 @@ namespace DynamicBridge.IPC
             }
         }
 
-        static DesignListEntry[] CachedDesigns = null;
-
         public static void ResetCache()
         {
-            GetDesigns(true);
+            GetDesigns();
         }
 
-        public static DesignListEntry[] GetDesigns(bool ResetCache = false)
+        public static DesignListEntry[] GetDesigns()
         {
-            if (CachedDesigns != null && !ResetCache)
-            {
-                return CachedDesigns;
-            }
-            CachedDesigns = GetDesignListIPC();
-            return CachedDesigns;
-            /*var ret = new List<MicroDesign>();
-            try
-            {
-                var path = Path.Combine(Svc.PluginInterface.ConfigDirectory.Parent.FullName, "Glamourer", "designs");
-                PluginLog.Debug($"Reading {path}");
-                foreach(var file in Directory.GetFiles(path))
-                {
-                    PluginLog.Debug($"Loading design {file}");
-                    using var reader = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var sReader = new StreamReader(reader);
-                    var str = sReader.ReadToEnd();
-                    var design = JsonConvert.DeserializeObject<MicroDesign>(str);
-                    design.WholeData = str;
-                    ret.Add(design);
-                    PluginLog.Debug($"Design {design.Name}/{design.Identifier} loaded"); 
-                }
-            }
-            catch(Exception e)
-            {
-                e.Log();
-            }
-            CachedDesigns = ret;
-            return ret;*/
+            return GetDesignListIPC();
         }
     }
 }

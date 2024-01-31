@@ -15,7 +15,7 @@ public static class GuiSettings
         ImGui.Checkbox($"Revert character before applying new rule", ref C.GlamourerResetBeforeApply);
         ImGui.Separator();
         ImGui.Checkbox("Customize+", ref C.EnableCustomize);
-        DrawPluginCheck("CustomizePlus", "1.2.6.9");
+        DrawPluginCheck("CustomizePlus", "2.0.0.8");
         ImGui.Separator();
         ImGui.Checkbox("Palette+", ref C.EnablePalette);
         DrawPluginCheck("PalettePlus", "0.0.3.14");
