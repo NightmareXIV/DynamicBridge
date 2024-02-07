@@ -22,5 +22,6 @@ namespace DynamicBridge.Configuration
         public List<Job> Jobs = [];
         public List<string> SelectedPresets = [];
         public List<ETime> Times = [];
+        public bool Passthrough = false;
     }
 }

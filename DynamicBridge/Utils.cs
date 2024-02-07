@@ -22,7 +22,17 @@ namespace DynamicBridge
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
 
-        public static bool GuidEquals(this ApplyRule[] rule, )
+        public static bool GuidEquals(this List<ApplyRule> rule, List<ApplyRule> other)
+        {
+            //if (rule == null && other == null) return true;
+            //if (rule == null || other == null) return false;
+            if (rule.Count != other.Count) return false;
+            for (int i = 0; i < rule.Count; i++)
+            {
+                if (rule[i].GUID != other[i].GUID) return false;
+            }
+            return true;
+        }
 
         public static int GetPreviousPreset(this Profile profile, int index, bool isStatic)
         {

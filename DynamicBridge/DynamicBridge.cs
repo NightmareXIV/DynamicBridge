@@ -23,7 +23,7 @@ namespace DynamicBridge
         public static Config C;
         public AgentMap* AgentMapInst;
         public WeatherManager WeatherManager;
-        public ApplyRule[] LastRule = null;
+        public List<ApplyRule> LastRule = [];
         public bool ForceUpdate = false;
         public bool SoftForceUpdate = false;
         public string MyOldDesign = null;
@@ -120,10 +120,10 @@ namespace DynamicBridge
                 var profile = Utils.Profile(Player.CID);
                 if (!TaskManager.IsBusy && profile != null)
                 {
-                    ApplyRule newRule = null;
+                    List<ApplyRule> newRule = [];
                     if (profile.IsStaticExists())
                     {
-                        newRule = StaticRule;
+                        newRule = [StaticRule];
                         StaticRule.SelectedPresets = [profile.GetStaticPreset().Name];
                     }
                     else
@@ -152,131 +152,133 @@ namespace DynamicBridge
                                 (x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
                                 )
                             {
-                                newRule = x;
-                                break;
+                                newRule.Add(x);
+                                if(!x.Passthrough) break;
                             }
                         }
                     }
-                    if (ForceUpdate || newRule?.GUID != LastRule?.GUID || (SoftForceUpdate && newRule != null))
+                    if (ForceUpdate || !Utils.GuidEquals(newRule, LastRule) || (SoftForceUpdate && newRule.Count > 0))
                     {
-                        PluginLog.Debug($"Old rule: {LastRule}, new rule: {newRule} | {newRule?.GUID != LastRule?.GUID} | F:{ForceUpdate}");
+                        PluginLog.Debug($"Old rule: {LastRule.Print()}, new rule: {newRule.Print()} | {Utils.GuidEquals(newRule, LastRule)} | F:{ForceUpdate}");
                         LastRule = newRule;
                         ForceUpdate = false;
                         SoftForceUpdate = false;
-                        if (newRule != null && newRule.SelectedPresets.Count > 0)
+                        var DoNullGlamourer = true;
+                        var DoNullCustomize = true;
+                        var DoNullHonorific = true;
+                        for (int i = 0; i < newRule.Count; i++)
                         {
-                            var index = Random.Next(0, newRule.SelectedPresets.Count);
-                            var preset = profile.Presets.FirstOrDefault(s => s.Name == newRule.SelectedPresets[index]);
-                            if (preset != null) 
+                            var rule = newRule[i];
+                            var isLast = i == newRule.Count - 1;
+                            var isFirst = i == 0;
+                            if (rule != null && rule.SelectedPresets.Count > 0)
                             {
-                                if (C.EnableGlamourer)
+                                var index = Random.Next(0, rule.SelectedPresets.Count);
+                                var preset = profile.Presets.FirstOrDefault(s => s.Name == rule.SelectedPresets[index]);
+                                if (preset != null)
                                 {
-                                    if (preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
+                                    if (C.EnableGlamourer)
                                     {
-                                        var selectedIndex = Random.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
-                                        var designs = new List<string>();
-                                        if (selectedIndex < preset.Glamourer.Count)
+                                        if (preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
                                         {
-                                            designs.Add(preset.Glamourer[selectedIndex]);
-                                        }
-                                        else
-                                        {
-                                            var complexEntry = C.ComplexGlamourerEntries.FirstOrDefault(x => x.Name == preset.ComplexGlamourer[selectedIndex - preset.Glamourer.Count]);
-                                            if (complexEntry != null)
+                                            var selectedIndex = Random.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                                            var designs = new List<string>();
+                                            if (selectedIndex < preset.Glamourer.Count)
                                             {
-                                                foreach (var e in complexEntry.Designs)
+                                                designs.Add(preset.Glamourer[selectedIndex]);
+                                            }
+                                            else
+                                            {
+                                                var complexEntry = C.ComplexGlamourerEntries.FirstOrDefault(x => x.Name == preset.ComplexGlamourer[selectedIndex - preset.Glamourer.Count]);
+                                                if (complexEntry != null)
                                                 {
-                                                    designs.Add(e);
+                                                    foreach (var e in complexEntry.Designs)
+                                                    {
+                                                        designs.Add(e);
+                                                    }
                                                 }
                                             }
-                                        }
-                                        var isNull = true;
-                                        foreach (var name in designs)
-                                        {
-                                            var design = Utils.GetDesignByName(name);
-                                            if (design != null)
+                                            var isNull = true;
+                                            foreach (var name in designs)
                                             {
-                                                isNull = false;
-                                                MyOldDesign ??= GlamourerManager.GetMyCustomization();
-                                                //TaskManager.DelayNext(60, true);
-                                                if (C.ManageGlamourerAutomation)
+                                                var design = Utils.GetDesignByName(name);
+                                                if (design != null)
                                                 {
-                                                    TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                    DoNullGlamourer = false;
+                                                    isNull = false;
+                                                    if(isFirst) MyOldDesign ??= GlamourerManager.GetMyCustomization();
+                                                    //TaskManager.DelayNext(60, true);
+                                                    if (isFirst && C.ManageGlamourerAutomation)
+                                                    {
+                                                        TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                    }
+                                                    TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                                    TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
+                                                    PluginLog.Debug($"Applying design {design}");
                                                 }
-                                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                                TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
-                                                PluginLog.Debug($"Applying design {design}");
                                             }
+                                            /*if (isNull)
+                                            {
+                                                NullGlamourer();
+                                                PluginLog.Debug($"Restoring state because design was null");
+                                            }*/
                                         }
-                                        if (isNull)
+                                        /*else
                                         {
                                             NullGlamourer();
                                             PluginLog.Debug($"Restoring state because design was null");
+                                        }*/
+                                    }
+                                    if (C.EnableHonorific)
+                                    {
+                                        if (preset.Honorific.Count > 0)
+                                        {
+                                            DoNullHonorific = false;
+                                            var randomTitle = preset.Honorific[Random.Next(preset.Honorific.Count)];
+                                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                            TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
                                         }
+                                        /*else
+                                        {
+                                            NullHonorific();
+                                        }*/
                                     }
-                                    else
+                                    if (C.EnableCustomize)
                                     {
-                                        NullGlamourer();
-                                        PluginLog.Debug($"Restoring state because design was null");
+                                        if (preset.Customize.Count > 0)
+                                        {
+                                            DoNullCustomize = false;
+                                            var randomCusProfile = preset.Customize[Random.Next(preset.Customize.Count)];
+                                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                            TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
+                                        }
+                                        /*else
+                                        {
+                                            NullCustomize();
+                                        }*/
                                     }
                                 }
-                                if (C.EnableHonorific)
+                                /*else
                                 {
-                                    if (preset.Honorific.Count > 0)
-                                    {
-                                        var randomTitle = preset.Honorific[Random.Next(preset.Honorific.Count)];
-                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                        TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
-                                    }
-                                    else
-                                    {
-                                        NullHonorific();
-                                    }
-                                }
-                                if (C.EnablePalette)
-                                {
-                                    if (preset.Palette.Count > 0)
-                                    {
-                                        var randomPalette = preset.Palette[Random.Next(preset.Palette.Count)];
-                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                        TaskManager.Enqueue(() => PalettePlusManager.SetPalette(randomPalette));
-                                    }
-                                    else
-                                    {
-                                        NullPalette();
-                                    }
-                                }
-                                if (C.EnableCustomize)
-                                {
-                                    if (preset.Customize.Count > 0)
-                                    {
-                                        var randomCusProfile = preset.Customize[Random.Next(preset.Customize.Count)];
-                                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                        TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
-                                    }
-                                    else
-                                    {
-                                        NullCustomize();
-                                    }
-                                }
+                                    Null();
+                                    PluginLog.Debug($"Restoring state because preset was null");
+                                }*/
                             }
-                            else
+                            /*else
                             {
                                 Null();
-                                PluginLog.Debug($"Restoring state because preset was null");
-                            }
+                                PluginLog.Debug($"Restoring state because no rule was found");
+                            }*/
                         }
-                        else
-                        {
-                            Null();
-                            PluginLog.Debug($"Restoring state because no rule was found");
-                        }
+
+                        if (DoNullGlamourer) NullGlamourer();
+                        if (DoNullCustomize) NullCustomize();
+                        if (DoNullHonorific) NullHonorific();
 
                         void Null()
                         {
                             NullGlamourer();
                             NullHonorific();
-                            NullPalette();
                             NullCustomize();
                         }
 
@@ -285,13 +287,6 @@ namespace DynamicBridge
                             if (!C.EnableHonorific) return;
                             TaskManager.Enqueue(Utils.WaitUntilInteractable);
                             if (HonorificManager.WasSet) TaskManager.Enqueue(() => HonorificManager.SetTitle());
-                        }
-
-                        void NullPalette()
-                        {
-                            if (!C.EnablePalette) return;
-                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                            if (PalettePlusManager.WasSet) TaskManager.Enqueue(() => PalettePlusManager.RevertPalette());
                         }
 
                         void NullCustomize()

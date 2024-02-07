@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ECommons.GameFunctions;
 using DynamicBridge.Configuration;
+using Dalamud.Interface.Utility.Raii;
 
 namespace DynamicBridge.Gui
 {
@@ -106,6 +107,8 @@ namespace DynamicBridge.Gui
                         }
                         var rule = Profile.Rules[i];
                         var col = !rule.Enabled;
+                        var col2 = P.LastRule.Any(x => x.GUID == rule.GUID);
+                        if (col2) ImGui.PushStyleColor(ImGuiCol.Text, EColor.Green);
                         if (col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
                         ImGui.PushID(rule.GUID);
                         ImGui.TableNextRow();
@@ -124,6 +127,11 @@ namespace DynamicBridge.Gui
                         {
                             (Profile.Rules[i + 1], Profile.Rules[i]) = (Profile.Rules[i], Profile.Rules[i + 1]);
                         }
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGuiEx.ButtonCheckbox("\uf103", ref rule.Passthrough);
+                        ImGui.PopFont();
+                        ImGuiEx.Tooltip("Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially.");
 
                         ImGui.TableNextColumn();
 
@@ -413,6 +421,7 @@ namespace DynamicBridge.Gui
                         ImGuiEx.Tooltip("Hold CTRL+Click to delete");
 
                         if (col) ImGui.PopStyleColor();
+                        if (col2) ImGui.PopStyleColor();
                         ImGui.PopID();
                     }
 
