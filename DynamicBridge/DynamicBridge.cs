@@ -23,7 +23,7 @@ namespace DynamicBridge
         public static Config C;
         public AgentMap* AgentMapInst;
         public WeatherManager WeatherManager;
-        public ApplyRule LastRule = null;
+        public ApplyRule[] LastRule = null;
         public bool ForceUpdate = false;
         public bool SoftForceUpdate = false;
         public string MyOldDesign = null;
@@ -196,13 +196,13 @@ namespace DynamicBridge
                                             var design = Utils.GetDesignByName(name);
                                             if (design != null)
                                             {
-                                                if(isNull && C.GlamourerResetBeforeApply)
-                                                {
-                                                    TaskManager.Enqueue(GlamourerManager.Revert);
-                                                } 
                                                 isNull = false;
                                                 MyOldDesign ??= GlamourerManager.GetMyCustomization();
                                                 //TaskManager.DelayNext(60, true);
+                                                if (C.ManageGlamourerAutomation)
+                                                {
+                                                    TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                }
                                                 TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                                 TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
                                                 PluginLog.Debug($"Applying design {design}");
@@ -304,23 +304,40 @@ namespace DynamicBridge
                         void NullGlamourer()
                         {
                             if (!C.EnableGlamourer) return;
-                            if (MyOldDesign != null)
+                            if (C.ManageGlamourerAutomation)
                             {
-                                //TaskManager.DelayNext(DelayMS);
-                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                TaskManager.Enqueue(() =>
-                                {
-                                    GlamourerManager.SetMyCustomization(MyOldDesign);
-                                    MyOldDesign = null;
-                                }, "Set my customization to old design");
-                                PluginLog.Debug($"Saved design found, restoring");
+                                TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(true), "GlamourerReflector.SetAutomationGlobalState = true");
                             }
-                            else
+                            if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.StoreRestore)
                             {
-                                //TaskManager.DelayNext(DelayMS);
-                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                if (MyOldDesign != null)
+                                {
+                                    //TaskManager.DelayNext(DelayMS);
+                                    TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                    TaskManager.Enqueue(() =>
+                                    {
+                                        GlamourerManager.SetMyCustomization(MyOldDesign);
+                                        MyOldDesign = null;
+                                    }, "Set my customization to old design");
+                                    PluginLog.Debug($"Saved design found, restoring");
+                                }
+                                else
+                                {
+                                    //TaskManager.DelayNext(DelayMS);
+                                    TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                    TaskManager.Enqueue(GlamourerManager.Revert);
+                                    PluginLog.Debug($"No saved design found, reverting");
+                                }
+                            }
+                            else if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.RevertToAutomation)
+                            {
+                                TaskManager.Enqueue(GlamourerManager.RevertToAutomation);
+                                PluginLog.Debug($"Reverting to automation");
+                            }
+                            else if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.RevertToNormal)
+                            {
                                 TaskManager.Enqueue(GlamourerManager.Revert);
-                                PluginLog.Debug($"No saved design found, reverting");
+                                PluginLog.Debug($"Reverting to game state");
                             }
                         }
                     }

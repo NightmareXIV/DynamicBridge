@@ -24,8 +24,15 @@ namespace DynamicBridge.IPC
 
         public const string LabelGetDesignList = "Glamourer.GetDesignList";
 
+        public static void RevertToAutomation()
+        {
+            GlamourerManager2.RevertToAutomation();
+        }
+
         public static void ApplyByGuid(Guid guid)
         {
+            GlamourerManager2.ApplyByGuid(guid);
+            return;
             try
             {
                 Svc.PluginInterface.GetIpcSubscriber<Guid, Character, object>(LabelApplyByGuidAllToCharacter).InvokeAction(guid, Player.Object);
@@ -91,6 +98,8 @@ namespace DynamicBridge.IPC
 
         public static void Revert()
         {
+            GlamourerManager2.Revert();
+            return;
             try
             {
                 /*var result = Svc.Commands.ProcessCommand($"/glamour revert <me>");

@@ -19,6 +19,14 @@ namespace DynamicBridge.Configuration
         public bool EnableCustomize = true;
         public bool EnableHonorific = true;
         [NonSerialized] internal bool EnablePalette = false;
-        public bool GlamourerResetBeforeApply = false;
+        public GlamourerNoRuleBehavior GlamNoRuleBehaviour = GlamourerNoRuleBehavior.RevertToNormal;
+        public bool ManageGlamourerAutomation = false;
+    }
+
+    public enum GlamourerNoRuleBehavior
+    {
+        RevertToNormal,
+        RevertToAutomation,
+        StoreRestore
     }
 }

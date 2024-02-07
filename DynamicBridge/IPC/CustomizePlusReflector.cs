@@ -14,10 +14,9 @@ public static class CustomizePlusReflector
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, false, true) && DalamudReflector.TryGetLocalPlugin(plugin, out var lp, out var lpType))
+            if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, out var context, false, true))
             {
-                var context = lp.GetFoP("loader").GetFoP<AssemblyLoadContext>("context");
-                var profileManager = ReflectionHelper.CallGenericStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions", "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
+                var profileManager = ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions", null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
                 return profileManager;
             }
         }

@@ -46,6 +46,9 @@ namespace DynamicBridge.Gui
                 }
                 if (ImGui.Button("Revert")) GlamourerManager.Revert();
                 if (ImGui.Button("Reset cache")) GlamourerManager.ResetCache();
+                ImGuiEx.Text($"Automation state: {GlamourerReflector.GetAutomationGlobalState()}");
+                if (ImGui.Button("Enable automation")) GlamourerReflector.SetAutomationGlobalState(true);
+                if (ImGui.Button("Disable automation")) GlamourerReflector.SetAutomationGlobalState(false);
             }
 
             if(ImGui.CollapsingHeader("Honorific test"))
@@ -82,7 +85,7 @@ namespace DynamicBridge.Gui
                     {
                         var context = lp.GetFoP("loader").GetFoP<AssemblyLoadContext>("context");
                         ImGuiEx.Text(context.Assemblies.Select(x => x).Print("\n"));
-                        var profileManager = ReflectionHelper.CallGenericStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions", "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
+                        var profileManager = ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions",null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
                         ImGuiEx.TextWrapped(profileManager.GetType().GetMethods().Select(x => x.Name).Print());
                     }
                     else
