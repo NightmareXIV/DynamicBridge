@@ -34,11 +34,11 @@ public static class DragDrop
         }
     }
 
-    public static void AcceptFolderDragDrop(Profile currentProfile, List<Preset> presetList)
+    public static void AcceptFolderDragDrop(Profile currentProfile, List<Preset> presetList, ImGuiDragDropFlags flags = ImGuiDragDropFlags.None)
     {
         if (ImGui.BeginDragDropTarget())
         {
-            if (ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload))
+            if (ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload, flags))
             {
                 MovePresetToList(currentProfile, payload, presetList);
             }

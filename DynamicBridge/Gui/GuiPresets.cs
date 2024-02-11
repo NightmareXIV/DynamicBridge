@@ -81,7 +81,7 @@ namespace DynamicBridge.Gui
                     if (ImGui.CollapsingHeader("Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
                     {
                         newOpen = "";
-                        DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets);
+                        DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
                         DrawPresets(Profile, Profile.Presets);
                     }
                     else
@@ -93,11 +93,11 @@ namespace DynamicBridge.Gui
                 foreach(var x in Profile.PresetsFolders)
                 {
                     if (Focus && Open != x.GUID && Open != null) continue;
-                    if (ImGui.CollapsingHeader($"{x.Name}##{x.GUID}"))
+                    if (ImGui.CollapsingHeader($"{x.Name}###presetfolder{x.GUID}"))
                     {
                         newOpen = x.GUID;
                         CollapsingHeaderClicked();
-                        DragDrop.AcceptFolderDragDrop(Profile, x.Presets);
+                        DragDrop.AcceptFolderDragDrop(Profile, x.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
                         DrawPresets(Profile, x.Presets, x.GUID);
                     }
                     else
@@ -120,7 +120,7 @@ namespace DynamicBridge.Gui
                         {
                             Copy(EzConfig.DefaultSerializationFactory.Serialize(x, false));
                         }
-                        ImGui.SameLine();
+                        ImGui.Separator();
                         if (ImGui.Selectable("Delete folder and move profiles to default folder (Hold CTRL)"))
                         {
                             if (ImGuiEx.Ctrl)
