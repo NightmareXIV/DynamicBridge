@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace DynamicBridge.Gui
 {
-    public static class Presets
+    public static class GuiPresets
     {
         static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         static bool[] OnlySelected = new bool[15];
@@ -17,7 +17,7 @@ namespace DynamicBridge.Gui
             if (Utils.Profile(UI.CurrentCID) != null)
             {
                 var Profile = Utils.Profile(UI.CurrentCID);
-                Profile.Presets.RemoveAll(x => x == null);
+                Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
                 if (ImGui.Button("Add new preset"))
                 {
                     Profile.Presets.Add(new());
@@ -34,23 +34,21 @@ namespace DynamicBridge.Gui
                         Notify.Error(e.Message);
                     }
                 }
-                if (Profile.Presets.Any(x => !x.IsStaticCategory))
-                {
-                    DrawPresets(Profile, false);
-                }
+                DrawPresets(Profile, Profile.Presets);
 
-                if(Profile.Presets.Any(x => x.IsStaticCategory))
+                foreach(var x in Profile.PresetFolders)
                 {
-                    if(ImGui.CollapsingHeader("Static presets"))
+                    ImGui.PushID(x.GUID);
+                    if (ImGui.CollapsingHeader($"{x.Name}"))
                     {
-                        DrawPresets(Profile, true);
+                        DrawPresets(Profile, x.Presets);
                     }
+                    ImGui.PopID();
                 }
-
             }
         }
 
-        static void DrawPresets(Profile Profile, bool drawStatic)
+        static void DrawPresets(Profile currentProfile, List<Preset> presetList)
         {
             var cnt = 3;
             if (C.EnableHonorific) cnt++;
@@ -68,11 +66,10 @@ namespace DynamicBridge.Gui
                 ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                 ImGui.TableHeadersRow();
 
-                var isStaticExists = Profile.IsStaticExists();
+                var isStaticExists = currentProfile.IsStaticExists();
 
-                for (int i = 0; i < Profile.Presets.Count; i++)
+                for (int i = 0; i < presetList.Count; i++)
                 {
-                    if (Profile.Presets[i].IsStaticCategory != drawStatic) continue;
                     var filterCnt = 0;
 
                     void FiltersSelection()
@@ -85,7 +82,7 @@ namespace DynamicBridge.Gui
                         ImGui.Separator();
                     }
 
-                    var preset = Profile.Presets[i];
+                    var preset = presetList[i];
 
                     ImGui.PushID(preset.GUID);
 
@@ -93,8 +90,6 @@ namespace DynamicBridge.Gui
                     {
                         ImGui.PushStyleColor(ImGuiCol.Text, preset.IsStatic ? ImGuiColors.DalamudOrange : ImGuiColors.DalamudGrey);
                     }
-                    var col = Profile.ForcedPreset == preset.Name;
-                    if (col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
@@ -104,7 +99,7 @@ namespace DynamicBridge.Gui
                     {
                         if (preset.IsStatic)
                         {
-                            Profile.SetStatic(preset);
+                            currentProfile.SetStatic(preset);
                         }
                         P.ForceUpdate = true;
                     }
@@ -112,15 +107,12 @@ namespace DynamicBridge.Gui
                     ImGui.SameLine();
                     if (ImGui.ArrowButton("up", ImGuiDir.Up) && i > 0)
                     {
-                        var other = Profile.GetPreviousPreset(i, drawStatic);
-                        if(other != -1) (Profile.Presets[other], Profile.Presets[i]) = (Profile.Presets[i], Profile.Presets[other]);
+                        (presetList[i-1], presetList[i]) = (presetList[i], presetList[i-1]);
                     }
                     ImGui.SameLine();
-                    if (ImGui.ArrowButton("down", ImGuiDir.Down) && i < Profile.Presets.Count - 1)
+                    if (ImGui.ArrowButton("down", ImGuiDir.Down) && i < presetList.Count - 2)
                     {
-                        var other = Profile.GetNextPreset(i, drawStatic);
-                        //DuoLog.Information($"Other {other}");
-                        if(other != -1) (Profile.Presets[other], Profile.Presets[i]) = (Profile.Presets[i], Profile.Presets[other]);
+                        (presetList[i+1], presetList[i]) = (presetList[i], presetList[i+1]);
                     }
 
                     ImGui.TableNextColumn();
@@ -128,7 +120,7 @@ namespace DynamicBridge.Gui
                     //name
 
                     var isEmpty = preset.Name == "";
-                    var isNonUnique = Profile.Presets.Count(x => x.Name == preset.Name) > 1;
+                    var isNonUnique = currentProfile.GetPresetsUnion().Count(x => x.Name == preset.Name) > 1;
                     if (isEmpty)
                     {
                         ImGui.PushFont(UiBuilder.IconFont);
@@ -255,7 +247,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##customize", preset.Customize.PrintRange(out var fullList, "- None -")))
                             {
                                 FiltersSelection();
-                                var profiles = CustomizePlusManager.GetProfiles(Profile.Name.Split("@")[0]).OrderBy(x => x.Name);
+                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Name.Split("@")[0]).OrderBy(x => x.Name);
                                 var index = 0;
                                 foreach (var x in profiles)
                                 {
@@ -291,7 +283,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -")))
                             {
                                 FiltersSelection();
-                                var titles = HonorificManager.GetTitleData(Profile.Name.Split("@")[0], ExcelWorldHelper.GetWorldByName(Profile.Name.Split("@")[1]).RowId).OrderBy(x => x.Title);
+                                var titles = HonorificManager.GetTitleData(currentProfile.Name.Split("@")[0], ExcelWorldHelper.Get(currentProfile.Name.Split("@")[1]).RowId).OrderBy(x => x.Title);
                                 var index = 0;
                                 foreach (var x in titles)
                                 {
@@ -327,30 +319,12 @@ namespace DynamicBridge.Gui
                         Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(preset)));
                     }
                     ImGui.SameLine();
-                    if (drawStatic)
-                    {
-                        if (ImGui.Button(" D "))
-                        {
-                            preset.IsStaticCategory = false;
-                        }
-                        ImGuiEx.Tooltip("Put this preset into Dynamic category");
-                    }
-                    else
-                    {
-                        if (ImGui.Button(" S "))
-                        {
-                            preset.IsStaticCategory = true;
-                        }
-                        ImGuiEx.Tooltip("Put this preset into Static category. This will remove possibility to select it in Rules tab. However, if it's already selected in some rule, it will not be removed from there.");
-                    }
-                    ImGui.SameLine();
                     if (ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)
                     {
-                        new TickScheduler(() => Profile.Presets.RemoveAll(x => x.GUID == preset.GUID));
+                        new TickScheduler(() => presetList.RemoveAll(x => x.GUID == preset.GUID));
                     }
                     ImGuiEx.Tooltip("Hold CTRL+Click to delete");
 
-                    if (col) ImGui.PopStyleColor();
                     if (isStaticExists) ImGui.PopStyleColor();
                     ImGui.PopID();
                 }

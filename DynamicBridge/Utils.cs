@@ -34,35 +34,16 @@ namespace DynamicBridge
             return true;
         }
 
-        public static int GetPreviousPreset(this Profile profile, int index, bool isStatic)
-        {
-            for (int i = index - 1; i >= 0; i--)
-            {
-                var preset = profile.Presets[i];
-                if (preset.IsStaticCategory == isStatic) return i;
-            }
-            return -1;
-        }
-        public static int GetNextPreset(this Profile profile, int index, bool isStatic)
-        {
-            for (int i = index + 1; i < profile.Presets.Count; i++)
-            {
-                var preset = profile.Presets[i];
-                if (preset.IsStaticCategory == isStatic) return i;
-            }
-            return -1;
-        }
-
         public static bool IsStaticExists(this Profile p)
         {
-            return p.Presets.Any(x => x.IsStatic);
+            return p.GetPresetsUnion().Any(x => x.IsStatic);
         }
 
-        public static Preset GetStaticPreset(this Profile p) => p.Presets.FirstOrDefault(x => x.IsStatic);
+        public static Preset GetStaticPreset(this Profile p) => p.GetPresetsUnion().FirstOrDefault(x => x.IsStatic);
 
         public static void SetStatic(this Profile p, Preset preset)
         {
-            p.Presets.Each(x => x.IsStatic = false);
+            p.GetPresetsUnion().Each(x => x.IsStatic = false);
             preset.IsStatic = true;
         }
 

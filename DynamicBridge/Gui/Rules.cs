@@ -386,7 +386,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##glamour", rule.SelectedPresets.PrintRange(out var fullList, "- None -")))
                             {
                                 FiltersSelection();
-                                var designs = Profile.Presets.OrderBy(x => x.Name).Where(x => !x.IsStaticCategory);
+                                var designs = Profile.GetPresetsUnion().OrderBy(x => x.Name).Where(x => !x.IsStaticCategory);
                                 foreach (var x in designs)
                                 {
                                     var name = x.Name;

@@ -71,9 +71,9 @@ namespace DynamicBridge
                 {
                     var name = arguments[(arguments.IndexOf(" ")+1)..];
                     var profile = Utils.Profile();
-                    if (profile != null && profile.Presets.TryGetFirst(x => x.Name == name, out var p))
+                    if (profile != null && profile.GetPresetsUnion().TryGetFirst(x => x.Name == name, out var p))
                     {
-                        profile.Presets.Each(x => x.IsStatic = false);
+                        profile.GetPresetsUnion().Each(x => x.IsStatic = false);
                         p.IsStatic = true;
                         Notify.Success($"{name} was made static.");
                         P.ForceUpdate = true;
@@ -174,7 +174,7 @@ namespace DynamicBridge
                             if (rule != null && rule.SelectedPresets.Count > 0)
                             {
                                 var index = Random.Next(0, rule.SelectedPresets.Count);
-                                var preset = profile.Presets.FirstOrDefault(s => s.Name == rule.SelectedPresets[index]);
+                                var preset = profile.GetPresetsUnion().FirstOrDefault(s => s.Name == rule.SelectedPresets[index]);
                                 if (preset != null)
                                 {
                                     if (C.EnableGlamourer)
