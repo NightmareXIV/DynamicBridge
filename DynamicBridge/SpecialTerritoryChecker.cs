@@ -25,7 +25,7 @@ namespace DynamicBridge
             [SpecialTerritory.Inn] = () => Inns.List.Contains(Svc.ClientState.TerritoryType),
             [SpecialTerritory.Apartment] = () => Apartments.Contains(Svc.ClientState.TerritoryType),
             [SpecialTerritory.Residential_area] = () => ResidentalAreas.List.Contains(Svc.ClientState.TerritoryType),
-            [SpecialTerritory.Duty] = () => Svc.Condition[ConditionFlag.BoundByDuty56] && Svc.Condition[ConditionFlag.InFlight],
+            [SpecialTerritory.Duty] = () => Svc.Condition[ConditionFlag.BoundByDuty56],
             [SpecialTerritory.Aquatic_Ocean] = () => Ocean.Contains(Svc.ClientState.TerritoryType),
             [SpecialTerritory.Aquatic_Lake] = () => Lake.Contains(Svc.ClientState.TerritoryType),
             [SpecialTerritory.Aquatic_River] = () => River.Contains(Svc.ClientState.TerritoryType),
