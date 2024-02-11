@@ -1,8 +1,12 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.IPC;
+using ECommons;
+using ECommons.Configuration;
 using ECommons.ExcelServices;
 using Newtonsoft.Json;
 using System.Data;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
 namespace DynamicBridge.Gui
@@ -11,6 +15,10 @@ namespace DynamicBridge.Gui
     {
         static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         static bool[] OnlySelected = new bool[15];
+        static string CurrentDrag = null;
+        static bool Focus = false;
+        static string Open = null;
+        static int RowHeight;
         public static void Draw()
         {
             UI.ProfileSelectorCommon();
@@ -20,42 +28,136 @@ namespace DynamicBridge.Gui
                 Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
                 if (ImGui.Button("Add new preset"))
                 {
-                    Profile.Presets.Add(new());
+                    if(Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                    {
+                        open.Presets.Add(new());
+                    }
+                    else
+                    {
+                        Profile.Presets.Add(new());
+                    }
                 }
                 ImGui.SameLine();
                 if (ImGui.Button("Paste from clipboard"))
                 {
                     try
                     {
-                        Profile.Presets.Add(JsonConvert.DeserializeObject<Preset>(Clipboard.GetText()));
+                        var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Clipboard.GetText()));
+                        if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                        {
+                            open.Presets.Add(str);
+                        }
+                        else
+                        {
+                            Profile.Presets.Add(str);
+                        }
                     }
                     catch (Exception e)
                     {
                         Notify.Error(e.Message);
                     }
                 }
-                DrawPresets(Profile, Profile.Presets);
 
-                foreach(var x in Profile.PresetFolders)
+                ImGui.SameLine();
+                ImGuiEx.Text($"|");
+                ImGui.SameLine();
+
+                if(ImGui.Button("Add new folder"))
                 {
-                    ImGui.PushID(x.GUID);
-                    if (ImGui.CollapsingHeader($"{x.Name}"))
-                    {
-                        DrawPresets(Profile, x.Presets);
-                    }
-                    ImGui.PopID();
+                    Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count+1}"});
                 }
+
+                ImGui.SameLine();
+                ImGuiEx.Text($"|");
+                ImGui.SameLine();
+
+                ImGui.Checkbox("Focus mode", ref Focus);
+                ImGuiEx.HelpMarker("While focus mode active, only one selected folder will be visible.");
+
+                string newOpen = null;
+
+                if (!Focus || Open == "" || Open == null)
+                {
+                    if (ImGui.CollapsingHeader("Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        newOpen = "";
+                        DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets);
+                        DrawPresets(Profile, Profile.Presets);
+                    }
+                    else
+                    {
+                        DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets);
+                    }
+                }
+
+                foreach(var x in Profile.PresetsFolders)
+                {
+                    if (Focus && Open != x.GUID && Open != null) continue;
+                    if (ImGui.CollapsingHeader($"{x.Name}##{x.GUID}"))
+                    {
+                        newOpen = x.GUID;
+                        CollapsingHeaderClicked();
+                        DragDrop.AcceptFolderDragDrop(Profile, x.Presets);
+                        DrawPresets(Profile, x.Presets, x.GUID);
+                    }
+                    else
+                    {
+                        CollapsingHeaderClicked();
+                        DragDrop.AcceptFolderDragDrop(Profile, x.Presets);
+                    }
+                    void CollapsingHeaderClicked()
+                    {
+                        if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                        {
+                            ImGui.OpenPopup($"Folder{x.GUID}");
+                        }
+                    }
+                    if (ImGui.BeginPopup($"Folder{x.GUID}"))
+                    {
+                        ImGuiEx.SetNextItemWidthScaled(150f);
+                        ImGui.InputTextWithHint("##name", "Folder name", ref x.Name, 200);
+                        if (ImGui.Selectable("Export to clipboard"))
+                        {
+                            Copy(EzConfig.DefaultSerializationFactory.Serialize(x, false));
+                        }
+                        ImGui.SameLine();
+                        if (ImGui.Selectable("Delete folder and move profiles to default folder (Hold CTRL)"))
+                        {
+                            if (ImGuiEx.Ctrl)
+                            {
+                                new TickScheduler(() =>
+                                {
+                                    foreach (var x in x.Presets)
+                                    {
+                                        Profile.Presets.Add(x);
+                                    }
+                                    Profile.PresetsFolders.Remove(x);
+                                });
+                            }
+                        }
+                        if (ImGui.Selectable("Delete folder and profiles (Hold CTRL+SHIFT)"))
+                        {
+                            if (ImGuiEx.Ctrl && ImGuiEx.Shift)
+                            {
+                                new TickScheduler(() => Profile.PresetsFolders.Remove(x));
+                            }
+                        }
+                        ImGui.EndPopup();
+                    }
+                }
+                Open = newOpen;
             }
         }
 
-        static void DrawPresets(Profile currentProfile, List<Preset> presetList)
+        static void DrawPresets(Profile currentProfile, List<Preset> presetList, string extraID = "")
         {
             var cnt = 3;
             if (C.EnableHonorific) cnt++;
             if (C.EnablePalette) cnt++;
             if (C.EnableCustomize) cnt++;
             if (C.EnableGlamourer) cnt++;
-            if (ImGui.BeginTable("##presets", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
+            List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
+            if (ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
             {
                 ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort);
                 ImGui.TableSetupColumn("Name");
@@ -90,11 +192,17 @@ namespace DynamicBridge.Gui
                     {
                         ImGui.PushStyleColor(ImGuiCol.Text, preset.IsStatic ? ImGuiColors.DalamudOrange : ImGuiColors.DalamudGrey);
                     }
-
                     ImGui.TableNextRow();
+                    if(CurrentDrag == preset.GUID)
+                    {
+                        var col = GradientColor.Get(EColor.Green, EColor.Green with { W = EColor.Green.W/4}, 500).ToUint();
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, col);
+                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg1, col);
+                    }
                     ImGui.TableNextColumn();
 
                     //Sorting
+                    var rowPos = ImGui.GetCursorPos();
                     if (ImGuiEx.CheckboxBullet("##static", ref preset.IsStatic))
                     {
                         if (preset.IsStatic)
@@ -105,20 +213,61 @@ namespace DynamicBridge.Gui
                     }
                     ImGuiEx.Tooltip("Set this preset as static, applying it unconditionally on this character disregarding any rules.");
                     ImGui.SameLine();
-                    if (ImGui.ArrowButton("up", ImGuiDir.Up) && i > 0)
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    var cur = ImGui.GetCursorPos();
+                    var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString());
+                    ImGui.Dummy(size);
+                    ImGui.PopFont();
+                    var moveIndex = i;
+                    MoveCommands.Add((rowPos, cur, delegate
                     {
-                        (presetList[i-1], presetList[i]) = (presetList[i], presetList[i-1]);
-                    }
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{preset.GUID}");
+                        ImGui.PopFont();
+                        if (ImGui.IsItemHovered())
+                        {
+                            ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
+                        }
+                        if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
+                        {
+                            ImGuiDragDrop.SetDragDropPayload("MovePreset", preset.GUID);
+                            CurrentDrag = preset.GUID;
+                            InternalLog.Verbose($"DragDropSource = {preset.GUID}");
+                            ImGui.EndDragDropSource();
+                        }
+                        else if (CurrentDrag == preset.GUID)
+                        {
+                            InternalLog.Verbose($"Current drag reset!");
+                            CurrentDrag = null;
+                        }
+                    }, delegate { DragDrop.AcceptProfileDragDrop(currentProfile, presetList, moveIndex); }
+                    ));
+
                     ImGui.SameLine();
-                    if (ImGui.ArrowButton("down", ImGuiDir.Down) && i < presetList.Count - 2)
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.CaretDown))
                     {
-                        (presetList[i+1], presetList[i]) = (presetList[i], presetList[i+1]);
+                        ImGui.OpenPopup($"MoveTo##{preset.GUID}");
+                    }
+                    if (ImGui.BeginPopup($"MoveTo##{preset.GUID}"))
+                    {
+                        if(ImGui.Selectable("- Main folder -", currentProfile.Presets.Any(x => x.GUID == preset.GUID)))
+                        {
+                            DragDrop.MovePresetToList(currentProfile, preset.GUID, currentProfile.Presets);
+                        }
+                        foreach(var x in currentProfile.PresetsFolders)
+                        {
+                            if (ImGui.Selectable($"{x.Name}##{x.GUID}", x.Presets.Any(x => x.GUID == preset.GUID)))
+                            {
+                                DragDrop.MovePresetToList(currentProfile, preset.GUID, x.Presets);
+                            }
+                        }
+                        ImGui.EndPopup();
                     }
 
+                    
                     ImGui.TableNextColumn();
 
                     //name
-
                     var isEmpty = preset.Name == "";
                     var isNonUnique = currentProfile.GetPresetsUnion().Count(x => x.Name == preset.Name) > 1;
                     if (isEmpty)
@@ -329,6 +478,15 @@ namespace DynamicBridge.Gui
                     ImGui.PopID();
                 }
                 ImGui.EndTable();
+                foreach(var x in MoveCommands)
+                {
+                    ImGui.SetCursorPos(x.ButtonPos);
+                    x.BeginDraw();
+                    x.AcceptDraw();
+                    ImGui.SetCursorPos(x.RowPos);
+                    ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize(" ").Y));
+                    x.AcceptDraw();
+                }
             }
         }
     }

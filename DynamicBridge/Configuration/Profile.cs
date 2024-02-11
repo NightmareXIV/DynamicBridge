@@ -12,22 +12,23 @@ namespace DynamicBridge.Configuration
         public string Name = "";
         public List<ApplyRule> Rules = [];
         public List<Preset> Presets = [];
-        public List<PresetFolder> PresetFolders = [];
+        public List<PresetFolder> PresetsFolders = [];
         public string ForcedPreset = null;
 
         public IEnumerable<Preset> GetPresetsUnion()
         {
-            foreach(var x in Presets) yield return x;
-            foreach(var x in PresetFolders)
+            foreach(var x in GetPresetsListUnion())
             {
-                foreach(var z in x.Presets) yield return z;
+                foreach(var z in x) yield return z;
             }
         }
 
         public IEnumerable<List<Preset>> GetPresetsListUnion()
         {
             yield return Presets;
-            foreach (var x in PresetFolders) yield return x.Presets;
+            foreach (var x in PresetsFolders) yield return x.Presets;
+            yield return C.GlobalPresets;
+            foreach (var x in C.GlobalPresetsFolders) yield return x.Presets;
         }
     }
 }
