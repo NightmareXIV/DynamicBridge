@@ -3,24 +3,21 @@ using ECommons.GameHelpers;
 using ECommons.ImGuiMethods.TerritorySelection;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ECommons.GameFunctions;
 using DynamicBridge.Configuration;
-using Dalamud.Interface.Utility.Raii;
+using Action = System.Action;
 
 namespace DynamicBridge.Gui
 {
-    public unsafe static class Rules
+    public unsafe static class GuiRules
     {
         static Vector2 iconSize => new Vector2(24f.Scale(), 24f.Scale());
         static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         static bool[] OnlySelected = new bool[15];
+        static string CurrentDrag = "";
+
         public static void Draw()
         {
             UI.ProfileSelectorCommon();
@@ -77,6 +74,7 @@ namespace DynamicBridge.Gui
                     ImGuiEx.Text(EColor.RedBright, $"Preset {Profile.GetStaticPreset()?.Name} is selected as static. Automation disabled.");
                 }
 
+                List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
                 if (ImGui.BeginTable("##main", 12, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
                 {
                     ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
@@ -111,22 +109,51 @@ namespace DynamicBridge.Gui
                         if (col2) ImGui.PushStyleColor(ImGuiCol.Text, EColor.Green);
                         if (col) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
                         ImGui.PushID(rule.GUID);
-                        ImGui.TableNextRow();
+                        ImGui.TableNextRow(); 
+                        if (CurrentDrag == rule.GUID)
+                        {
+                            var color = GradientColor.Get(EColor.Green, EColor.Green with { W = EColor.Green.W / 4 }, 500).ToUint();
+                            ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, color);
+                            ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg1, color);
+                        }
                         ImGui.TableNextColumn();
 
                         //Sorting
+                        var rowPos = ImGui.GetCursorPos();
                         ImGui.Checkbox("##enable", ref rule.Enabled);
                         ImGuiEx.Tooltip("Enable this rule");
+
                         ImGui.SameLine();
-                        if (ImGui.ArrowButton("up", ImGuiDir.Up) && i > 0)
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        var cur = ImGui.GetCursorPos();
+                        var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString());
+                        ImGui.Dummy(size);
+                        ImGui.PopFont();
+                        var moveIndex = i;
+                        MoveCommands.Add((rowPos, cur, delegate
                         {
-                            (Profile.Rules[i - 1], Profile.Rules[i]) = (Profile.Rules[i], Profile.Rules[i - 1]);
-                        }
-                        ImGui.SameLine();
-                        if (ImGui.ArrowButton("down", ImGuiDir.Down) && i < Profile.Rules.Count - 1)
-                        {
-                            (Profile.Rules[i + 1], Profile.Rules[i]) = (Profile.Rules[i], Profile.Rules[i + 1]);
-                        }
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{rule.GUID}");
+                            ImGui.PopFont();
+                            if (ImGui.IsItemHovered())
+                            {
+                                ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
+                            }
+                            if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
+                            {
+                                ImGuiDragDrop.SetDragDropPayload("MoveRule", rule.GUID);
+                                CurrentDrag = rule.GUID;
+                                InternalLog.Verbose($"DragDropSource = {rule.GUID}");
+                                ImGui.EndDragDropSource();
+                            }
+                            else if (CurrentDrag == rule.GUID)
+                            {
+                                InternalLog.Verbose($"Current drag reset!");
+                                CurrentDrag = null;
+                            }
+                        }, delegate { DragDrop.AcceptRuleDragDrop(Profile, moveIndex); }
+                        ));
+
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
                         ImGuiEx.ButtonCheckbox("\uf103", ref rule.Passthrough);
@@ -392,11 +419,12 @@ namespace DynamicBridge.Gui
                                     var name = x.Name;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.SelectedPresets.Contains(name)) continue;
+                                    if (x.GetFolder(Profile)?.HiddenFromSelection == true) continue;
                                     ImGuiEx.CollectionCheckbox($"{name}##{x.GUID}", x.Name, rule.SelectedPresets);
                                 }
                                 foreach (var x in rule.SelectedPresets)
                                 {
-                                    if (designs.Any(d => d.Name == x)) continue;
+                                    if (designs.Any(d => d.Name == x && d.GetFolder(Profile)?.HiddenFromSelection != true)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                     ImGuiEx.CollectionCheckbox($"{x}", x, rule.SelectedPresets, false, true);
                                     ImGui.PopStyleColor();
@@ -426,6 +454,15 @@ namespace DynamicBridge.Gui
                     }
 
                     ImGui.EndTable();
+                    foreach (var x in MoveCommands)
+                    {
+                        ImGui.SetCursorPos(x.ButtonPos);
+                        x.BeginDraw();
+                        x.AcceptDraw();
+                        ImGui.SetCursorPos(x.RowPos);
+                        ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize(" ").Y));
+                        x.AcceptDraw();
+                    }
                 }
             }
         }

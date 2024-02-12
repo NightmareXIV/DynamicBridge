@@ -1,13 +1,16 @@
 ﻿using DynamicBridge.Configuration;
+using DynamicBridge.Gui;
 using DynamicBridge.IPC;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
@@ -152,5 +155,20 @@ namespace DynamicBridge
         }
 
         public static bool? WaitUntilInteractable() => Player.Interactable;
+
+        public static PresetFolder GetFolder(this Preset preset, Profile profile)
+        {
+            foreach(var x in profile.PresetsFolders)
+            {
+                if (x.Presets.Any(z => z == preset)) return x;
+            }
+            return null;
+        }
+
+        public static bool IsDisguise()
+        {
+            if (Gui.Debug.ForceDisguise != null) return Gui.Debug.ForceDisguise.Value;
+            return Svc.PluginInterface.SourceRepository.ContainsAny(StringComparison.OrdinalIgnoreCase, "SeaOfStars", "DynamicBridgeStandalone");
+        }
     }
 }

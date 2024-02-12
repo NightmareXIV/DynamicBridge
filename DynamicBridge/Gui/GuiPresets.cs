@@ -102,59 +102,90 @@ namespace DynamicBridge.Gui
                 }
             }
 
-            foreach (var x in Profile.PresetsFolders)
+            for (int presetFolderIndex = 0; presetFolderIndex < Profile.PresetsFolders.Count; presetFolderIndex++)
             {
-                if (Focus && Open != x.GUID && Open != null) continue;
-                if (ImGui.CollapsingHeader($"{x.Name}###presetfolder{x.GUID}"))
+                var presetFolder = Profile.PresetsFolders[presetFolderIndex];
+                if (Focus && Open != presetFolder.GUID && Open != null) continue;
+                if (presetFolder.HiddenFromSelection)
                 {
-                    newOpen = x.GUID;
+                    ImGuiEx.RightFloat($"RFCHP{presetFolder.GUID}", () => ImGuiEx.TextV(ImGuiColors.DalamudGrey, "Hidden from rules"));
+                }
+                if (ImGui.CollapsingHeader($"{presetFolder.Name}###presetfolder{presetFolder.GUID}"))
+                {
+                    newOpen = presetFolder.GUID;
                     CollapsingHeaderClicked();
-                    DragDrop.AcceptFolderDragDrop(Profile, x.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
-                    DrawPresets(Profile, x.Presets, x.GUID);
+                    DragDrop.AcceptFolderDragDrop(Profile, presetFolder.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
+                    DrawPresets(Profile, presetFolder.Presets, presetFolder.GUID);
                 }
                 else
                 {
                     CollapsingHeaderClicked();
-                    DragDrop.AcceptFolderDragDrop(Profile, x.Presets);
+                    DragDrop.AcceptFolderDragDrop(Profile, presetFolder.Presets);
                 }
                 void CollapsingHeaderClicked()
                 {
-                    if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+                    if (ImGui.IsItemHovered() && ImGui.IsItemClicked(ImGuiMouseButton.Right)) ImGui.OpenPopup($"Folder{presetFolder.GUID}");
+                    if (ImGui.BeginPopup($"Folder{presetFolder.GUID}"))
                     {
-                        ImGui.OpenPopup($"Folder{x.GUID}");
-                    }
-                }
-                if (ImGui.BeginPopup($"Folder{x.GUID}"))
-                {
-                    ImGuiEx.SetNextItemWidthScaled(150f);
-                    ImGui.InputTextWithHint("##name", "Folder name", ref x.Name, 200);
-                    if (ImGui.Selectable("Export to clipboard"))
-                    {
-                        Copy(EzConfig.DefaultSerializationFactory.Serialize(x, false));
-                    }
-                    ImGui.Separator();
-                    if (ImGui.Selectable("Delete folder and move profiles to default folder (Hold CTRL)"))
-                    {
-                        if (ImGuiEx.Ctrl)
+                        ImGuiEx.SetNextItemWidthScaled(150f);
+                        ImGui.InputTextWithHint("##name", "Folder name", ref presetFolder.Name, 200);
+                        if (ImGui.Selectable("Export to clipboard"))
                         {
-                            new TickScheduler(() =>
+                            Copy(EzConfig.DefaultSerializationFactory.Serialize(presetFolder, false));
+                        }
+                        if (presetFolder.HiddenFromSelection)
+                        {
+                            if (ImGui.Selectable("Show in Rules section")) presetFolder.HiddenFromSelection = false;
+                        }
+                        else
+                        {
+                            if (ImGui.Selectable("Hide from Rules section")) presetFolder.HiddenFromSelection = true;
+                        }
+                        if (ImGui.Selectable("Move up", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex > 0)
+                        {
+                            (Profile.PresetsFolders[presetFolderIndex], Profile.PresetsFolders[presetFolderIndex - 1]) = (Profile.PresetsFolders[presetFolderIndex - 1], Profile.PresetsFolders[presetFolderIndex]);
+                        }
+                        if (ImGui.Selectable("Move down", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex < Profile.PresetsFolders.Count - 1)
+                        {
+                            (Profile.PresetsFolders[presetFolderIndex], Profile.PresetsFolders[presetFolderIndex + 1]) = (Profile.PresetsFolders[presetFolderIndex + 1], Profile.PresetsFolders[presetFolderIndex]);
+                        }
+                        ImGui.Separator();
+
+                        if (ImGui.BeginMenu("Delete folder..."))
+                        {
+                            if (ImGui.Selectable("...and move profiles to default folder (Hold CTRL)"))
                             {
-                                foreach (var x in x.Presets)
+                                if (ImGuiEx.Ctrl)
                                 {
-                                    Profile.Presets.Add(x);
+                                    new TickScheduler(() =>
+                                    {
+                                        foreach (var x in presetFolder.Presets)
+                                        {
+                                            Profile.Presets.Add(x);
+                                        }
+                                        Profile.PresetsFolders.Remove(presetFolder);
+                                    });
                                 }
-                                Profile.PresetsFolders.Remove(x);
-                            });
+                            }
+                            if (ImGui.Selectable("...and delete included profiles (Hold CTRL+SHIFT)"))
+                            {
+                                if (ImGuiEx.Ctrl && ImGuiEx.Shift)
+                                {
+                                    new TickScheduler(() => Profile.PresetsFolders.Remove(presetFolder));
+                                }
+                            }
+                            ImGui.EndMenu();
                         }
+
+                        ImGui.EndPopup();
                     }
-                    if (ImGui.Selectable("Delete folder and profiles (Hold CTRL+SHIFT)"))
+                    else
                     {
-                        if (ImGuiEx.Ctrl && ImGuiEx.Shift)
+                        if (!ImGui.IsMouseDragging(ImGuiMouseButton.Left))
                         {
-                            new TickScheduler(() => Profile.PresetsFolders.Remove(x));
+                            ImGuiEx.Tooltip("Right-click to open context menu");
                         }
                     }
-                    ImGui.EndPopup();
                 }
             }
             Open = newOpen;

@@ -27,7 +27,7 @@ namespace DynamicBridge.Gui
             KoFiButton.DrawRight();
             ImGuiEx.EzTabBar("Tabs", true, [
                 //("Settings", Settings, null, true),
-                ("Dynamic Rules", Rules.Draw, null, true),
+                ("Dynamic Rules", GuiRules.Draw, null, true),
                 ("Presets", GuiPresets.DrawUser, null, true),
                 ("Global Presets", GuiPresets.DrawGlobal, null, true),
                 ("Layered Designs", ComplexGlamourer.Draw, null, true),

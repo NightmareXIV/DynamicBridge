@@ -62,4 +62,16 @@ public static class DragDrop
             }
         }
     }
+
+    public static void AcceptRuleDragDrop(Profile currentProfile, int i)
+    {
+        if (ImGui.BeginDragDropTarget())
+        {
+            if (ImGuiDragDrop.AcceptDragDropPayload("MoveRule", out var payload, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+            {
+                MoveItemToPosition(currentProfile.Rules, (x) => x.GUID == payload, i);
+            }
+            ImGui.EndDragDropTarget();
+        }
+    }
 }

@@ -20,8 +20,10 @@ namespace DynamicBridge.Gui
         static bool TestBool = false;
         static bool? TestBool2 = null;
         static string cont = "Test button";
+        public static bool? ForceDisguise = null;
         public static void Draw()
         {
+            ImGuiEx.Checkbox("Disguise", ref ForceDisguise);
             if (ImGui.CollapsingHeader("Time"))
             {
                 var time = *ETimeChecker.ET;
