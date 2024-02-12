@@ -28,7 +28,8 @@ namespace DynamicBridge.Gui
             ImGuiEx.EzTabBar("Tabs", true, [
                 //("Settings", Settings, null, true),
                 ("Dynamic Rules", Rules.Draw, null, true),
-                ("Presets", GuiPresets.Draw, null, true),
+                ("Presets", GuiPresets.DrawUser, null, true),
+                ("Global Presets", GuiPresets.DrawGlobal, null, true),
                 ("Layered Designs", ComplexGlamourer.Draw, null, true),
                 ("House Registration", HouseReg.Draw, null, true),
                 ("Settings", GuiSettings.Draw, null, true),

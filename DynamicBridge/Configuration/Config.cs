@@ -13,8 +13,7 @@ namespace DynamicBridge.Configuration
         public HashSet<ulong> Blacklist = [];
         public List<HousingRecord> Houses = [];
         public List<ComplexGlamourerEntry> ComplexGlamourerEntries = [];
-        public List<Preset> GlobalPresets = [];
-        public List<PresetFolder> GlobalPresetsFolders = [];
+        public Profile GlobalProfile = new() { Name = "Global profile" };
         public Dictionary<ulong, Profile> Profiles = [];
         public bool Debug = false;
         public bool EnableGlamourer = true;

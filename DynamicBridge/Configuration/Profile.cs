@@ -15,20 +15,25 @@ namespace DynamicBridge.Configuration
         public List<PresetFolder> PresetsFolders = [];
         public string ForcedPreset = null;
 
-        public IEnumerable<Preset> GetPresetsUnion()
+        public bool IsGlobal => C.GlobalProfile == this;
+
+        public IEnumerable<Preset> GetPresetsUnion(bool includeGlobal = true)
         {
-            foreach(var x in GetPresetsListUnion())
+            foreach(var x in GetPresetsListUnion(includeGlobal))
             {
                 foreach(var z in x) yield return z;
             }
         }
 
-        public IEnumerable<List<Preset>> GetPresetsListUnion()
+        public IEnumerable<List<Preset>> GetPresetsListUnion(bool includeGlobal = true)
         {
             yield return Presets;
             foreach (var x in PresetsFolders) yield return x.Presets;
-            yield return C.GlobalPresets;
-            foreach (var x in C.GlobalPresetsFolders) yield return x.Presets;
+            if (!IsGlobal && includeGlobal)
+            {
+                yield return C.GlobalProfile.Presets;
+                foreach (var x in C.GlobalProfile.PresetsFolders) yield return x.Presets;
+            }
         }
     }
 }

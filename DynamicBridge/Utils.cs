@@ -43,7 +43,7 @@ namespace DynamicBridge
 
         public static void SetStatic(this Profile p, Preset preset)
         {
-            p.GetPresetsUnion().Each(x => x.IsStatic = false);
+            p.GetPresetsUnion(false).Each(x => x.IsStatic = false);
             preset.IsStatic = true;
         }
 
