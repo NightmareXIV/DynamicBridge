@@ -42,9 +42,10 @@ public static unsafe class ComplexGlamourer
                     {
                         var name = x.Name;
                         var id = x.Identifier.ToString();
-                        if (Filter.Length > 0 && !name.Contains(Filter, StringComparison.OrdinalIgnoreCase)) continue;
+                        var transformedName = GlamourerManager.TransformName(id);
+                        if (Filter.Length > 0 && !transformedName.Contains(Filter, StringComparison.OrdinalIgnoreCase)) continue;
                         if (OnlySelected && !gEntry.Designs.Contains(id)) continue;
-                        ImGuiEx.CollectionCheckbox($"{name}##{x.Identifier}", id, gEntry.Designs);
+                        ImGuiEx.CollectionCheckbox($"{transformedName}##{x.Identifier}", id, gEntry.Designs);
                     }
                     foreach (var x in gEntry.Designs)
                     {

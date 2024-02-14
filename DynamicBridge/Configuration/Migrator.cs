@@ -42,8 +42,8 @@ public class Migrator
                         }
                     }
                 }
+                Svc.Framework.Update -= DoGlamourerMigration;
             }
-            Svc.Framework.Update -= DoGlamourerMigration;
         }
     }
 

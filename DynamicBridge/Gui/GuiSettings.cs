@@ -1,4 +1,5 @@
 ﻿using DynamicBridge.Configuration;
+using DynamicBridge.IPC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +28,22 @@ public static class GuiSettings
         ImGui.SameLine();
         ImGuiEx.SetNextItemWidthScaled(200f);
         ImGuiEx.EnumCombo("##dbglamdef", ref C.GlamNoRuleBehaviour, GlamourerNoRuleBehaviorNames);
-        ImGui.Checkbox("[Beta] Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
+        if (C.ManageGlamourerAutomation)
+        {
+            if(C.GlamNoRuleBehaviour != GlamourerNoRuleBehavior.RevertToAutomation)
+            {
+                ImGuiEx.HelpMarker("Revert to Automation is recommended if you are using Glamourer automation.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+            }
+        }
+        ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
         ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
+        if (GlamourerReflector.GetAutomationGlobalState())
+        {
+            if (!C.ManageGlamourerAutomation)
+            {
+                ImGuiEx.HelpMarker("You MUST enable this setting or disable Glamourer's automation, otherwise either Glamourer's or DynamicBridge's automation will not work correctly.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+            }
+        }
         ImGui.Checkbox("Display full path in design selection dropdown", ref C.GlamourerFullPath);
         ImGui.Separator();
         ImGui.Checkbox("Customize+", ref C.EnableCustomize);

@@ -51,7 +51,7 @@ namespace DynamicBridge.IPC
             }
             catch (Exception ex)
             {
-                ex.Log();
+                InternalLog.Error(ex.ToString());
             }
             return [];
         }

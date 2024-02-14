@@ -23,6 +23,7 @@ namespace DynamicBridge.Configuration
         public bool ManageGlamourerAutomation = false;
         public bool AllowNegativeConditions = false;
         public bool GlamourerFullPath = false;
+        public string LastVersion = "0";
     }
 
     public enum GlamourerNoRuleBehavior

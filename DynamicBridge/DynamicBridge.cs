@@ -4,7 +4,9 @@ using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC;
 using ECommons.Automation;
+using ECommons.ChatMethods;
 using ECommons.Configuration;
+using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
 using ECommons.GameFunctions;
@@ -14,6 +16,8 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 
 namespace DynamicBridge
 {
@@ -40,6 +44,24 @@ namespace DynamicBridge
             new TickScheduler(() =>
             {
                 C = EzConfig.Init<Config>();
+                var ver = this.GetType().Assembly.GetName().Version.ToString();
+                if(C.LastVersion != ver)
+                {
+                    try
+                    {
+                        using (FileStream fs = new FileStream(Path.Combine(Svc.PluginInterface.ConfigDirectory.FullName, $"Backup_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}.zip"), FileMode.Create))
+                        using (ZipArchive arch = new ZipArchive(fs, ZipArchiveMode.Create))
+                        {
+                            arch.CreateEntryFromFile(EzConfig.DefaultConfigurationFileName, EzConfig.DefaultSerializationFactory.DefaultConfigFileName);
+                        }
+                        C.LastVersion = ver;
+                        DuoLog.Information($"Because plugin version was changed, a backup of your current configuraton has been created.");
+                    }
+                    catch(Exception e)
+                    {
+                        e.Log();
+                    }
+                }
                 EzConfigGui.Init(UI.DrawMain);
                 EzCmd.Add("/db", OnCommand, "open the plugin settings\n/db apply - reapply rules immediately\n/db static <name> - mark preset as static\n/db dynamic - cancel static preset and use dynamic rules");
                 AgentMapInst = AgentMap.Instance();
@@ -54,7 +76,26 @@ namespace DynamicBridge
                     TimeoutSilently = false,
                 };
                 Migrator = new();
+                ProperOnLogin.RegisterInteractable(WarnAutomation, true);
             });
+        }
+
+        private void WarnAutomation()
+        {
+            if (C.EnableGlamourer)
+            {
+                if (GlamourerReflector.GetAutomationGlobalState())
+                {
+                    if(C.ManageGlamourerAutomation)
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        ChatPrinter.Orange("[DynamicBridge] Glamourer automation is enabled but DynamicBridge is not configured to work together with it. This will cause issues. Either disable Glamourer automation or configure DynamicBridge accordingly (/db - settings).");
+                    }
+                }
+            }
         }
 
         private void OnCommand(string command, string arguments)

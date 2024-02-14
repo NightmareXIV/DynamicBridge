@@ -184,6 +184,9 @@
         <None Update="res\state\6.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="res\state\7.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="res\zgrp\0.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

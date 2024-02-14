@@ -19,6 +19,8 @@ namespace DynamicBridge
             [CharacterState.Flying_in_the_air] = () => Svc.Condition[ConditionFlag.Mounted] && Svc.Condition[ConditionFlag.InFlight],
             [CharacterState.Diving] = () => Svc.Condition[ConditionFlag.Diving] && !Svc.Condition[ConditionFlag.Mounted],
             [CharacterState.Wading_in_water] = () => !Svc.Condition[ConditionFlag.Diving] && !Svc.Condition[ConditionFlag.Swimming] && Utils.IsInWater,
+            [CharacterState.Watching_cutscene] = () => Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                || Svc.Condition[ConditionFlag.WatchingCutscene78],
         };
 
         public static bool Check(this CharacterState state)

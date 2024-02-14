@@ -15,5 +15,6 @@ namespace DynamicBridge
         Flying_in_the_air,
         Flying_underwater,
         Wading_in_water,
+        Watching_cutscene
     }
 }

@@ -341,14 +341,15 @@ namespace DynamicBridge.Gui
 
                                 // normal
                                 {
-                                    var designs = GlamourerManager.GetDesigns().OrderBy(x => x.Name);
+                                    var designs = GlamourerManager.GetDesigns().OrderBy(x => GlamourerManager.TransformName(x.Identifier.ToString()));
                                     foreach (var x in designs)
                                     {
                                         var name = x.Name;
                                         var id = x.Identifier.ToString();
-                                        if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                        var transformedName = GlamourerManager.TransformName(x.Identifier.ToString());
+                                        if (Filters[filterCnt].Length > 0 && !transformedName.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         if (OnlySelected[filterCnt] && !preset.Glamourer.Contains(id)) continue;
-                                        ImGuiEx.CollectionCheckbox($"{GlamourerManager.TransformName(x.Identifier.ToString())}##{x.Identifier}", id, preset.Glamourer);
+                                        ImGuiEx.CollectionCheckbox($"{transformedName}##{x.Identifier}", id, preset.Glamourer);
                                     }
                                     foreach (var x in preset.Glamourer)
                                     {
