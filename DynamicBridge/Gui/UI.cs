@@ -11,6 +11,7 @@ namespace DynamicBridge.Gui
         public static ulong SelectedCID = 0;
         public static ulong CurrentCID => SelectedCID == 0 ? Player.CID : SelectedCID;
         public const string RandomNotice = "Will be randomly selected between:\n";
+        public const string AnyNotice = "Meeting any of the following conditions will result in rule being triggered:\n";
 
         public static void DrawMain()
         {

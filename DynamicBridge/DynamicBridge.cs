@@ -31,6 +31,7 @@ namespace DynamicBridge
         public TaskManager TaskManager;
         public const int DelayMS = 100;
         public static ApplyRule StaticRule = new();
+        public static Migrator Migrator;
 
         public DynamicBridge(DalamudPluginInterface pi)
         {
@@ -52,6 +53,7 @@ namespace DynamicBridge
                     AbortOnTimeout = true,
                     TimeoutSilently = false,
                 };
+                Migrator = new();
             });
         }
 
@@ -133,23 +135,32 @@ namespace DynamicBridge
                             if (
                                 x.Enabled
                                 &&
-                                (x.States.Count == 0 || x.States.Any(s => s.Check()))
+                                (x.States.Count == 0 || x.States.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.States.Any(s => s.Check()))
                                 &&
-                                (x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check()))
+                                (x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.SpecialTerritories.Any(s => s.Check()))
                                 &&
-                                (x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check()))
+                                (x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Biomes.Any(s => s.Check()))
                                 &&
-                                (x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather()))
+                                (x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Weathers.Contains(WeatherManager.GetWeather()))
                                 &&
-                                (x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType))
+                                (x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType)) 
+                                && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))
                                 &&
-                                (x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))
+                                (x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))
                                 &&
                                 (x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
+                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))
                                 &&
                                 (x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
+                                && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))
                                 &&
                                 (x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
+                                && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
                                 )
                             {
                                 newRule.Add(x);
@@ -201,7 +212,7 @@ namespace DynamicBridge
                                             var isNull = true;
                                             foreach (var name in designs)
                                             {
-                                                var design = Utils.GetDesignByName(name);
+                                                var design = Utils.GetDesignByGUID(name);
                                                 if (design != null)
                                                 {
                                                     DoNullGlamourer = false;

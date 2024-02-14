@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using ECommons.GameFunctions;
 using DynamicBridge.Configuration;
 using Action = System.Action;
+using Emote = Lumina.Excel.GeneratedSheets.Emote;
 
 namespace DynamicBridge.Gui
 {
@@ -165,7 +166,7 @@ namespace DynamicBridge.Gui
                         {
                             //Conditions
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##conditions", rule.States.Select(x => x.ToString().Replace("_", " ")).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##conditions", rule.States.PrintRange(rule.Not.States, out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<CharacterState>())
@@ -178,11 +179,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox(name, cond, rule.States);
+                                    DrawSelector(name, cond, rule.States, rule.Not.States);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -191,7 +192,7 @@ namespace DynamicBridge.Gui
                         {
                             //Biome
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##biome", rule.Biomes.Select(x => x.ToString().Replace("_", " ")).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##biome", rule.Biomes.PrintRange(rule.Not.Biomes, out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<Biome>())
@@ -205,11 +206,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox(name, cond, rule.Biomes);
+                                    DrawSelector(name, cond, rule.Biomes, rule.Not.Biomes);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -218,7 +219,7 @@ namespace DynamicBridge.Gui
                         {
                             //Weather
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##weather", rule.Weathers.Select(x => P.WeatherManager.Weathers[x]).ToHashSet().PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##weather", rule.Weathers.Select(x => P.WeatherManager.Weathers[x]).ToHashSet().PrintRange(rule.Not.Weathers.Select(x => P.WeatherManager.Weathers[x]).ToHashSet(), out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in P.WeatherManager.WeatherNames)
@@ -232,11 +233,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox($"{cond.Key}##{cond.Value.First()}", P.WeatherManager.WeatherNames[cond.Key], rule.Weathers);
+                                    DrawSelector($"{cond.Key}##{cond.Value.First()}", P.WeatherManager.WeatherNames[cond.Key], rule.Weathers, rule.Not.Weathers);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -245,7 +246,7 @@ namespace DynamicBridge.Gui
                         {
                             //Time
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##Time", rule.Times.Select(x => x.ToString().Replace("_", " ")).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##Time", rule.Times.PrintRange(rule.Not.Times, out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<ETime>())
@@ -253,12 +254,12 @@ namespace DynamicBridge.Gui
                                     var name = cond.ToString().Replace("_", " ");
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.Times.Contains(cond)) continue;
-                                    ImGuiEx.CollectionCheckbox(name, cond, rule.Times);
+                                    DrawSelector(name, cond, rule.Times, rule.Not.Times);
                                     ImGuiEx.Tooltip($"{ETimeChecker.Names[cond]}");
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -267,7 +268,7 @@ namespace DynamicBridge.Gui
                         {
                             //Zone groups
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##zgroup", rule.SpecialTerritories.Select(x => SpecialTerritoryChecker.Renames.TryGetValue(x, out var s)?s:x.ToString().Replace("_", " ")).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##zgroup", rule.SpecialTerritories.Select(x => SpecialTerritoryChecker.Renames.TryGetValue(x, out var s)?s:x.ToString().Replace("_", " ")).PrintRange(rule.Not.SpecialTerritories.Select(x => SpecialTerritoryChecker.Renames.TryGetValue(x, out var s) ? s : x.ToString().Replace("_", " ")), out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<SpecialTerritory>())
@@ -280,11 +281,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox(name, cond, rule.SpecialTerritories);
+                                    DrawSelector(name, cond, rule.SpecialTerritories, rule.Not.SpecialTerritories);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -293,16 +294,46 @@ namespace DynamicBridge.Gui
                         {
                             //Zone
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##zone", rule.Territories.Select(x => ExcelTerritoryHelper.GetName(x)).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##zone", rule.Territories.Select(x => ExcelTerritoryHelper.GetName(x)).PrintRange(rule.Not.Territories.Select(x => ExcelTerritoryHelper.GetName(x)), out var fullList)))
                             {
-                                new TerritorySelector(rule.Territories, (terr, s) => rule.Territories = [.. s])
+                                if (C.AllowNegativeConditions)
                                 {
-                                    ActionDrawPlaceName = DrawPlaceName
-                                };
-                                ImGui.CloseCurrentPopup();
+                                    if (ImGui.Selectable("Open allow list editor"))
+                                    {
+                                        new TerritorySelector(rule.Territories, (terr, s) =>
+                                        {
+                                            rule.Territories = [.. s];
+                                            rule.Not.Territories.RemoveAll(x => rule.Territories.Contains(x));
+                                        })
+                                        {
+                                            ActionDrawPlaceName = DrawPlaceName,
+                                            WindowName = $"Select allow list zones"
+                                        };
+                                    }
+                                    if (ImGui.Selectable("Open deny list editor"))
+                                    {
+                                        new TerritorySelector(rule.Territories, (terr, s) =>
+                                        {
+                                            rule.Not.Territories = [.. s];
+                                            rule.Territories.RemoveAll(x => rule.Not.Territories.Contains(x));
+                                        })
+                                        {
+                                            ActionDrawPlaceName = DrawPlaceName,
+                                            WindowName = $"Select deny list zones"
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    new TerritorySelector(rule.Territories, (terr, s) => rule.Territories = [.. s])
+                                    {
+                                        ActionDrawPlaceName = DrawPlaceName
+                                    };
+                                    ImGui.CloseCurrentPopup();
+                                }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                         }
 
                         ImGui.TableNextColumn();
@@ -310,7 +341,7 @@ namespace DynamicBridge.Gui
                         {
                             //House
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##house", rule.Houses.Select(x => C.Houses.FirstOrDefault(h => h.ID == x)?.Name ?? $"{x:X16}").PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##house", rule.Houses.Select(x => C.Houses.FirstOrDefault(h => h.ID == x)?.Name ?? $"{x:X16}").PrintRange(rule.Not.Houses.Select(x => C.Houses.FirstOrDefault(h => h.ID == x)?.Name ?? $"{x:X16}"), out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var z in C.Houses)
@@ -318,7 +349,7 @@ namespace DynamicBridge.Gui
                                     var name = z.Name;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.Houses.Contains(z.ID)) continue;
-                                    ImGuiEx.CollectionCheckbox(name + $"##{z.GUID}", z.ID, rule.Houses);
+                                    DrawSelector(name + $"##{z.GUID}", z.ID, rule.Houses, rule.Not.Houses);
                                 }
                                 foreach (var z in rule.Houses)
                                 {
@@ -331,7 +362,7 @@ namespace DynamicBridge.Gui
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -340,7 +371,7 @@ namespace DynamicBridge.Gui
                         {
                             //Emote
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##emote", rule.Emotes.Select(x => Svc.Data.GetExcelSheet<Emote>().GetRow(x).Name.ExtractText()).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##emote", rule.Emotes.Select(x => Svc.Data.GetExcelSheet<Emote>().GetRow(x).Name.ExtractText()).PrintRange(rule.Not.Emotes.Select(x => Svc.Data.GetExcelSheet<Emote>().GetRow(x).Name.ExtractText()), out var fullList)))
                             {
                                 FiltersSelection();
 
@@ -354,7 +385,7 @@ namespace DynamicBridge.Gui
                                         ImGui.SameLine();
                                     }
                                     ImGui.PushStyleColor(ImGuiCol.Text, EColor.CyanBright);
-                                    ImGuiEx.CollectionCheckbox($"Current: {id}/{cond.Name.ExtractText()}##{cond.RowId}", cond.RowId, rule.Emotes);
+                                    DrawSelector($"Current: {id}/{cond.Name.ExtractText()}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
                                     ImGui.PopStyleColor();
                                     ImGui.Separator();
                                 }
@@ -369,11 +400,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox($"{name}##{cond.RowId}", cond.RowId, rule.Emotes);
+                                    DrawSelector($"{name}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -383,7 +414,7 @@ namespace DynamicBridge.Gui
                             //Job
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
                             rule.Jobs.RemoveAll(x => x.IsUpgradeable());
-                            if (ImGui.BeginCombo("##job", rule.Jobs.Select(x => x.ToString().Replace("_", " ")).PrintRange(out var fullList)))
+                            if (ImGui.BeginCombo("##job", rule.Jobs.PrintRange(rule.Not.Jobs, out var fullList)))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<Job>().Where(x => !x.IsUpgradeable()).OrderByDescending(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Role))
@@ -397,11 +428,11 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    ImGuiEx.CollectionCheckbox(name, cond, rule.Jobs);
+                                    DrawSelector(name, cond, rule.Jobs, rule.Not.Jobs);
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                             filterCnt++;
                         }
 
@@ -476,6 +507,52 @@ namespace DynamicBridge.Gui
                 ImGui.SameLine();
             }
             ImGuiEx.Text(nullable, arg2);
+        }
+        static void DrawSelector<T>(string name, T value, ICollection<T> values, ICollection<T> notValues) => DrawSelector(name, [value], values, notValues);
+
+        static void DrawSelector<T>(string name, IEnumerable<T> value, ICollection<T> values, ICollection<T> notValues)
+        {
+            var buttonSize = ImGuiHelpers.GetButtonSize(" ");
+            var size = new Vector2(buttonSize.Y);
+            bool? s = false;
+            if (values.ContainsAny(value)) s = true;
+            if (notValues.ContainsAny(value)) s = null;
+
+            if(ImGuiEx.Checkbox(name, ref s))
+            {
+                if(!C.AllowNegativeConditions && s == null)
+                {
+                    s = true;
+                }
+                if(s == true)
+                {
+                    foreach (var v in value)
+                    {
+                        notValues.Remove(v);
+                        values.Add(v);
+                    }
+                }
+                else if(s == false)
+                {
+                    foreach (var v in value)
+                    {
+                        notValues.Remove(v);
+                        values.Remove(v);
+                    }
+                }
+                else
+                {
+                    foreach (var v in value)
+                    {
+                        notValues.Add(v);
+                        values.Remove(v);
+                    }
+                }
+            }
+            if (s == null)
+            {
+                ImGuiEx.Tooltip($"If matching any condition with dot, rule will not be applied.");
+            }
         }
     }
 }

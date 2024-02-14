@@ -1,9 +1,11 @@
 ﻿using ECommons.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.AxHost;
 
 namespace DynamicBridge.IPC;
 public static class GlamourerReflector
@@ -38,5 +40,37 @@ public static class GlamourerReflector
         {
             ex.LogWarning();
         }
+    }
+
+    public static string GetPathForDesignByGuid(Guid guid)
+    {
+        try
+        {
+            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            {
+                var manager = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignManager"], []);
+                var designList = manager.GetFoP<System.Collections.IList>("Designs");
+                foreach(var design in designList)
+                {
+                    if(design.GetFoP<Guid>("Identifier") == guid)
+                    {
+                        var dfs = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignFileSystem"], []);
+                        object[] findLeafArray = [design, null];
+                        if (dfs.Call<bool>("FindLeaf", findLeafArray, false))
+                        {
+                            var ret = findLeafArray[1].Call<string>("FullName", []);
+                            //PluginLog.Information($"Path for {guid} is {ret}");
+                            return ret;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            InternalLog.Warning(ex.ToString());
+        }
+        return null;
     }
 }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,12 +75,12 @@ namespace DynamicBridge
             return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRow(Svc.ClientState.TerritoryType)?.PlaceNameRegion.Value?.Name?.ExtractText()}, Ward {h->GetCurrentWard()+1}, plot {h->GetCurrentPlot()+1}";
         }
 
-        public static DesignListEntry? GetDesignByName(string name)
+        public static DesignListEntry? GetDesignByGUID(string GUID)
         {
             var designs = GlamourerManager.GetDesigns();
             foreach(var d in designs)
             {
-                if (d.Name == name) return d;
+                if (d.Identifier.ToString() == GUID) return d;
             }
             return null;
         }
@@ -137,9 +138,28 @@ namespace DynamicBridge
             FullList = null;
             var list = s.ToArray();
             if (list.Length == 0) return noneStr;
-            if(list.Length == 1) return list[0].ToString();
+            if (list.Length == 1) return list[0].ToString();
             FullList = list.Select(x => x.ToString()).Join("\n");
             return $"{list.Length} selected";
+        }
+
+        public static string PrintRange<T>(this IEnumerable<T> s, IEnumerable<T> notS, out string FullList, string noneStr = "Any")
+        {
+            if (!C.AllowNegativeConditions)
+            {
+                return PrintRange(s.Select(x => x.ToString().Replace("_", " ")), out FullList, noneStr);
+            }
+            FullList = null;
+            var list = s.Select(x => x.ToString().Replace("_", " ")).ToArray();
+            var notList = notS.Select(x => x.ToString().Replace("_", " ")).ToArray();
+            if (list.Length == 0 && notList.Length == 0) return noneStr;
+            FullList = list.Select(x => x.ToString()).Join("\n");
+            if (notList.Length > 0)
+            {
+                FullList += "\nMeeting any of these condition will make rule invalid:\n";
+                FullList += notList.Select(x => x.ToString()).Join("\n");
+            }
+            return $"{list.Length} | {notList.Length} selected";
         }
 
         public static List<uint> GetArmor()

@@ -12,6 +12,7 @@ namespace DynamicBridge.Configuration
     {
         [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
         public bool Enabled = true;
+
         public List<CharacterState> States = [];
         public List<SpecialTerritory> SpecialTerritories = [];
         public List<Biome> Biomes = [];
@@ -20,8 +21,24 @@ namespace DynamicBridge.Configuration
         public List<long> Houses = [];
         public List<uint> Emotes = [];
         public List<Job> Jobs = [];
-        public List<string> SelectedPresets = [];
         public List<ETime> Times = [];
+
+        public List<string> SelectedPresets = [];
         public bool Passthrough = false;
+        public NotConditions Not = new();
+
+        [Serializable]
+        public class NotConditions
+        {
+            public List<CharacterState> States = [];
+            public List<SpecialTerritory> SpecialTerritories = [];
+            public List<Biome> Biomes = [];
+            public List<uint> Territories = [];
+            public List<uint> Weathers = [];
+            public List<long> Houses = [];
+            public List<uint> Emotes = [];
+            public List<Job> Jobs = [];
+            public List<ETime> Times = [];
+        }
     }
 }

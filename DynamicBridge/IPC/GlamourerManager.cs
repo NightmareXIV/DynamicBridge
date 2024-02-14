@@ -43,7 +43,7 @@ namespace DynamicBridge.IPC
             }
         }
 
-        public static DesignListEntry[] GetDesignListIPC()
+        static DesignListEntry[] GetDesignListIPC()
         {
             try
             {
@@ -121,6 +121,22 @@ namespace DynamicBridge.IPC
         public static DesignListEntry[] GetDesigns()
         {
             return GetDesignListIPC();
+        }
+
+        public static string TransformName(string originalName)
+        {
+            if(Guid.TryParse(originalName, out Guid guid))
+            {
+                if(GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
+                {
+                    if (C.GlamourerFullPath)
+                    {
+                        return GlamourerReflector.GetPathForDesignByGuid(guid) ?? entry.Name;
+                    }
+                    return entry.Name;
+                }
+            }
+            return originalName;
         }
     }
 }

@@ -18,7 +18,6 @@ namespace DynamicBridge.Gui
         static string CurrentDrag = null;
         static bool Focus = false;
         static string Open = null;
-        static int RowHeight;
         public static void DrawUser()
         {
             UI.ProfileSelectorCommon();
@@ -195,7 +194,6 @@ namespace DynamicBridge.Gui
         {
             var cnt = 3;
             if (C.EnableHonorific) cnt++;
-            if (C.EnablePalette) cnt++;
             if (C.EnableCustomize) cnt++;
             if (C.EnableGlamourer) cnt++;
             List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
@@ -204,7 +202,6 @@ namespace DynamicBridge.Gui
                 ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort);
                 ImGui.TableSetupColumn("Name");
                 if(C.EnableGlamourer) ImGui.TableSetupColumn("Glamourer");
-                if (C.EnablePalette) ImGui.TableSetupColumn("Palette+");
                 if (C.EnableCustomize) ImGui.TableSetupColumn("Customize+");
                 if (C.EnableHonorific) ImGui.TableSetupColumn("Honorific");
                 ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
@@ -338,7 +335,7 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer, .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -")))
+                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -")))
                             {
                                 FiltersSelection();
 
@@ -348,13 +345,14 @@ namespace DynamicBridge.Gui
                                     foreach (var x in designs)
                                     {
                                         var name = x.Name;
+                                        var id = x.Identifier.ToString();
                                         if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                        if (OnlySelected[filterCnt] && !preset.Glamourer.Contains(name)) continue;
-                                        ImGuiEx.CollectionCheckbox($"{name}##{x.Identifier}", x.Name, preset.Glamourer);
+                                        if (OnlySelected[filterCnt] && !preset.Glamourer.Contains(id)) continue;
+                                        ImGuiEx.CollectionCheckbox($"{GlamourerManager.TransformName(x.Identifier.ToString())}##{x.Identifier}", id, preset.Glamourer);
                                     }
                                     foreach (var x in preset.Glamourer)
                                     {
-                                        if (designs.Any(d => d.Name == x)) continue;
+                                        if (designs.Any(d => d.Identifier.ToString() == x)) continue;
                                         ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                         ImGuiEx.CollectionCheckbox($"{x}", x, preset.Glamourer, false, true);
                                         ImGui.PopStyleColor();
@@ -370,7 +368,7 @@ namespace DynamicBridge.Gui
                                         var name = x.Name;
                                         if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         if (OnlySelected[filterCnt] && !preset.ComplexGlamourer.Contains(name)) continue;
-                                        FontAwesome.Layers.ImGuiText("Complex Glamourer entry");
+                                        FontAwesome.Layers.ImGuiText("Layered Design");
                                         ImGui.SameLine();
                                         ImGuiEx.CollectionCheckbox($"{name}##{x.GUID}", x.Name, preset.ComplexGlamourer);
                                     }
@@ -379,48 +377,12 @@ namespace DynamicBridge.Gui
                                     {
                                         if (designs.Any(d => d.Name == x)) continue;
                                         ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                        FontAwesome.Layers.ImGuiText("Complex Glamourer entry");
+                                        FontAwesome.Layers.ImGuiText("Layered Design");
                                         ImGuiEx.CollectionCheckbox($"{x}", x, preset.ComplexGlamourer, false, true);
                                         ImGui.PopStyleColor();
                                     }
                                 }
 
-                                ImGui.EndCombo();
-                            }
-                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
-                            filterCnt++;
-                        }
-                    }
-
-
-                    //palette+
-                    {
-                        if (C.EnablePalette)
-                        {
-                            ImGui.TableNextColumn();
-                            ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##palette", preset.Palette.PrintRange(out var fullList, "- None -")))
-                            {
-                                FiltersSelection();
-                                var palettes = PalettePlusManager.GetPalettes().OrderBy(x => x.Name);
-                                var index = 0;
-                                foreach (var x in palettes)
-                                {
-                                    index++;
-                                    ImGui.PushID(index);
-                                    var name = x.Name;
-                                    if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                    if (OnlySelected[filterCnt] && !preset.Palette.Contains(name)) continue;
-                                    ImGuiEx.CollectionCheckbox($"{name}", x.Name, preset.Palette);
-                                    ImGui.PopID();
-                                }
-                                foreach (var x in preset.Palette)
-                                {
-                                    if (palettes.Any(d => d.Name == x)) continue;
-                                    ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                    ImGuiEx.CollectionCheckbox($"{x}", x, preset.Palette, false, true);
-                                    ImGui.PopStyleColor();
-                                }
                                 ImGui.EndCombo();
                             }
                             if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
