@@ -37,7 +37,7 @@ public static class GuiSettings
         }
         ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
         ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
-        if (GlamourerReflector.GetAutomationGlobalState())
+        if (GlamourerReflector.GetAutomationGlobalState() && GlamourerReflector.GetAutomationStatusForChara())
         {
             if (!C.ManageGlamourerAutomation)
             {

@@ -84,7 +84,7 @@ namespace DynamicBridge
         {
             if (C.EnableGlamourer)
             {
-                if (GlamourerReflector.GetAutomationGlobalState())
+                if (GlamourerReflector.GetAutomationGlobalState() && GlamourerReflector.GetAutomationStatusForChara())
                 {
                     if(C.ManageGlamourerAutomation)
                     {

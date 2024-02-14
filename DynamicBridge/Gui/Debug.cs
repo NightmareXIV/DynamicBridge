@@ -49,6 +49,7 @@ namespace DynamicBridge.Gui
                 if (ImGui.Button("Revert")) GlamourerManager.Revert();
                 if (ImGui.Button("Reset cache")) GlamourerManager.ResetCache();
                 ImGuiEx.Text($"Automation state: {GlamourerReflector.GetAutomationGlobalState()}");
+                ImGuiEx.Text($"Automation state for chara: {GlamourerReflector.GetAutomationStatusForChara()}");
                 if (ImGui.Button("Enable automation")) GlamourerReflector.SetAutomationGlobalState(true);
                 if (ImGui.Button("Disable automation")) GlamourerReflector.SetAutomationGlobalState(false);
             }

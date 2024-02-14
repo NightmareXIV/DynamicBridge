@@ -1,4 +1,5 @@
-﻿using ECommons.Reflection;
+﻿using ECommons.GameHelpers;
+using ECommons.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -40,6 +41,35 @@ public static class GlamourerReflector
         {
             ex.LogWarning();
         }
+    }
+
+    public static bool GetAutomationStatusForChara()
+    {
+        try
+        {
+            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            {
+                var adm = plugin.GetFoP("_services").Call<System.Collections.IEnumerable>(context.Assemblies, "GetService", ["Glamourer.Automation.AutoDesignManager"], []);
+                foreach(var profile in adm)
+                {
+                    if (profile.GetFoP<bool>("Enabled"))
+                    {
+                        foreach(var identifier in profile.GetFoP<System.Collections.IEnumerable>("Identifiers"))
+                        {
+                            if (identifier.GetFoP("PlayerName").ToString().EqualsIgnoreCase(Player.Name))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            InternalLog.Warning(ex.ToString());
+        }
+        return false;
     }
 
     public static string GetPathForDesignByGuid(Guid guid)
