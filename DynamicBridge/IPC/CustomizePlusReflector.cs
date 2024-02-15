@@ -16,13 +16,13 @@ public static class CustomizePlusReflector
         {
             if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, out var context, false, true))
             {
-                var profileManager = ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions", null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
+                var profileManager = plugin.GetFoP("_services").Call([plugin.GetType().Assembly], "GetService", ["CustomizePlus.Profiles.ProfileManager"], []);
                 return profileManager;
             }
         }
         catch(Exception e)
         {
-            e.LogVerbose();
+            e.LogInternal();
         }
         return null;
     }
@@ -47,7 +47,7 @@ public static class CustomizePlusReflector
         }
         catch(Exception e)
         {
-            e.LogVerbose();
+            e.LogInternal();
         }
         return ret;
     }
@@ -69,7 +69,7 @@ public static class CustomizePlusReflector
         }
         catch (Exception e)
         {
-            e.LogVerbose();
+            e.LogInternal();
         }
     }
 }

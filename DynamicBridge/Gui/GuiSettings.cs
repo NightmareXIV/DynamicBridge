@@ -47,7 +47,7 @@ public static class GuiSettings
         ImGui.Checkbox("Display full path in design selection dropdown", ref C.GlamourerFullPath);
         ImGui.Separator();
         ImGui.Checkbox("Customize+", ref C.EnableCustomize);
-        DrawPluginCheck("CustomizePlus", "2.0.0.8");
+        DrawPluginCheck("CustomizePlus", "2.0.1.0");
         ImGui.Separator();
         ImGui.Checkbox("Honorific", ref C.EnableHonorific);
         DrawPluginCheck("Honorific", "1.4.2.0");

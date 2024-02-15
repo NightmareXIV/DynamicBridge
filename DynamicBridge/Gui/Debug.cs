@@ -72,7 +72,7 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Text($"wasset: {CustomizePlusManager.WasSet}");
                 foreach (var d in CustomizePlusManager.GetProfiles())
                 {
-                    if (ImGui.Selectable($"{d.Name}"))
+                    if (ImGui.Selectable($"{d.Name} / {d.characterName} / {d.ID} / {d.IsEnabled}"))
                     {
                         CustomizePlusManager.SetProfile(d.Name, Player.Name);
                     }
@@ -88,7 +88,8 @@ namespace DynamicBridge.Gui
                     {
                         var context = lp.GetFoP("loader").GetFoP<AssemblyLoadContext>("context");
                         ImGuiEx.Text(context.Assemblies.Select(x => x).Print("\n"));
-                        var profileManager = ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions",null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
+                        var profileManager = plugin.GetFoP("_services").Call([plugin.GetType().Assembly], "GetService", ["CustomizePlus.Profiles.ProfileManager"], []);
+                            //ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions",null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
                         ImGuiEx.TextWrapped(profileManager.GetType().GetMethods().Select(x => x.Name).Print());
                     }
                     else
