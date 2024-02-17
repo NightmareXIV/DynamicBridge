@@ -17,6 +17,5 @@ namespace DynamicBridge.Configuration
         public List<string> Palette = [];
         public List<string> Customize = [];
         public bool IsStatic = false;
-        public bool IsStaticCategory = false;
     }
 }
