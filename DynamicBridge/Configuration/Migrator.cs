@@ -1,9 +1,4 @@
 ﻿using DynamicBridge.IPC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicBridge.Configuration;
 public class Migrator
@@ -11,6 +6,7 @@ public class Migrator
     public Migrator()
     {
         Svc.Framework.Update += DoGlamourerMigration;
+        Svc.Framework.Update += DoCustomizeMigration;
     }
 
     void DoGlamourerMigration(object a)
@@ -59,7 +55,7 @@ public class Migrator
                     {
                         if (entries.TryGetFirst(z => z.Name == x.Glamourer[i], out var value))
                         {
-                            PluginLog.Information($">> Profile {p.Name}: changing {x.Glamourer[i]} -> {value.Identifier}");
+                            PluginLog.Information($">> Profile {p.Name}: glamourer changing {x.Glamourer[i]} -> {value.Identifier}");
                             x.Glamourer[i] = value.Identifier.ToString();
                         }
                     }
@@ -67,6 +63,50 @@ public class Migrator
             }
         }
         catch(Exception e)
+        {
+            e.Log();
+        }
+    }
+
+    void DoCustomizeMigration(object a)
+    {
+        if (C.EnableCustomize)
+        {
+            var entries = CustomizePlusManager.GetProfiles();
+            if (entries.Any())
+            {
+                PluginLog.Information($"Begin Customize+ name to guid migration");
+                MigrateProfileCustomize(C.GlobalProfile, entries);
+                foreach (var x in C.Profiles)
+                {
+                    MigrateProfileCustomize(x.Value, entries);
+                }
+                PluginLog.Information($"Finished Customize+ name to guid migration");
+                Svc.Framework.Update -= DoCustomizeMigration;
+            }
+        }
+    }
+
+    void MigrateProfileCustomize(Profile p, CustomizePlusProfile[] entries)
+    {
+        try
+        {
+            foreach (var x in p.GetPresetsUnion())
+            {
+                for (int i = 0; i < x.Customize.Count; i++)
+                {
+                    if (!Guid.TryParse(x.Customize[i], out _))
+                    {
+                        if (entries.TryGetFirst(z => z.Name == x.Customize[i], out var value))
+                        {
+                            PluginLog.Information($">> Profile {p.Name}: customize+ changing {x.Customize[i]} -> {value.ID}");
+                            x.Customize[i] = value.ID.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
         {
             e.Log();
         }

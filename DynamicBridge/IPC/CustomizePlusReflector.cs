@@ -72,4 +72,36 @@ public static class CustomizePlusReflector
             e.LogInternal();
         }
     }
+
+    public static string GetPathForProfileByGuid(Guid guid)
+    {
+        try
+        {
+            if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, out var context, true, true))
+            {
+                var manager = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["CustomizePlus.Profiles.ProfileManager"], []);
+                var designList = manager.GetFoP<System.Collections.IList>("Profiles");
+                foreach (var design in designList)
+                {
+                    if (design.GetFoP<Guid>("UniqueId") == guid)
+                    {
+                        var dfs = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["CustomizePlus.Profiles.ProfileFileSystem"], []);
+                        object[] findLeafArray = [design, null];
+                        if (dfs.Call<bool>("FindLeaf", findLeafArray, false))
+                        {
+                            var ret = findLeafArray[1].Call<string>("FullName", []);
+                            //PluginLog.Information($"Path for {guid} is {ret}");
+                            return ret;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            InternalLog.Warning(ex.ToString());
+        }
+        return null;
+    }
 }

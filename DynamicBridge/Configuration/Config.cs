@@ -20,10 +20,26 @@ namespace DynamicBridge.Configuration
         public bool EnableCustomize = true;
         public bool EnableHonorific = true;
         public GlamourerNoRuleBehavior GlamNoRuleBehaviour = GlamourerNoRuleBehavior.RevertToNormal;
+        public bool RevertBeforeAutomationRestore = false;
         public bool ManageGlamourerAutomation = false;
         public bool AllowNegativeConditions = false;
         public bool GlamourerFullPath = false;
         public string LastVersion = "0";
+        public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
+
+        public bool Cond_State = true;
+        public bool Cond_Biome = true;
+        public bool Cond_Weather = true;
+        public bool Cond_Time = true;
+        public bool Cond_ZoneGroup = true;
+        public bool Cond_Zone = true;
+        public bool Cond_House = true;
+        public bool Cond_Emote = true;
+        public bool Cond_Job = true;
+        public bool Cond_World = false;
+        public bool Cond_Gearset = false;
+
+        public Dictionary<string, List<GearsetEntry>> GearsetNameCache = [];
     }
 
     public enum GlamourerNoRuleBehavior

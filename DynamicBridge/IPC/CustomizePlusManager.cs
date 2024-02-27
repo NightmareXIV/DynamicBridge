@@ -28,7 +28,7 @@ public static class CustomizePlusManager
         }
     }
 
-    public static void SetProfile(string profileName, string charName)
+    public static void SetProfile(string profileGuidStr, string charName)
     {
         try
         {
@@ -44,11 +44,18 @@ public static class CustomizePlusManager
                     SavedProfileID = Guid.Empty;
                 }
             }
-            if (charaProfiles.TryGetFirst(x => x.Name == profileName, out var profile))
+            if (Guid.TryParse(profileGuidStr, out var guid))
             {
-                //Svc.PluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.EnableProfileByUniqueId").InvokeAction(profile.ID);
-                CustomizePlusReflector.SetEnabled(profile.ID, true);
-                LastEnabledProfileID = profile.ID;
+                if (charaProfiles.TryGetFirst(x => x.ID == guid, out var profile))
+                {
+                    //Svc.PluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.EnableProfileByUniqueId").InvokeAction(profile.ID);
+                    CustomizePlusReflector.SetEnabled(profile.ID, true);
+                    LastEnabledProfileID = profile.ID;
+                }
+            }
+            else
+            {
+                PluginLog.Error($"Could not parse Customize+ profile: {profileGuidStr}. Is customize+ loaded?");
             }
         }
         catch(Exception e)
@@ -82,5 +89,23 @@ public static class CustomizePlusManager
             SavedProfileID = Guid.Empty;
         }
         WasSet = false;
+    }
+
+
+
+    public static string TransformName(string originalName)
+    {
+        if (Guid.TryParse(originalName, out Guid guid))
+        {
+            if (GetProfiles().TryGetFirst(x => x.ID == guid, out var entry))
+            {
+                if (C.GlamourerFullPath)
+                {
+                    return CustomizePlusReflector.GetPathForProfileByGuid(guid) ?? entry.Name;
+                }
+                return entry.Name;
+            }
+        }
+        return originalName;
     }
 }

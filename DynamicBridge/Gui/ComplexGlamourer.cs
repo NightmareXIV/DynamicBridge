@@ -34,7 +34,7 @@ public static unsafe class ComplexGlamourer
                 ImGui.InputText($"##name", ref gEntry.Name, 100);
                 ImGuiEx.TextV($"2. Select Glamourer designs:");
                 ImGui.SameLine();
-                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(GlamourerManager.TransformName).PrintRange(out var fullList, "- None -")))
+                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(GlamourerManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                 {
                     FiltersSelection();
                     var designs = GlamourerManager.GetDesigns().OrderBy(x => x.Name);

@@ -1,4 +1,5 @@
-﻿using DynamicBridge.Configuration;
+﻿using Dalamud.Memory;
+using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC;
 using ECommons.ExcelServices;
@@ -7,6 +8,7 @@ using ECommons.GameHelpers;
 using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
@@ -189,6 +191,41 @@ namespace DynamicBridge
         {
             if (Gui.Debug.ForceDisguise != null) return Gui.Debug.ForceDisguise.Value;
             return Svc.PluginInterface.SourceRepository.ContainsAny(StringComparison.OrdinalIgnoreCase, "SeaOfStars", "DynamicBridgeStandalone");
+        }
+
+        public static IEnumerable<string> ToWorldNames(this IEnumerable<uint> worldIds)
+        {
+            return worldIds.Select(ExcelWorldHelper.GetName);
+        }
+
+        public static void UpdateGearsetCache()
+        {
+            if (Player.Available)
+            {
+                var list = new List<GearsetEntry>();
+                foreach (var x in RaptureGearsetModule.Instance()->EntriesSpan)
+                {
+                    if (*x.Name == 0) continue;
+                    list.Add(new(x.ID, MemoryHelper.ReadStringNullTerminated((nint)x.Name), x.ClassJob));
+                }
+                C.GearsetNameCache[Player.NameWithWorld] = list;
+            }
+        }
+
+        public static IEnumerable<string> ToGearsetNames(this List<int> gearsetIDs, string nameWithWorld)
+        {
+            if (!C.GearsetNameCache.TryGetValue(nameWithWorld, out var cache)) cache = [];
+            for (int i = 0; i < gearsetIDs.Count; i++)
+            {
+                if (cache.TryGetFirst(x => x.Id == gearsetIDs[i], out var ret))
+                {
+                    yield return $"{ret}";
+                }
+                else
+                {
+                    yield return $"{gearsetIDs[i]} No name found";
+                }
+            }
         }
     }
 }

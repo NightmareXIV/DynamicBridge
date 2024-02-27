@@ -1,6 +1,4 @@
-﻿using Dalamud.Interface.Internal;
-using Dalamud.Plugin;
-using DynamicBridge.Configuration;
+﻿using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC;
 using ECommons.Automation;
@@ -9,15 +7,15 @@ using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
-using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using System.Collections.Generic;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 
 namespace DynamicBridge
 {
@@ -76,11 +74,11 @@ namespace DynamicBridge
                     TimeoutSilently = false,
                 };
                 Migrator = new();
-                ProperOnLogin.RegisterInteractable(WarnAutomation, true);
+                ProperOnLogin.RegisterInteractable(OnLogin, true);
             });
         }
 
-        private void WarnAutomation()
+        private void OnLogin()
         {
             if (C.EnableGlamourer)
             {
@@ -96,6 +94,8 @@ namespace DynamicBridge
                     }
                 }
             }
+
+            Utils.UpdateGearsetCache();
         }
 
         private void OnCommand(string command, string arguments)
@@ -176,32 +176,38 @@ namespace DynamicBridge
                             if (
                                 x.Enabled
                                 &&
-                                (x.States.Count == 0 || x.States.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.States.Any(s => s.Check()))
+                                (!C.Cond_State || ((x.States.Count == 0 || x.States.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.States.Any(s => s.Check()))))
                                 &&
-                                (x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.SpecialTerritories.Any(s => s.Check()))
+                                (!C.Cond_ZoneGroup || ((x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.SpecialTerritories.Any(s => s.Check()))))
                                 &&
-                                (x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Biomes.Any(s => s.Check()))
+                                (!C.Cond_Biome || ((x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Biomes.Any(s => s.Check()))))
                                 &&
-                                (x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Weathers.Contains(WeatherManager.GetWeather()))
+                                (!C.Cond_Weather || ((x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Weathers.Contains(WeatherManager.GetWeather()))))
                                 &&
-                                (x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType)) 
-                                && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))
+                                (!C.Cond_Zone || ((x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType)) 
+                                && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))))
                                 &&
-                                (x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))
+                                (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId())) 
+                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))))
                                 &&
-                                (x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
-                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))
+                                (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
+                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))))
                                 &&
-                                (x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
-                                && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))
+                                (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
+                                && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))))
                                 &&
-                                (x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
-                                && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
+                                (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
+                                && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))
+                                &&
+                                (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.Id))
+                                && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.Id))))
+                                &&
+                                (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
+                                && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
                                 )
                             {
                                 newRule.Add(x);
@@ -378,16 +384,27 @@ namespace DynamicBridge
                             }
                             else if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.RevertToAutomation)
                             {
+                                if (C.RevertBeforeAutomationRestore)
+                                {
+                                    TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                                    TaskManager.Enqueue(GlamourerManager.Revert);
+                                }
+                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                 TaskManager.Enqueue(GlamourerManager.RevertToAutomation);
                                 PluginLog.Debug($"Reverting to automation");
                             }
                             else if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.RevertToNormal)
                             {
+                                TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                 TaskManager.Enqueue(GlamourerManager.Revert);
                                 PluginLog.Debug($"Reverting to game state");
                             }
                         }
                     }
+                }
+                if (Svc.Condition[ConditionFlag.LoggingOut])
+                {
+                    if (EzThrottler.Throttle("LogoutUpdateGS", 30000)) Utils.UpdateGearsetCache();
                 }
             }
             else

@@ -22,6 +22,8 @@ namespace DynamicBridge.Configuration
         public List<uint> Emotes = [];
         public List<Job> Jobs = [];
         public List<ETime> Times = [];
+        public List<uint> Worlds = [];
+        public List<int> Gearsets = [];
 
         public List<string> SelectedPresets = [];
         public bool Passthrough = false;
@@ -39,6 +41,8 @@ namespace DynamicBridge.Configuration
             public List<uint> Emotes = [];
             public List<Job> Jobs = [];
             public List<ETime> Times = [];
+            public List<uint> Worlds = [];
+            public List<int> Gearsets = [];
         }
     }
 }

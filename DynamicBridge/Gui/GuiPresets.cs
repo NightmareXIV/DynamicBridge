@@ -335,7 +335,7 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -")))
+                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
 
@@ -398,24 +398,24 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##customize", preset.Customize.PrintRange(out var fullList, "- None -")))
+                            if (ImGui.BeginCombo("##customize", preset.Customize.Select(CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
-                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Name.Split("@")[0]).OrderBy(x => x.Name);
+                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Name.Split("@")[0]).OrderBy(x => CustomizePlusManager.TransformName(x.ID.ToString()));
                                 var index = 0;
                                 foreach (var x in profiles)
                                 {
                                     index++;
                                     ImGui.PushID(index);
-                                    var name = x.Name;
+                                    var name = CustomizePlusManager.TransformName(x.ID.ToString());
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                    if (OnlySelected[filterCnt] && !preset.Customize.Contains(name)) continue;
-                                    ImGuiEx.CollectionCheckbox($"{name}", x.Name, preset.Customize);
+                                    if (OnlySelected[filterCnt] && !preset.Customize.Contains(x.ID.ToString())) continue;
+                                    ImGuiEx.CollectionCheckbox($"{name}", x.ID.ToString(), preset.Customize);
                                     ImGui.PopID();
                                 }
                                 foreach (var x in preset.Customize)
                                 {
-                                    if (profiles.Any(d => d.Name == x)) continue;
+                                    if (profiles.Any(d => d.ID.ToString() == x)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                     ImGuiEx.CollectionCheckbox($"{x}", x, preset.Customize, false, true);
                                     ImGui.PopStyleColor();
@@ -434,7 +434,7 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -")))
+                            if (ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
                                 var titles = HonorificManager.GetTitleData(currentProfile.Name.Split("@")[0], ExcelWorldHelper.Get(currentProfile.Name.Split("@")[1]).RowId).OrderBy(x => x.Title);
