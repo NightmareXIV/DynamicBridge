@@ -21,8 +21,23 @@ namespace DynamicBridge.Gui
         static bool? TestBool2 = null;
         static string cont = "Test button";
         public static bool? ForceDisguise = null;
+        static List<string> TestData = null;
         public static void Draw()
         {
+            if (ImGui.CollapsingHeader("Task manager"))
+            {
+                if (ImGui.Button("Step mode on")) P.TaskManager.SetStepMode(true);
+                ImGui.SameLine();
+                if (ImGui.Button("Step mode off")) P.TaskManager.SetStepMode(false);
+                ImGui.SameLine();
+                if (ImGui.Button("Step")) P.TaskManager.Step();
+                ImGui.SameLine();
+                if (ImGui.Button("Abort")) P.TaskManager.Abort();
+                foreach(var x in P.TaskManager.TaskStack)
+                {
+                    ImGuiEx.Text($"{x}");
+                }
+            }
             ImGuiEx.Checkbox("Disguise", ref ForceDisguise);
             if (ImGui.CollapsingHeader("Time"))
             {

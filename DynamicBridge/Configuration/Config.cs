@@ -21,11 +21,13 @@ namespace DynamicBridge.Configuration
         public bool EnableHonorific = true;
         public GlamourerNoRuleBehavior GlamNoRuleBehaviour = GlamourerNoRuleBehavior.RevertToNormal;
         public bool RevertBeforeAutomationRestore = false;
+        public bool RevertGlamourerBeforeApply = false;
         public bool ManageGlamourerAutomation = false;
         public bool AllowNegativeConditions = false;
         public bool GlamourerFullPath = false;
         public string LastVersion = "0";
         public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
+        public bool UpdateJobGSChange = false;
 
         public bool Cond_State = true;
         public bool Cond_Biome = true;

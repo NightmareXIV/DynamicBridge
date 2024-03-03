@@ -34,6 +34,8 @@ namespace DynamicBridge
         public const int DelayMS = 100;
         public static ApplyRule StaticRule = new();
         public static Migrator Migrator;
+        public uint LastJob = 0;
+        public int LastGS = -1;
 
         public DynamicBridge(DalamudPluginInterface pi)
         {
@@ -96,6 +98,9 @@ namespace DynamicBridge
             }
 
             Utils.UpdateGearsetCache();
+
+            LastJob = Player.Object.ClassJob.Id;
+            LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
         }
 
         private void OnCommand(string command, string arguments)
@@ -154,12 +159,28 @@ namespace DynamicBridge
         {
             MyOldDesign = null;
             if (C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
+            LastJob = 0;
+            LastGS = -1;
         }
 
         private void OnUpdate()
         {
             if (Player.Interactable)
             {
+                if (C.UpdateJobGSChange)
+                {
+                    if (LastJob != Player.Object.ClassJob.Id)
+                    {
+                        LastJob = Player.Object.ClassJob.Id;
+                        ForceUpdate = true;
+                    }
+                    if (LastGS != RaptureGearsetModule.Instance()->CurrentGearsetIndex)
+                    {
+                        LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
+                        ForceUpdate = true;
+                    }
+                }
+
                 var profile = Utils.Profile(Player.CID);
                 if (!TaskManager.IsBusy && profile != null)
                 {
@@ -263,13 +284,20 @@ namespace DynamicBridge
                                                 if (design != null)
                                                 {
                                                     DoNullGlamourer = false;
-                                                    isNull = false;
                                                     if(isFirst) MyOldDesign ??= GlamourerManager.GetMyCustomization();
                                                     //TaskManager.DelayNext(60, true);
-                                                    if (isFirst && C.ManageGlamourerAutomation)
+                                                    if (isFirst)
                                                     {
-                                                        TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                        if (C.ManageGlamourerAutomation)
+                                                        {
+                                                            TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                        }
+                                                        if (C.RevertGlamourerBeforeApply)
+                                                        {
+                                                            TaskManager.Enqueue(GlamourerManager.Revert, "Revert character");
+                                                        }
                                                     }
+                                                    isNull = false;
                                                     TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                                     TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
                                                     PluginLog.Debug($"Applying design {design}");
@@ -402,6 +430,7 @@ namespace DynamicBridge
                         }
                     }
                 }
+
                 if (Svc.Condition[ConditionFlag.LoggingOut])
                 {
                     if (EzThrottler.Throttle("LogoutUpdateGS", 30000)) Utils.UpdateGearsetCache();
