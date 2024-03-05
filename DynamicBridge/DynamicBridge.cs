@@ -35,7 +35,9 @@ namespace DynamicBridge
         public static ApplyRule StaticRule = new();
         public static Migrator Migrator;
         public uint LastJob = 0;
-        public int LastGS = -1;
+        //public int LastGS = -1;
+        public Memory Memory;
+        public List<uint> LastItems = [];
 
         public DynamicBridge(DalamudPluginInterface pi)
         {
@@ -76,7 +78,9 @@ namespace DynamicBridge
                     TimeoutSilently = false,
                 };
                 Migrator = new();
+                GlamourerManager.Init();
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
+                Memory = new();
             });
         }
 
@@ -100,7 +104,7 @@ namespace DynamicBridge
             Utils.UpdateGearsetCache();
 
             LastJob = Player.Object.ClassJob.Id;
-            LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
+            //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
         }
 
         private void OnCommand(string command, string arguments)
@@ -160,7 +164,8 @@ namespace DynamicBridge
             MyOldDesign = null;
             if (C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
             LastJob = 0;
-            LastGS = -1;
+            LastItems = [];
+            //LastGS = -1;
         }
 
         private void OnUpdate()
@@ -174,10 +179,19 @@ namespace DynamicBridge
                         LastJob = Player.Object.ClassJob.Id;
                         ForceUpdate = true;
                     }
-                    if (LastGS != RaptureGearsetModule.Instance()->CurrentGearsetIndex)
+                    /*if (LastGS != RaptureGearsetModule.Instance()->CurrentGearsetIndex)
                     {
                         LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
                         ForceUpdate = true;
+                    }*/
+                }
+                if(C.UpdateGearChange)
+                {
+                    var items = Utils.GetCurrentGear();
+                    if (!LastItems.SequenceEqual(items))
+                    {
+                        LastItems = items;
+                        P.TaskManager.Enqueue(() => ForceUpdate = true);
                     }
                 }
 
@@ -452,6 +466,7 @@ namespace DynamicBridge
 
         public void Dispose()
         {
+            Memory.Dispose();
             ECommonsMain.Dispose();
             P = null; 
             C = null;

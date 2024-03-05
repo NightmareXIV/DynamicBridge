@@ -28,6 +28,19 @@ namespace DynamicBridge
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
 
+        public static List<uint> GetCurrentGear()
+        {
+            var ret = new List<uint>();
+            var im = InventoryManager.Instance();
+            var cont = im->GetInventoryContainer(InventoryType.EquippedItems);
+            for (int i = 0; i < cont->Size; i++)
+            {
+                var item = cont->GetInventorySlot(i);
+                ret.Add((uint)(item->ItemID + (item->Flags.HasFlag(InventoryItem.ItemFlags.HQ) ? 1000000 : 0)));
+            }
+            return ret;
+        }
+        
         public static bool GuidEquals(this List<ApplyRule> rule, List<ApplyRule> other)
         {
             //if (rule == null && other == null) return true;
@@ -53,12 +66,13 @@ namespace DynamicBridge
             preset.IsStatic = true;
         }
 
-        public static Profile Profile(ulong CID)
+        public static Profile Profile(ulong CID, bool returnMain = false)
         {
             if (CID == 0 || C.Blacklist.Contains(CID)) return null;
             if (C.Profiles.TryGetValue(CID, out var ret))
             {
-                return ret;
+                if (returnMain) return ret;
+                return ret.Subprofiles.SafeSelect(ret.Subprofile) ?? ret;
             }
             else
             {
@@ -69,7 +83,7 @@ namespace DynamicBridge
             }
         }
 
-        public static Profile Profile() => Profile(Player.CID);
+        public static Profile Profile(bool returnMain = false) => Profile(Player.CID, returnMain);
 
         public static string GetHouseDefaultName()
         {

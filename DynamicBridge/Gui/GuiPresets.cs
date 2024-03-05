@@ -23,8 +23,7 @@ namespace DynamicBridge.Gui
             UI.ProfileSelectorCommon();
             if (Utils.Profile(UI.CurrentCID) != null)
             {
-                var Profile = Utils.Profile(UI.CurrentCID);
-                DrawProfile(Profile);
+                DrawProfile(Utils.Profile(UI.CurrentCID));
             }
         }
 

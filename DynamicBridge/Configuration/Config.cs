@@ -27,7 +27,8 @@ namespace DynamicBridge.Configuration
         public bool GlamourerFullPath = false;
         public string LastVersion = "0";
         public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
-        public bool UpdateJobGSChange = false;
+        public bool UpdateJobGSChange = true;
+        public bool UpdateGearChange = false;
 
         public bool Cond_State = true;
         public bool Cond_Biome = true;

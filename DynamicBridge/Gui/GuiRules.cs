@@ -12,6 +12,7 @@ using Emote = Lumina.Excel.GeneratedSheets.Emote;
 using OtterGui.Widgets;
 using ECommons.Throttlers;
 using System.Runtime.InteropServices;
+using ECommons;
 
 namespace DynamicBridge.Gui
 {
@@ -56,11 +57,18 @@ namespace DynamicBridge.Gui
                     UI.SelectedCID = 0;
                 }
                 ImGui.SameLine();
-                if (ImGuiEx.ButtonCtrl("Import profile from clipboard"))
+                if (ImGuiEx.ButtonCtrl("Import subprofile from clipboard"))
                 {
                     try
                     {
-                        C.Profiles[UI.CurrentCID] = JsonConvert.DeserializeObject<Profile>(Clipboard.GetText());
+                        if (C.Profiles[UI.CurrentCID].Subprofiles.SafeSelect(C.Profiles[UI.CurrentCID].Subprofile) != null)
+                        {
+                            C.Profiles[UI.CurrentCID].Subprofiles[C.Profiles[UI.CurrentCID].Subprofile] = JsonConvert.DeserializeObject<Profile>(Clipboard.GetText());
+                        }
+                        else
+                        {
+                            C.Profiles[UI.CurrentCID] = JsonConvert.DeserializeObject<Profile>(Clipboard.GetText());
+                        }
                     }
                     catch (Exception e)
                     {
@@ -68,7 +76,7 @@ namespace DynamicBridge.Gui
                     }
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Export profile to clipboard"))
+                if (ImGui.Button("Export subprofile to clipboard"))
                 {
                     Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(Profile)));
                 }

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Ipc.Exceptions;
+using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ImGuizmoNET;
 using Newtonsoft.Json;
@@ -14,11 +15,13 @@ namespace DynamicBridge.IPC
 {
     public static class GlamourerManager
     {
-        public const string GlamourerGetAllCustomization = "Glamourer.GetAllCustomizationFromCharacter";
-        public const string GlamourerApplyToChar = "Glamourer.ApplyAllOnceToCharacter";
-        public const string GlamourerRevert = "Glamourer.RevertCharacter";
-        public const string GlamourerApplyToCharByGuid = "Glamourer.ApplyByGuidOnceToCharacter";
-        public const string GlamourerGetDesignList = "Glamourer.GetDesignList";
+        [EzIPC] static Func<Character, string> GetAllCustomizationFromCharacter;
+        [EzIPC] static Action<string, Character> ApplyAllOnceToCharacter;
+        [EzIPC] static Action<Character> RevertCharacter;
+        [EzIPC] static Action<Guid, Character> ApplyByGuidOnceToCharacter;
+        [EzIPC] static Func<DesignListEntry[]> GetDesignList;
+
+        public static void Init() => EzIPC.Init(typeof(GlamourerManager), "Glamourer");
 
         public static void RevertToAutomation()
         {
@@ -29,7 +32,7 @@ namespace DynamicBridge.IPC
         {
             try
             {
-                Svc.PluginInterface.GetIpcSubscriber<Guid, Character, object>(GlamourerApplyToCharByGuid).InvokeAction(guid, Player.Object);
+                ApplyByGuidOnceToCharacter(guid, Player.Object);
             }
             catch (Exception ex)
             {
@@ -41,7 +44,7 @@ namespace DynamicBridge.IPC
         {
             try
             {
-                return Svc.PluginInterface.GetIpcSubscriber<DesignListEntry[]>(GlamourerGetDesignList).InvokeFunc();
+                return GetDesignList();
             }
             catch (Exception ex)
             {
@@ -54,7 +57,7 @@ namespace DynamicBridge.IPC
         {
             try
             {
-                return Svc.PluginInterface.GetIpcSubscriber<Character, string>(GlamourerGetAllCustomization).InvokeFunc(Player.Object);
+                return GetAllCustomizationFromCharacter(Player.Object);
             }
             catch (Exception e)
             {
@@ -67,7 +70,7 @@ namespace DynamicBridge.IPC
         {
             try
             {
-                Svc.PluginInterface.GetIpcSubscriber<string, Character, object>(GlamourerApplyToChar).InvokeAction(customization, Player.Object);
+                ApplyAllOnceToCharacter(customization, Player.Object);
             }
             catch (Exception e)
             {
@@ -96,7 +99,7 @@ namespace DynamicBridge.IPC
             {
                 /*var result = Svc.Commands.ProcessCommand($"/glamour revert <me>");
                 if (!result) throw new Exception("Glamourer not found");*/
-                Svc.PluginInterface.GetIpcSubscriber<Character, object>(GlamourerRevert).InvokeAction(Player.Object);
+                RevertCharacter(Player.Object);
             }
             catch (Exception e)
             {

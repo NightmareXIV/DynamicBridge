@@ -24,6 +24,11 @@ namespace DynamicBridge.Gui
         static List<string> TestData = null;
         public static void Draw()
         {
+            if (ImGui.CollapsingHeader("Items"))
+            {
+                ImGuiEx.Text($"Current: {Utils.GetCurrentGear().Print()}");
+                ImGuiEx.Text($"Last: {P.LastItems.Print()}");
+            }
             if (ImGui.CollapsingHeader("Task manager"))
             {
                 if (ImGui.Button("Step mode on")) P.TaskManager.SetStepMode(true);

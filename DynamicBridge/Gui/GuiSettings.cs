@@ -34,7 +34,19 @@ public static class GuiSettings
             ImGui.Checkbox("Display full path in profile editor, where available", ref C.GlamourerFullPath);
             ImGuiEx.SetNextItemWidthScaled(150f);
             ImGuiEx.EnumCombo("Dropdown menu size", ref C.ComboSize, ComboFlagNames.ContainsKey, ComboFlagNames);
-            ImGui.Checkbox($"Force update appearance on job and gearset changes", ref C.UpdateJobGSChange);
+            if(ImGui.Checkbox($"Force update appearance on job and gearset changes", ref C.UpdateJobGSChange))
+            {
+                if (C.UpdateJobGSChange)
+                {
+                    P.Memory.EquipGearsetHook.Enable();
+                }
+                else
+                {
+                    P.Memory.EquipGearsetHook.Disable();
+                }
+            }
+            /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
+            ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
             ImGuiGroup.EndGroupBox();
         }
 

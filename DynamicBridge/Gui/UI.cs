@@ -1,4 +1,5 @@
 ﻿using DynamicBridge.IPC;
+using ECommons;
 using ECommons.GameHelpers;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json.Linq;
@@ -23,7 +24,7 @@ namespace DynamicBridge.Gui
             }
             if (Player.Available && Utils.Profile() != null)
             {
-                Utils.Profile().Name = Player.NameWithWorld;
+                Utils.Profile(true).Name = Player.NameWithWorld;
             }
             KoFiButton.DrawRight();
             ImGuiEx.EzTabBar("Tabs", true, [
@@ -48,8 +49,8 @@ namespace DynamicBridge.Gui
                     C.Blacklist.Remove(Player.CID);
                 }
             }
-            ImGuiEx.SetNextItemFullWidth();
-            if (ImGui.BeginCombo($"##selectProfile", $"{Utils.Profile(UI.CurrentCID)?.Name ?? "Select profile..."}"))
+            ImGuiEx.SetNextItemWidth(0.6f);
+            if (ImGui.BeginCombo($"##selectProfile", $"{Utils.Profile(UI.CurrentCID, true)?.Name ?? "Select profile..."}"))
             {
                 foreach (var x in C.Profiles)
                 {
@@ -65,6 +66,53 @@ namespace DynamicBridge.Gui
                     ImGui.PopID();
                 }
                 ImGui.EndCombo();
+            }
+
+            var prof = Utils.Profile(UI.CurrentCID, true);
+            if (prof != null)
+            {
+                ImGui.SameLine();
+                var sub = prof.Subprofiles.SafeSelect(prof.Subprofile);
+                ImGuiEx.InputWithRightButtonsArea("subprofile", () =>
+                {
+                    if (ImGui.BeginCombo("##selSub", sub?.Name ?? "Default subprofile"))
+                    {
+                        if (ImGui.Selectable("Default subprofile")) prof.SetSuprofile(-1);
+                        for (int i = 0; i < prof.Subprofiles.Count; i++)
+                        {
+                            if (ImGui.Selectable($"{prof.Name}##{i}")) prof.SetSuprofile(i);
+                        }
+                        ImGui.EndCombo();
+                    }
+                }, () =>
+                {
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
+                    {
+                        prof.Subprofiles.Add(new() { Name = $"Subprofile {prof.Subprofiles.Count + 1}" });
+                    }
+                    if (sub != null)
+                    {
+                        ImGui.SameLine();
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Edit))
+                        {
+                            ImGui.OpenPopup($"EditSub");
+                        }
+                        ImGui.SameLine();
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                        {
+                            new TickScheduler(() => prof.Subprofiles.RemoveAt(prof.Subprofile));
+                        }
+                    }
+                });
+                if (ImGui.BeginPopup($"EditSub"))
+                {
+                    ImGuiEx.SetNextItemWidthScaled(150f);
+                    if (prof.Subprofiles.SafeSelect(prof.Subprofile) != null)
+                    {
+                        ImGui.InputText($"##renameSub", ref prof.Subprofiles[prof.Subprofile].Name, 150);
+                    }
+                    ImGui.EndPopup();
+                }
             }
         }
     }

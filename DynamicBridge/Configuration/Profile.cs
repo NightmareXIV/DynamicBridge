@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,21 @@ namespace DynamicBridge.Configuration
         public List<Preset> Presets = [];
         public List<PresetFolder> PresetsFolders = [];
         public string ForcedPreset = null;
+        public int Subprofile = -1;
+        public List<Profile> Subprofiles = [];
+
+        internal void SetSuprofile(int i)
+        {
+            if(i < 0 || i >= Subprofiles.Count)
+            {
+                Subprofile = -1;
+            }
+            else
+            {
+                Subprofile = i;
+            }
+            P.ForceUpdate = true;
+        }
 
         public bool IsGlobal => C.GlobalProfile == this;
 
