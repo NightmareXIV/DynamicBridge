@@ -1,0 +1,1 @@
+﻿global using GlamourerDesignInfo = (string Name, System.Guid Identifier);

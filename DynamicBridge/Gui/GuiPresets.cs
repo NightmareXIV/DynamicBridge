@@ -1,5 +1,7 @@
 ﻿using DynamicBridge.Configuration;
-using DynamicBridge.IPC;
+using DynamicBridge.IPC.Customize;
+using DynamicBridge.IPC.Glamourer;
+using DynamicBridge.IPC.Honorific;
 using ECommons;
 using ECommons.Configuration;
 using ECommons.ExcelServices;
@@ -334,18 +336,19 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                            if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(P.GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
+                                if (ImGui.IsWindowAppearing()) P.GlamourerManager.ResetNameCache();
                                 FiltersSelection();
 
                                 // normal
                                 {
-                                    var designs = GlamourerManager.GetDesigns().OrderBy(x => GlamourerManager.TransformName(x.Identifier.ToString()));
+                                    var designs = P.GlamourerManager.GetDesigns().OrderBy(x => P.GlamourerManager.TransformName(x.Identifier.ToString()));
                                     foreach (var x in designs)
                                     {
                                         var name = x.Name;
                                         var id = x.Identifier.ToString();
-                                        var transformedName = GlamourerManager.TransformName(x.Identifier.ToString());
+                                        var transformedName = P.GlamourerManager.TransformName(x.Identifier.ToString());
                                         if (Filters[filterCnt].Length > 0 && !transformedName.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         if (OnlySelected[filterCnt] && !preset.Glamourer.Contains(id)) continue;
                                         ImGuiEx.CollectionCheckbox($"{transformedName}##{x.Identifier}", id, preset.Glamourer);

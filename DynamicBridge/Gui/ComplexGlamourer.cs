@@ -1,5 +1,5 @@
 ﻿using DynamicBridge.Configuration;
-using DynamicBridge.IPC;
+using DynamicBridge.IPC.Glamourer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,15 +34,16 @@ public static unsafe class ComplexGlamourer
                 ImGui.InputText($"##name", ref gEntry.Name, 100);
                 ImGuiEx.TextV($"2. Select Glamourer designs:");
                 ImGui.SameLine();
-                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(GlamourerManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(P.GlamourerManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                 {
+                    if (ImGui.IsWindowAppearing()) P.GlamourerManager.ResetNameCache();
                     FiltersSelection();
-                    var designs = GlamourerManager.GetDesigns().OrderBy(x => x.Name);
+                    var designs = P.GlamourerManager.GetDesigns().OrderBy(x => x.Name);
                     foreach (var x in designs)
                     {
                         var name = x.Name;
                         var id = x.Identifier.ToString();
-                        var transformedName = GlamourerManager.TransformName(id);
+                        var transformedName = P.GlamourerManager.TransformName(id);
                         if (Filter.Length > 0 && !transformedName.Contains(Filter, StringComparison.OrdinalIgnoreCase)) continue;
                         if (OnlySelected && !gEntry.Designs.Contains(id)) continue;
                         ImGuiEx.CollectionCheckbox($"{transformedName}##{x.Identifier}", id, gEntry.Designs);
@@ -71,7 +72,7 @@ public static unsafe class ComplexGlamourer
                         (gEntry.Designs[i + 1], gEntry.Designs[i]) = (gEntry.Designs[i], gEntry.Designs[i + 1]);
                     }
                     ImGui.SameLine();
-                    ImGuiEx.Text($"{GlamourerManager.TransformName(design)}");
+                    ImGuiEx.Text($"{P.GlamourerManager.TransformName(design)}");
                     ImGui.PopID();
                 }
                 if (ImGuiEx.ButtonCtrl("Delete"))

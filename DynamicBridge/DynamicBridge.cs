@@ -1,6 +1,8 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
-using DynamicBridge.IPC;
+using DynamicBridge.IPC.Customize;
+using DynamicBridge.IPC.Glamourer;
+using DynamicBridge.IPC.Honorific;
 using ECommons.Automation;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
@@ -38,6 +40,8 @@ namespace DynamicBridge
         //public int LastGS = -1;
         public Memory Memory;
         public List<uint> LastItems = [];
+
+        public GlamourerManager GlamourerManager;
 
         public DynamicBridge(DalamudPluginInterface pi)
         {
@@ -78,7 +82,7 @@ namespace DynamicBridge
                     TimeoutSilently = false,
                 };
                 Migrator = new();
-                GlamourerManager.Init();
+                GlamourerManager = new();
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
                 Memory = new();
             });
@@ -88,7 +92,7 @@ namespace DynamicBridge
         {
             if (C.EnableGlamourer)
             {
-                if (GlamourerReflector.GetAutomationGlobalState() && GlamourerReflector.GetAutomationStatusForChara())
+                if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
                 {
                     if(C.ManageGlamourerAutomation)
                     {
@@ -304,7 +308,7 @@ namespace DynamicBridge
                                                     {
                                                         if (C.ManageGlamourerAutomation)
                                                         {
-                                                            TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                                                            TaskManager.Enqueue(() => GlamourerManager.Reflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
                                                         }
                                                         if (C.RevertGlamourerBeforeApply)
                                                         {
@@ -313,7 +317,7 @@ namespace DynamicBridge
                                                     }
                                                     isNull = false;
                                                     TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                                    TaskManager.Enqueue(() => design.Value.ApplyToSelf(), $"ApplyToSelf({design})");
+                                                    TaskManager.Enqueue(() => GlamourerManager.ApplyToSelf(design.Value), $"ApplyToSelf({design})");
                                                     PluginLog.Debug($"Applying design {design}");
                                                 }
                                             }
@@ -401,7 +405,7 @@ namespace DynamicBridge
                             if (!C.EnableGlamourer) return;
                             if (C.ManageGlamourerAutomation)
                             {
-                                TaskManager.Enqueue(() => GlamourerReflector.SetAutomationGlobalState(true), "GlamourerReflector.SetAutomationGlobalState = true");
+                                TaskManager.Enqueue(() => GlamourerManager.Reflector.SetAutomationGlobalState(true), "GlamourerReflector.SetAutomationGlobalState = true");
                             }
                             if (C.GlamNoRuleBehaviour == GlamourerNoRuleBehavior.StoreRestore)
                             {

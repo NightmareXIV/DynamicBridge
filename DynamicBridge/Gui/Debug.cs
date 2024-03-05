@@ -1,4 +1,7 @@
 ﻿using DynamicBridge.IPC;
+using DynamicBridge.IPC.Customize;
+using DynamicBridge.IPC.Glamourer;
+using DynamicBridge.IPC.Honorific;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
@@ -59,19 +62,18 @@ namespace DynamicBridge.Gui
 
             if(ImGui.CollapsingHeader("Glamourer test"))
             {
-                foreach (var d in GlamourerManager.GetDesigns()) 
+                foreach (var d in P.GlamourerManager.GetDesigns()) 
                 {
                     if (ImGui.Selectable($"{d}"))
                     {
-                        GlamourerManager.ApplyByGuid(d.Identifier);
+                        P.GlamourerManager.ApplyByGuid(d.Identifier);
                     }
                 }
-                if (ImGui.Button("Revert")) GlamourerManager.Revert();
-                if (ImGui.Button("Reset cache")) GlamourerManager.ResetCache();
-                ImGuiEx.Text($"Automation state: {GlamourerReflector.GetAutomationGlobalState()}");
-                ImGuiEx.Text($"Automation state for chara: {GlamourerReflector.GetAutomationStatusForChara()}");
-                if (ImGui.Button("Enable automation")) GlamourerReflector.SetAutomationGlobalState(true);
-                if (ImGui.Button("Disable automation")) GlamourerReflector.SetAutomationGlobalState(false);
+                if (ImGui.Button("Revert")) P.GlamourerManager.Revert();
+                ImGuiEx.Text($"Automation state: {P.GlamourerManager.Reflector.GetAutomationGlobalState()}");
+                ImGuiEx.Text($"Automation state for chara: {P.GlamourerManager.Reflector.GetAutomationStatusForChara()}");
+                if (ImGui.Button("Enable automation")) P.GlamourerManager.Reflector.SetAutomationGlobalState(true);
+                if (ImGui.Button("Disable automation")) P.GlamourerManager.Reflector.SetAutomationGlobalState(false);
             }
 
             if(ImGui.CollapsingHeader("Honorific test"))
@@ -122,18 +124,6 @@ namespace DynamicBridge.Gui
                     e.Log();
                     ImGuiEx.Text(e.ToString());
                 }
-            }
-
-            if (ImGui.CollapsingHeader("P+ test"))
-            {
-                foreach (var d in PalettePlusManager.GetPalettes())
-                {
-                    if (ImGui.Selectable($"{d.Name}"))
-                    {
-                        PalettePlusManager.SetPalette(d.Name);
-                    }
-                }
-                if (ImGui.Button("Revert p+")) PalettePlusManager.RevertPalette();
             }
 
             ImGuiEx.Text($"In water: {Utils.IsInWater}");

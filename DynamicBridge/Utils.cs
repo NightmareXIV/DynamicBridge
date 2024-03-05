@@ -1,7 +1,7 @@
 ﻿using Dalamud.Memory;
 using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
-using DynamicBridge.IPC;
+using DynamicBridge.IPC.Glamourer;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -91,9 +91,9 @@ namespace DynamicBridge
             return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRow(Svc.ClientState.TerritoryType)?.PlaceNameRegion.Value?.Name?.ExtractText()}, Ward {h->GetCurrentWard()+1}, plot {h->GetCurrentPlot()+1}";
         }
 
-        public static DesignListEntry? GetDesignByGUID(string GUID)
+        public static GlamourerDesignInfo? GetDesignByGUID(string GUID)
         {
-            var designs = GlamourerManager.GetDesigns();
+            var designs = P.GlamourerManager.GetDesigns();
             foreach(var d in designs)
             {
                 if (d.Identifier.ToString() == GUID) return d;

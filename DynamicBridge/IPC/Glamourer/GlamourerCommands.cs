@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge.IPC;
-public static class GlamourerManager2
+namespace DynamicBridge.IPC.Glamourer;
+public class GlamourerCommands
 {
-    public static void ApplyByGuid(Guid guid)
+    public void ApplyByGuid(Guid guid)
     {
         Svc.Commands.ProcessCommand($"/glamour apply {guid}|<me>");
     }
 
-    public static void Revert()
+    public void Revert()
     {
         Svc.Commands.ProcessCommand("/glamour revert <me>");
     }
 
-    public static void RevertToAutomation()
+    public void RevertToAutomation()
     {
         Svc.Commands.ProcessCommand("/glamour reapplyautomation <me>");
     }

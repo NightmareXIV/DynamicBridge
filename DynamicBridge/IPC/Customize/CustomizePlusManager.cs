@@ -3,7 +3,7 @@ using DynamicBridge.Configuration;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
 
-namespace DynamicBridge.IPC;
+namespace DynamicBridge.IPC.Customize;
 public static class CustomizePlusManager
 {
     public static bool WasSet = false;
@@ -15,7 +15,7 @@ public static class CustomizePlusManager
         {
             //var ret = Svc.PluginInterface.GetIpcSubscriber<CustomizePlusProfile[]>("CustomizePlus.GetProfileList").InvokeFunc();
             var ret = CustomizePlusReflector.GetProfiles().ToArray();
-            if(chara != null)
+            if (chara != null)
             {
                 ret = ret.Where(x => x.characterName == chara).ToArray();
             }
@@ -35,7 +35,7 @@ public static class CustomizePlusManager
             var charaProfiles = GetProfiles().Where(x => x.characterName == charName).ToArray();
             if (!WasSet)
             {
-                if(charaProfiles.TryGetFirst(x => x.IsEnabled, out var enabledProfile))
+                if (charaProfiles.TryGetFirst(x => x.IsEnabled, out var enabledProfile))
                 {
                     SavedProfileID = enabledProfile.ID;
                 }
@@ -58,7 +58,7 @@ public static class CustomizePlusManager
                 PluginLog.Error($"Could not parse Customize+ profile: {profileGuidStr}. Is customize+ loaded?");
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.Log();
         }

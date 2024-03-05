@@ -1,4 +1,5 @@
-﻿using DynamicBridge.IPC;
+﻿using DynamicBridge.IPC.Customize;
+using DynamicBridge.IPC.Glamourer;
 
 namespace DynamicBridge.Configuration;
 public class Migrator
@@ -13,7 +14,7 @@ public class Migrator
     {
         if(C.EnableGlamourer)
         {
-            var entries = GlamourerManager.GetDesigns();
+            var entries = P.GlamourerManager.GetDesigns();
             if (entries.Any())
             {
                 PluginLog.Information($"Begin Glamourer name to guid migration");
@@ -43,7 +44,7 @@ public class Migrator
         }
     }
 
-    void MigrateProfile(Profile p, DesignListEntry[] entries)
+    void MigrateProfile(Profile p, GlamourerDesignInfo[] entries)
     {
         try
         {

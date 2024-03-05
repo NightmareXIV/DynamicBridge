@@ -1,10 +1,10 @@
 ﻿using ECommons.GameHelpers;
 using ECommons.Reflection;
 
-namespace DynamicBridge.IPC;
-public static class GlamourerReflector
+namespace DynamicBridge.IPC.Glamourer;
+public class GlamourerReflector
 {
-    public static bool GetAutomationGlobalState()
+    public bool GetAutomationGlobalState()
     {
         try
         {
@@ -20,7 +20,7 @@ public static class GlamourerReflector
         }
         return false;
     }
-    public static void SetAutomationGlobalState(bool state)
+    public void SetAutomationGlobalState(bool state)
     {
         try
         {
@@ -36,18 +36,18 @@ public static class GlamourerReflector
         }
     }
 
-    public static bool GetAutomationStatusForChara()
+    public bool GetAutomationStatusForChara()
     {
         try
         {
             if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
                 var adm = plugin.GetFoP("_services").Call<System.Collections.IEnumerable>(context.Assemblies, "GetService", ["Glamourer.Automation.AutoDesignManager"], []);
-                foreach(var profile in adm)
+                foreach (var profile in adm)
                 {
                     if (profile.GetFoP<bool>("Enabled"))
                     {
-                        foreach(var identifier in profile.GetFoP<System.Collections.IEnumerable>("Identifiers"))
+                        foreach (var identifier in profile.GetFoP<System.Collections.IEnumerable>("Identifiers"))
                         {
                             if (identifier.GetFoP("PlayerName").ToString().EqualsIgnoreCase(Player.Name))
                             {
@@ -65,7 +65,7 @@ public static class GlamourerReflector
         return false;
     }
 
-    public static string GetPathForDesignByGuid(Guid guid)
+    public string GetPathForDesignByGuid(Guid guid)
     {
         try
         {
@@ -73,9 +73,9 @@ public static class GlamourerReflector
             {
                 var manager = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignManager"], []);
                 var designList = manager.GetFoP<System.Collections.IList>("Designs");
-                foreach(var design in designList)
+                foreach (var design in designList)
                 {
-                    if(design.GetFoP<Guid>("Identifier") == guid)
+                    if (design.GetFoP<Guid>("Identifier") == guid)
                     {
                         var dfs = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignFileSystem"], []);
                         object[] findLeafArray = [design, null];

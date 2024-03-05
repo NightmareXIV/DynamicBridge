@@ -1,4 +1,4 @@
-﻿using DynamicBridge.IPC;
+﻿using DynamicBridge.IPC.Glamourer;
 using ECommons;
 using ECommons.GameHelpers;
 using Lumina.Excel.GeneratedSheets;
@@ -18,7 +18,7 @@ namespace DynamicBridge.Gui
         {
             if (ImGui.IsWindowAppearing())
             {
-                GlamourerManager.ResetCache();
+                P.GlamourerManager.ResetNameCache();
                 foreach (var x in Svc.Data.GetExcelSheet<Weather>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
                 foreach (var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
             }

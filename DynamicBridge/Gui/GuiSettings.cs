@@ -1,5 +1,5 @@
 ﻿using DynamicBridge.Configuration;
-using DynamicBridge.IPC;
+using DynamicBridge.IPC.Glamourer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +88,7 @@ public static class GuiSettings
             var c = new CancellationTokenSource();
             ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
             ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
-            if (GlamourerReflector.GetAutomationGlobalState() && GlamourerReflector.GetAutomationStatusForChara())
+            if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
             {
                 if (!C.ManageGlamourerAutomation)
                 {

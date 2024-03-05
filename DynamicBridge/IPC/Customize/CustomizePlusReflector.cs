@@ -7,20 +7,20 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge.IPC;
+namespace DynamicBridge.IPC.Customize;
 public static class CustomizePlusReflector
 {
     public static object GetProfileManager()
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, out var context, false, true))
+            if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, out var context, true, true))
             {
                 var profileManager = plugin.GetFoP("_services").Call([plugin.GetType().Assembly], "GetService", ["CustomizePlus.Profiles.ProfileManager"], []);
                 return profileManager;
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.LogInternal();
         }
@@ -45,7 +45,7 @@ public static class CustomizePlusReflector
                     ));
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.LogInternal();
         }
@@ -61,7 +61,7 @@ public static class CustomizePlusReflector
             if (profiles == null) return;
             foreach (var x in profiles)
             {
-                if(x.GetFoP<Guid>("UniqueId") == id)
+                if (x.GetFoP<Guid>("UniqueId") == id)
                 {
                     mgr.Call("SetEnabled", [x, enabled, false]);
                 }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge.IPC;
+namespace DynamicBridge.IPC.Honorific;
 public static class HonorificManager
 {
     public static bool WasSet = false;
@@ -19,7 +19,7 @@ public static class HonorificManager
             world ??= Svc.ClientState.LocalPlayer.HomeWorld.Id;
             return Svc.PluginInterface.GetIpcSubscriber<string, uint, TitleData[]>("Honorific.GetCharacterTitleList").InvokeFunc(name, world.Value);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.Log();
             return [];
@@ -48,7 +48,7 @@ public static class HonorificManager
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.Log();
         }

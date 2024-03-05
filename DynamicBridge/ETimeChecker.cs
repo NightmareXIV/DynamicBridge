@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace DynamicBridge;
 public unsafe static class ETimeChecker
 {
-    internal static long* ET = &CSFramework.Instance()->EorzeaTime;
+    internal static long* ET = &CSFramework.Instance()->ClientTime.EorzeaTime;
 
     public readonly static Dictionary<ETime, string> Names = new()
     {
