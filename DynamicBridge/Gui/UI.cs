@@ -80,7 +80,7 @@ namespace DynamicBridge.Gui
                         if (ImGui.Selectable("Default subprofile")) prof.SetSuprofile(-1);
                         for (int i = 0; i < prof.Subprofiles.Count; i++)
                         {
-                            if (ImGui.Selectable($"{prof.Name}##{i}")) prof.SetSuprofile(i);
+                            if (ImGui.Selectable($"{sub?.Name}##{i}")) prof.SetSuprofile(i);
                         }
                         ImGui.EndCombo();
                     }
