@@ -3,4 +3,4 @@
 	url = https://github.com/NightmareXIV/ECommons
 [submodule "OtterGui"]
 	path = OtterGui
-	url = https://github.com/Limiana/OtterGui.git
+	url = https://github.com/Limiana/OtterGui
