@@ -90,6 +90,7 @@ namespace DynamicBridge
 
         private void OnLogin()
         {
+            C.SeenCharacters[Player.CID] = Player.NameWithWorld;
             if (C.EnableGlamourer)
             {
                 if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
