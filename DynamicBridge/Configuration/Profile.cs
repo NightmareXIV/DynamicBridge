@@ -17,6 +17,7 @@ namespace DynamicBridge.Configuration
         public string ForcedPreset = null;
         public int Subprofile = -1;
         public List<Profile> Subprofiles = [];
+        public HashSet<ulong> Characters = [];
 
         internal void SetSuprofile(int i)
         {

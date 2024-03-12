@@ -2,6 +2,7 @@
 using DynamicBridge.Configuration;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
+using System;
 
 namespace DynamicBridge.IPC.Customize;
 public static class CustomizePlusManager
@@ -9,7 +10,7 @@ public static class CustomizePlusManager
     public static bool WasSet = false;
     public static Guid SavedProfileID = Guid.Empty;
     public static Guid LastEnabledProfileID = Guid.Empty;
-    public static CustomizePlusProfile[] GetProfiles(string chara = null)
+    public static CustomizePlusProfile[] GetProfiles(IEnumerable<string> chara = null)
     {
         try
         {
@@ -17,7 +18,7 @@ public static class CustomizePlusManager
             var ret = CustomizePlusReflector.GetProfiles().ToArray();
             if (chara != null)
             {
-                ret = ret.Where(x => x.characterName == chara).ToArray();
+                ret = ret.Where(x => chara.Contains(x.characterName)).ToArray();
             }
             return ret;
         }

@@ -1,5 +1,7 @@
-﻿using DynamicBridge.IPC.Customize;
+﻿using Dalamud.Plugin.Services;
+using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
+using ECommons.Configuration;
 
 namespace DynamicBridge.Configuration;
 public class Migrator
@@ -8,6 +10,33 @@ public class Migrator
     {
         Svc.Framework.Update += DoGlamourerMigration;
         Svc.Framework.Update += DoCustomizeMigration;
+        Svc.Framework.Update += DoProfileMigration;
+    }
+
+    void DoProfileMigration(object framework)
+    {
+#pragma warning disable CS0612 // Type or member is obsolete
+        PluginLog.Information($"Profile migration begins with {C.Profiles.Count} values");
+        foreach (var x in C.Profiles)
+        {
+            PluginLog.Information($"Migrating profile {x.Key}/{x.Value.Name}");
+            C.ProfilesL.Add(x.Value);
+            var charName = x.Value.Name;
+            x.Value.Name = $"Converted profile {charName}";
+            x.Value.SetCharacter(x.Key);
+            if(x.Value.Name != "") C.SeenCharacters[x.Key] = charName;
+            foreach(var s in x.Value.Subprofiles)
+            {
+                PluginLog.Information($"  Migrating subprofile {s.Name}");
+                C.ProfilesL.Add(s);
+                s.Name = $"Converted subprofile {s.Name} / {charName}";
+            }
+            x.Value.Subprofiles.Clear();
+        }
+        C.Profiles.Clear();
+        Svc.Framework.Update -= DoProfileMigration;
+        EzConfig.Save();
+#pragma warning restore CS0612 // Type or member is obsolete
     }
 
     void DoGlamourerMigration(object a)

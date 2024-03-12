@@ -10,11 +10,13 @@ namespace DynamicBridge.Configuration
     [Serializable]
     public class Config : IEzConfig
     {
+        public bool Enable = true;
         public HashSet<ulong> Blacklist = [];
         public List<HousingRecord> Houses = [];
         public List<ComplexGlamourerEntry> ComplexGlamourerEntries = [];
         public Profile GlobalProfile = new() { Name = "Global profile" };
-        public Dictionary<ulong, Profile> Profiles = [];
+        [Obsolete]public Dictionary<ulong, Profile> Profiles = [];
+        public List<Profile> ProfilesL = [];
         public bool Debug = false;
         public bool EnableGlamourer = true;
         public bool EnableCustomize = true;
@@ -29,6 +31,7 @@ namespace DynamicBridge.Configuration
         public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
         public bool UpdateJobGSChange = true;
         public bool UpdateGearChange = false;
+        public Dictionary<ulong, string> SeenCharacters = [];
 
         public bool Cond_State = true;
         public bool Cond_Biome = true;

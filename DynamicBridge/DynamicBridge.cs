@@ -199,58 +199,61 @@ namespace DynamicBridge
                     }
                 }
 
-                var profile = Utils.Profile(Player.CID);
+                var profile = Utils.GetProfileByCID(Player.CID);
                 if (!TaskManager.IsBusy && profile != null)
                 {
                     List<ApplyRule> newRule = [];
-                    if (profile.IsStaticExists())
+                    if (C.Enable)
                     {
-                        newRule = [StaticRule];
-                        StaticRule.SelectedPresets = [profile.GetStaticPreset().Name];
-                    }
-                    else
-                    {
-                        foreach (var x in profile.Rules)
+                        if (profile.IsStaticExists())
                         {
-                            if (
-                                x.Enabled
-                                &&
-                                (!C.Cond_State || ((x.States.Count == 0 || x.States.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.States.Any(s => s.Check()))))
-                                &&
-                                (!C.Cond_ZoneGroup || ((x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.SpecialTerritories.Any(s => s.Check()))))
-                                &&
-                                (!C.Cond_Biome || ((x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Biomes.Any(s => s.Check()))))
-                                &&
-                                (!C.Cond_Weather || ((x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Weathers.Contains(WeatherManager.GetWeather()))))
-                                &&
-                                (!C.Cond_Zone || ((x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType)) 
-                                && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))))
-                                &&
-                                (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId())) 
-                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))))
-                                &&
-                                (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
-                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))))
-                                &&
-                                (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
-                                && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))))
-                                &&
-                                (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
-                                && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))
-                                &&
-                                (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.Id))
-                                && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.Id))))
-                                &&
-                                (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
-                                && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
-                                )
+                            newRule = [StaticRule];
+                            StaticRule.SelectedPresets = [profile.GetStaticPreset().Name];
+                        }
+                        else
+                        {
+                            foreach (var x in profile.Rules)
                             {
-                                newRule.Add(x);
-                                if(!x.Passthrough) break;
+                                if (
+                                    x.Enabled
+                                    &&
+                                    (!C.Cond_State || ((x.States.Count == 0 || x.States.Any(s => s.Check()))
+                                    && (!C.AllowNegativeConditions || !x.Not.States.Any(s => s.Check()))))
+                                    &&
+                                    (!C.Cond_ZoneGroup || ((x.SpecialTerritories.Count == 0 || x.SpecialTerritories.Any(s => s.Check()))
+                                    && (!C.AllowNegativeConditions || !x.Not.SpecialTerritories.Any(s => s.Check()))))
+                                    &&
+                                    (!C.Cond_Biome || ((x.Biomes.Count == 0 || x.Biomes.Any(s => s.Check()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Biomes.Any(s => s.Check()))))
+                                    &&
+                                    (!C.Cond_Weather || ((x.Weathers.Count == 0 || x.Weathers.Contains(WeatherManager.GetWeather()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Weathers.Contains(WeatherManager.GetWeather()))))
+                                    &&
+                                    (!C.Cond_Zone || ((x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType))
+                                    && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))))
+                                    &&
+                                    (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))))
+                                    &&
+                                    (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
+                                    && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))))
+                                    &&
+                                    (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))))
+                                    &&
+                                    (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))
+                                    &&
+                                    (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.Id))
+                                    && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.Id))))
+                                    &&
+                                    (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
+                                    && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
+                                    )
+                                {
+                                    newRule.Add(x);
+                                    if (!x.Passthrough) break;
+                                }
                             }
                         }
                     }
@@ -335,10 +338,11 @@ namespace DynamicBridge
                                     }
                                     if (C.EnableHonorific)
                                     {
-                                        if (preset.Honorific.Count > 0)
+                                        var hfiltered = preset.HonorificFiltered().ToArray();
+                                        if (hfiltered.Length > 0)
                                         {
                                             DoNullHonorific = false;
-                                            var randomTitle = preset.Honorific[Random.Next(preset.Honorific.Count)];
+                                            var randomTitle = hfiltered[Random.Next(hfiltered.Length)];
                                             TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                             TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
                                         }
@@ -349,10 +353,11 @@ namespace DynamicBridge
                                     }
                                     if (C.EnableCustomize)
                                     {
-                                        if (preset.Customize.Count > 0)
+                                        var cfiltered = preset.CustomizeFiltered().ToArray();
+                                        if (cfiltered.Length > 0)
                                         {
                                             DoNullCustomize = false;
-                                            var randomCusProfile = preset.Customize[Random.Next(preset.Customize.Count)];
+                                            var randomCusProfile = cfiltered[Random.Next(cfiltered.Length)];
                                             TaskManager.Enqueue(Utils.WaitUntilInteractable);
                                             TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
                                         }

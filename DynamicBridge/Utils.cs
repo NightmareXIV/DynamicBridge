@@ -1,7 +1,9 @@
 ﻿using Dalamud.Memory;
 using DynamicBridge.Configuration;
 using DynamicBridge.Gui;
+using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
+using DynamicBridge.IPC.Honorific;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
@@ -19,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Action = System.Action;
 
 namespace DynamicBridge
 {
@@ -27,6 +30,89 @@ namespace DynamicBridge
         public const string IconWarning = "\uf071";
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
+
+        public static IEnumerable<string> HonorificFiltered(this Preset preset)
+        {
+            var name = Utils.GetCharaNameFromCID(Player.CID);
+            var hlist = HonorificManager.GetTitleData([Player.CID]);
+            foreach (var x in preset.Honorific)
+            {
+                if (hlist.Any(h => h.Title == x))
+                {
+                    yield return x;
+                }
+            }
+        }
+
+        public static IEnumerable<string> CustomizeFiltered(this Preset preset)
+        {
+            var name = Utils.GetCharaNameFromCID(Player.CID);
+            var clist = CustomizePlusManager.GetProfiles([Player.Name]);
+            foreach (var x in preset.Customize)
+            {
+                if (clist.Any(h => h.ID.ToString() == x))
+                {
+                    yield return x;
+                }
+            }
+        }
+
+        public static void Banner(string id, IEnumerable<string> text, Vector4? colBg = null, Vector4? colText = null)
+        {
+            if (ImGui.BeginTable($"##TableBanner{id}", 1, ImGuiTableFlags.SizingStretchSame | ImGuiTableFlags.Borders))
+            {
+                ImGui.TableHeader($"##header");
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, (colBg ?? ImGuiEx.Vector4FromRGBA(0x222222aa)).ToUint());
+                var i = 0;
+                foreach (var t in text)
+                {
+                    ImGuiEx.LineCentered($"Banner{id}-{i++}", () => ImGuiEx.Text(colText ?? ImGuiColors.DalamudWhite, t));
+                }
+                ImGui.EndTable();
+            }
+        }
+
+        public static bool BannerCombo(string id, string text, Action draw, Vector4? colBg = null)
+        {
+            ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
+            if(colBg != null)
+            {
+                ImGui.PushStyleColor(ImGuiCol.FrameBg, colBg.Value);
+                ImGui.PushStyleColor(ImGuiCol.FrameBgActive, colBg.Value);
+                ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, colBg.Value);
+            }
+
+            var ret = ImGui.BeginCombo($"##{id}", text, C.ComboSize);
+            if (ret)
+            {
+                if (colBg != null) ImGui.PopStyleColor(3);
+                draw();
+                ImGui.EndCombo();
+            }
+            else
+            {
+                if (colBg != null) ImGui.PopStyleColor(3);
+            }
+            ImGui.PopStyleVar();
+            return ret;
+        }
+
+        public static string GetCharaNameFromCID(ulong CID)
+        {
+            if(C.SeenCharacters.TryGetValue(CID, out var name)) return name;
+            return $"Unknown character {CID:X16}";
+        }
+
+        public static void SetCharacter(this Profile profile, ulong player)
+        {
+            foreach(var c in C.ProfilesL)
+            {
+                c.Characters.Remove(player);
+            }
+            profile.Characters.Add(player);
+        }
 
         public static List<uint> GetCurrentGear()
         {
@@ -66,24 +152,17 @@ namespace DynamicBridge
             preset.IsStatic = true;
         }
 
-        public static Profile Profile(ulong CID, bool returnMain = false)
+        public static Profile GetProfileByCID(ulong CID)
         {
             if (CID == 0 || C.Blacklist.Contains(CID)) return null;
-            if (C.Profiles.TryGetValue(CID, out var ret))
+            if(C.ProfilesL.TryGetFirst(x => x.Characters.Contains(CID), out var profile))
             {
-                if (returnMain) return ret;
-                return ret.Subprofiles.SafeSelect(ret.Subprofile) ?? ret;
+                return profile;
             }
-            else
-            {
-                ret = new Profile();
-                if (CID == Player.CID) ret.Name = Player.NameWithWorld;
-                C.Profiles[CID] = ret;
-                return ret;
-            }
+            return null;
         }
 
-        public static Profile Profile(bool returnMain = false) => Profile(Player.CID, returnMain);
+        public static Profile Profile(bool returnMain = false) => GetProfileByCID(Player.CID);
 
         public static string GetHouseDefaultName()
         {

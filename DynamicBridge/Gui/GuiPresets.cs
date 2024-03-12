@@ -1,4 +1,5 @@
-﻿using DynamicBridge.Configuration;
+﻿using Dalamud.Interface.Components;
+using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
@@ -23,9 +24,9 @@ namespace DynamicBridge.Gui
         public static void DrawUser()
         {
             UI.ProfileSelectorCommon();
-            if (Utils.Profile(UI.CurrentCID) != null)
+            if (UI.Profile != null)
             {
-                DrawProfile(Utils.Profile(UI.CurrentCID));
+                DrawProfile(UI.Profile);
             }
         }
 
@@ -38,7 +39,7 @@ namespace DynamicBridge.Gui
         static void DrawProfile(Profile Profile)
         {
             Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
-            if (ImGui.Button("Add new preset"))
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new Preset"))
             {
                 if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                 {
@@ -50,7 +51,7 @@ namespace DynamicBridge.Gui
                 }
             }
             ImGui.SameLine();
-            if (ImGui.Button("Paste from clipboard"))
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
             {
                 try
                 {
@@ -69,12 +70,17 @@ namespace DynamicBridge.Gui
                     Notify.Error(e.Message);
                 }
             }
+            ImGui.SameLine();
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Apply Rules and Appearance"))
+            {
+                P.SoftForceUpdate = true;
+            }
 
             ImGui.SameLine();
             ImGuiEx.Text($"|");
             ImGui.SameLine();
 
-            if (ImGui.Button("Add new folder"))
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.FolderPlus, "Add new folder"))
             {
                 Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
             }
@@ -403,7 +409,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##customize", preset.Customize.Select(CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
-                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Name.Split("@")[0]).OrderBy(x => CustomizePlusManager.TransformName(x.ID.ToString()));
+                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Characters.Select(Utils.GetCharaNameFromCID).Select(z => z.Split("@")[0])).OrderBy(x => CustomizePlusManager.TransformName(x.ID.ToString()));
                                 var index = 0;
                                 foreach (var x in profiles)
                                 {
@@ -439,7 +445,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
-                                var titles = HonorificManager.GetTitleData(currentProfile.Name.Split("@")[0], ExcelWorldHelper.Get(currentProfile.Name.Split("@")[1]).RowId).OrderBy(x => x.Title);
+                                var titles = HonorificManager.GetTitleData(currentProfile.Characters).OrderBy(x => x.Title);
                                 var index = 0;
                                 foreach (var x in titles)
                                 {

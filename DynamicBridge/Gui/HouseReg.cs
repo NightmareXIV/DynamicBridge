@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+﻿using Dalamud.Interface.Components;
+using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Text($"Current house: {CurrentHouse:X16}");
                 if (!C.Houses.TryGetFirst(x => x.ID == CurrentHouse, out var record))
                 {
-                    if (ImGui.Button("Register this house"))
+                    if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Home, "Register this house"))
                     {
                         C.Houses.Add(new() { ID = CurrentHouse, Name = Utils.GetHouseDefaultName() });
                     }

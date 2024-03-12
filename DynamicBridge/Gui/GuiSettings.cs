@@ -1,5 +1,6 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,7 @@ public static class GuiSettings
 
     public static void Draw()
     {
+        ImGui.Checkbox($"Enable Plugin", ref C.Enable);
         if (ImGuiGroup.BeginGroupBox("General"))
         {
             ImGui.Checkbox($"Allow applying negative conditions", ref C.AllowNegativeConditions);

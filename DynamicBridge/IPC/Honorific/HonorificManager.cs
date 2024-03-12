@@ -1,5 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using ECommons.ExcelServices;
 using ECommons.GameHelpers;
+using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,13 +13,26 @@ namespace DynamicBridge.IPC.Honorific;
 public static class HonorificManager
 {
     public static bool WasSet = false;
-    public static TitleData[] GetTitleData(string name = null, uint? world = null)
+    public static List<TitleData> GetTitleData(IEnumerable<ulong> CIDs)
     {
         try
         {
-            name ??= Svc.ClientState.LocalPlayer.Name.ToString();
-            world ??= Svc.ClientState.LocalPlayer.HomeWorld.Id;
-            return Svc.PluginInterface.GetIpcSubscriber<string, uint, TitleData[]>("Honorific.GetCharacterTitleList").InvokeFunc(name, world.Value);
+            List<TitleData> ret = [];
+            foreach (var c in CIDs)
+            {
+                var nameWithWorld = Utils.GetCharaNameFromCID(c);
+                if (nameWithWorld != null)
+                {
+                    var parts = nameWithWorld.Split("@");
+                    if (parts.Length == 2)
+                    {
+                        var name = parts[0];
+                        var world = ExcelWorldHelper.Get(parts[1]);
+                        ret.AddRange(Svc.PluginInterface.GetIpcSubscriber<string, uint, TitleData[]>("Honorific.GetCharacterTitleList").InvokeFunc(name, world.RowId));
+                    }
+                }
+            }
+            return ret;
         }
         catch (Exception e)
         {
@@ -38,7 +53,7 @@ public static class HonorificManager
             else
             {
                 WasSet = true;
-                if (GetTitleData().TryGetFirst(x => x.Title == title, out var t))
+                if (GetTitleData([Player.CID]).TryGetFirst(x => x.Title == title, out var t))
                 {
                     Svc.PluginInterface.GetIpcSubscriber<Character, string, object>("Honorific.SetCharacterTitle").InvokeAction(Player.Object, JsonConvert.SerializeObject(t));
                 }

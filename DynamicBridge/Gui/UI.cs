@@ -1,117 +1,160 @@
-﻿using DynamicBridge.IPC.Glamourer;
+﻿using Dalamud.Interface.Components;
+using DynamicBridge.Configuration;
+using DynamicBridge.IPC.Glamourer;
 using ECommons;
+using ECommons.Configuration;
 using ECommons.GameHelpers;
+using ECommons.Reflection;
+using ECommons.SimpleGui;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Xml.Linq;
 
 namespace DynamicBridge.Gui
 {
     public unsafe static class UI
     {
 
-        public static ulong SelectedCID = 0;
-        public static ulong CurrentCID => SelectedCID == 0 ? Player.CID : SelectedCID;
+        public static Profile SelectedProfile = null;
+        public static Profile Profile => SelectedProfile ?? Utils.GetProfileByCID(Player.CID);
         public const string RandomNotice = "Will be randomly selected between:\n";
         public const string AnyNotice = "Meeting any of the following conditions will result in rule being triggered:\n";
+        static string PSelFilter = "";
+        public static string RequestTab = null;
 
         public static void DrawMain()
         {
+            var resolution = "";
+            if (Player.CID == 0) resolution = "Not logged in";
+            else if (C.Blacklist.Contains(Player.CID)) resolution = "Character blacklisted";
+            else if (Utils.GetProfileByCID(Player.CID) == null) resolution = "No associated profile";
+            else resolution = $"Profile {Utils.GetProfileByCID(Player.CID).Name}";
+            if (!C.Enable && Environment.TickCount64 % 2000 > 1000) resolution = "PLUGIN DISABLED BY SETTINGS";
+            EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} v{P.GetType().Assembly.GetName().Version} [{resolution}]###{DalamudReflector.GetPluginName()}";
             if (ImGui.IsWindowAppearing())
             {
                 P.GlamourerManager.ResetNameCache();
                 foreach (var x in Svc.Data.GetExcelSheet<Weather>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
                 foreach (var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
             }
-            if (Player.Available && Utils.Profile() != null)
-            {
-                Utils.Profile(true).Name = Player.NameWithWorld;
-            }
             KoFiButton.DrawRight();
-            ImGuiEx.EzTabBar("Tabs", true, [
+            ImGuiEx.EzTabBar("TabsNR", true, RequestTab, [
                 //("Settings", Settings, null, true),
-                ("Dynamic Rules", GuiRules.Draw, null, true),
-                ("Presets", GuiPresets.DrawUser, null, true),
-                ("Global Presets", GuiPresets.DrawGlobal, null, true),
-                ("Layered Designs", ComplexGlamourer.Draw, null, true),
-                ("House Registration", HouseReg.Draw, null, true),
+                ("Profiles", GuiProfiles.DrawProfiles, EColor.GreenBright, true),
+                ("Characters", GuiProfiles.DrawCharacters, EColor.GreenBright, true),
+                ("Dynamic Rules", GuiRules.Draw, EColor.GreenBright, true),
+                ("Presets", GuiPresets.DrawUser, EColor.GreenBright, true),
+                ("Global Presets", GuiPresets.DrawGlobal, EColor.YellowBright, true),
+                ("Layered Designs", ComplexGlamourer.Draw, EColor.PurpleBright, true),
+                ("House Registration", HouseReg.Draw, EColor.PurpleBright, true),
                 ("Settings", GuiSettings.Draw, null, true),
                 InternalLog.ImGuiTab(),
                 (C.Debug?"Debug":null, Debug.Draw, ImGuiColors.DalamudGrey3, true),
                 ]);
+            RequestTab = null;
         }
 
         public static void ProfileSelectorCommon()
         {
-            if (C.Blacklist.Contains(Player.CID))
+            if (SelectedProfile != null && !C.ProfilesL.Contains(SelectedProfile)) SelectedProfile = null;
+            var currentCharaProfile = Utils.GetProfileByCID(Player.CID);
+
+            if (SelectedProfile == null)
             {
-                if (ImGui.Button("Unblacklist current character"))
+                if (currentCharaProfile == null)
                 {
-                    C.Blacklist.Remove(Player.CID);
+                    if (C.Blacklist.Contains(Player.CID))
+                    {
+                        ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("blisted", $"\"{Player.NameWithWorld}\" is blacklisted. Select a profile to edit it.", ProfileSelectable), () =>
+                        {
+                            if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.ArrowCircleUp, "Unblacklist"))
+                            {
+                                C.Blacklist.Remove(Player.CID);
+                            }
+                        });
+                    }
+                    else if (Player.CID != 0)
+                    {
+                        ImGuiEx.SetNextItemFullWidth();
+                        ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("noprofile", $"\"{Player.NameWithWorld}\" has no associated profile. Select other profile to edit or associate profile in Characters tab.", ProfileSelectable), () =>
+                        {
+                            if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.PlusCircle, "Create Empty"))
+                            {
+                                var profile = new Profile();
+                                C.ProfilesL.Add(profile);
+                                profile.Characters = [Player.CID];
+                                profile.Name = $"Autogenerated Profile for {Player.Name}";
+                            }
+                            ImGuiEx.Tooltip($"Create new empty profile and assign it to current character");
+                        });
+                    }
+                    else
+                    {
+                        ImGuiEx.SetNextItemFullWidth();
+                        Utils.BannerCombo("nlg", $"You are not logged in. Please select profile to edit.", ProfileSelectable);
+                    }
+                }
+                else
+                {
+                    UsedByCurrent();
                 }
             }
-            ImGuiEx.SetNextItemWidth(0.6f);
-            if (ImGui.BeginCombo($"##selectProfile", $"{Utils.Profile(UI.CurrentCID, true)?.Name ?? "Select profile..."}"))
+            else
             {
-                foreach (var x in C.Profiles)
+                if (currentCharaProfile == SelectedProfile)
                 {
-                    if (C.Blacklist.Contains(x.Key)) continue;
-                    ImGui.PushID(x.Value.GUID);
-                    if (x.Key == Player.CID) ImGui.PushStyleColor(ImGuiCol.Text, EColor.Green);
-                    if (ImGui.Selectable(x.Value.Name, x.Key == CurrentCID))
-                    {
-                        UI.SelectedCID = Player.CID == x.Key ? 0 : x.Key;
-                    }
-                    if (x.Key == Player.CID) ImGui.PopStyleColor();
-                        if (x.Key == UI.CurrentCID && ImGui.IsWindowAppearing()) ImGui.SetScrollHereY();
-                    ImGui.PopID();
+                    UsedByCurrent();
                 }
-                ImGui.EndCombo();
+                else
+                {
+                    ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("EditNotify", $"You are editing profile \"{SelectedProfile.Name}\". It is not used by \"{Player.NameWithWorld}\".", ProfileSelectable, EColor.YellowDark), () =>
+                    {
+                        if (!C.Blacklist.Contains(Player.CID))
+                        {
+                            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Link, "Link"))
+                            {
+                                new TickScheduler(() => SelectedProfile.SetCharacter(Player.CID));
+                            }
+                            ImGuiEx.Tooltip($"Assign profile {SelectedProfile?.Name} to {Player.NameWithWorld}");
+                        }
+                        else
+                        {
+                            ImGuiEx.HelpMarker("Your current character is blacklisted", null, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                        }
+                    });
+                }
             }
 
-            var prof = Utils.Profile(UI.CurrentCID, true);
-            if (prof != null)
+            void UsedByCurrent()
             {
-                ImGui.SameLine();
-                var sub = prof.Subprofiles.SafeSelect(prof.Subprofile);
-                ImGuiEx.InputWithRightButtonsArea("subprofile", () =>
+                ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("EditNotify", $"You are editing profile \"{currentCharaProfile.Name}\" which is used by \"{Player.NameWithWorld}\".", ProfileSelectable, EColor.GreenDark), () =>
                 {
-                    if (ImGui.BeginCombo("##selSub", sub?.Name ?? "Default subprofile"))
+                    if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Unlink, "Unlink"))
                     {
-                        if (ImGui.Selectable("Default subprofile")) prof.SetSuprofile(-1);
-                        for (int i = 0; i < prof.Subprofiles.Count; i++)
-                        {
-                            if (ImGui.Selectable($"{sub?.Name}##{i}")) prof.SetSuprofile(i);
-                        }
-                        ImGui.EndCombo();
+                        new TickScheduler(() => currentCharaProfile.Characters.Remove(Player.CID));
                     }
-                }, () =>
-                {
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
-                    {
-                        prof.Subprofiles.Add(new() { Name = $"Subprofile {prof.Subprofiles.Count + 1}" });
-                    }
-                    if (sub != null)
-                    {
-                        ImGui.SameLine();
-                        if (ImGuiEx.IconButton(FontAwesomeIcon.Edit))
-                        {
-                            ImGui.OpenPopup($"EditSub");
-                        }
-                        ImGui.SameLine();
-                        if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
-                        {
-                            new TickScheduler(() => prof.Subprofiles.RemoveAt(prof.Subprofile));
-                        }
-                    }
+                    ImGuiEx.Tooltip($"Unassign profile {currentCharaProfile?.Name} from {Player.NameWithWorld}");
                 });
-                if (ImGui.BeginPopup($"EditSub"))
+            }
+
+            void ProfileSelectable()
+            {
+                if(ImGui.Selectable("- Current character -", SelectedProfile == null))
                 {
-                    ImGuiEx.SetNextItemWidthScaled(150f);
-                    if (prof.Subprofiles.SafeSelect(prof.Subprofile) != null)
+                    SelectedProfile = null;
+                }
+                ImGui.Separator();
+                ImGuiEx.SetNextItemWidthScaled(150f);
+                ImGui.InputTextWithHint($"##SearchCombo", "Filter...", ref PSelFilter, 50);
+                foreach(var x in C.ProfilesL)
+                {
+                    if (PSelFilter.Length > 0 && !x.Name.Contains(PSelFilter, StringComparison.OrdinalIgnoreCase)) continue;
+                    if (SelectedProfile == x && ImGui.IsWindowAppearing()) ImGui.SetScrollHereY();
+                    if(ImGui.Selectable($"{x.Name}##{x.GUID}", SelectedProfile == x))
                     {
-                        ImGui.InputText($"##renameSub", ref prof.Subprofiles[prof.Subprofile].Name, 150);
+                        new TickScheduler(() => SelectedProfile = x);
                     }
-                    ImGui.EndPopup();
                 }
             }
         }

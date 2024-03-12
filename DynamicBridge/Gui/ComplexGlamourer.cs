@@ -1,4 +1,5 @@
-﻿using DynamicBridge.Configuration;
+﻿using Dalamud.Interface.Components;
+using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ public static unsafe class ComplexGlamourer
             return;
         }
         ImGuiEx.TextWrapped($"Here you can create layered designs for Glamourer. Upon application, they will be applied sequentially one after another. You will be able to select layered designs for profiles together with normal entries.");
-        if(ImGui.Button("Add new entry"))
+        if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new entry"))
         {
             C.ComplexGlamourerEntries.Add(new());
         }

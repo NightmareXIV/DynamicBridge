@@ -13,12 +13,13 @@ using OtterGui.Widgets;
 using ECommons.Throttlers;
 using System.Runtime.InteropServices;
 using ECommons;
+using Dalamud.Interface.Components;
 
 namespace DynamicBridge.Gui
 {
     public unsafe static class GuiRules
     {
-        static Vector2 iconSize => new(24f.Scale());
+        static Vector2 iconSize => new(24f);
         static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "","","","","","",""];
         static bool[] OnlySelected = new bool[20];
         static string CurrentDrag = "";
@@ -26,16 +27,16 @@ namespace DynamicBridge.Gui
         public static void Draw()
         {
             UI.ProfileSelectorCommon();
-            if (Utils.Profile(UI.CurrentCID) != null)
+            if (UI.Profile != null)
             {
-                var Profile = Utils.Profile(UI.CurrentCID);
+                var Profile = UI.Profile;
                 Profile.Rules.RemoveAll(x => x == null);
-                if (ImGui.Button("Add new rule"))
+                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new rule"))
                 {
                     Profile.Rules.Add(new());
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Paste from clipboard"))
+                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
                 {
                     try
                     {
@@ -47,38 +48,9 @@ namespace DynamicBridge.Gui
                     }
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Apply rules"))
+                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Apply Rules and Appearance"))
                 {
                     P.SoftForceUpdate = true;
-                }
-                if (ImGuiEx.ButtonCtrl("Blacklist character"))
-                {
-                    C.Blacklist.Add(Player.CID);
-                    UI.SelectedCID = 0;
-                }
-                ImGui.SameLine();
-                if (ImGuiEx.ButtonCtrl("Import subprofile from clipboard"))
-                {
-                    try
-                    {
-                        if (C.Profiles[UI.CurrentCID].Subprofiles.SafeSelect(C.Profiles[UI.CurrentCID].Subprofile) != null)
-                        {
-                            C.Profiles[UI.CurrentCID].Subprofiles[C.Profiles[UI.CurrentCID].Subprofile] = JsonConvert.DeserializeObject<Profile>(Clipboard.GetText());
-                        }
-                        else
-                        {
-                            C.Profiles[UI.CurrentCID] = JsonConvert.DeserializeObject<Profile>(Clipboard.GetText());
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Notify.Error(e.Message);
-                    }
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("Export subprofile to clipboard"))
-                {
-                    Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(Profile)));
                 }
                 if (Profile.IsStaticExists())
                 {

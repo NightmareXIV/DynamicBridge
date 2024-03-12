@@ -78,7 +78,7 @@ namespace DynamicBridge.Gui
 
             if(ImGui.CollapsingHeader("Honorific test"))
             {
-                foreach (var d in HonorificManager.GetTitleData())
+                foreach (var d in HonorificManager.GetTitleData([Player.CID]))
                 {
                     if (ImGui.Selectable($"{d.Title}"))
                     {
