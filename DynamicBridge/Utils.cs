@@ -301,13 +301,13 @@ namespace DynamicBridge
                     if (*x.Name == 0) continue;
                     list.Add(new(x.ID, MemoryHelper.ReadStringNullTerminated((nint)x.Name), x.ClassJob));
                 }
-                C.GearsetNameCache[Player.NameWithWorld] = list;
+                C.GearsetNameCacheCID[Player.CID] = list;
             }
         }
 
-        public static IEnumerable<string> ToGearsetNames(this List<int> gearsetIDs, string nameWithWorld)
+        public static IEnumerable<string> ToGearsetNames(this List<int> gearsetIDs, ulong CID)
         {
-            if (!C.GearsetNameCache.TryGetValue(nameWithWorld, out var cache)) cache = [];
+            if (!C.GearsetNameCacheCID.TryGetValue(CID, out var cache)) cache = [];
             for (int i = 0; i < gearsetIDs.Count; i++)
             {
                 if (cache.TryGetFirst(x => x.Id == gearsetIDs[i], out var ret))

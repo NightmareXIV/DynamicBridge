@@ -470,10 +470,11 @@ namespace DynamicBridge.Gui
                             ImGui.TableNextColumn();
                             //Gearset
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            if (ImGui.BeginCombo("##gs", rule.Gearsets.ToGearsetNames(Profile.Name).PrintRange(rule.Not.Gearsets.ToGearsetNames(Profile.Name), out var fullList), C.ComboSize))
+                            var gch = Profile.Characters.FirstOrDefault();
+                            if (ImGui.BeginCombo("##gs", rule.Gearsets.ToGearsetNames(gch).PrintRange(rule.Not.Gearsets.ToGearsetNames(gch), out var fullList), C.ComboSize))
                             {
                                 FiltersSelection();
-                                if (!C.GearsetNameCache.TryGetValue(Profile.Name, out var gearsets)) gearsets = [];
+                                if (!C.GearsetNameCacheCID.TryGetValue(gch, out var gearsets)) gearsets = [];
                                 foreach (var cond in gearsets)
                                 {
                                     var name = cond.ToString();

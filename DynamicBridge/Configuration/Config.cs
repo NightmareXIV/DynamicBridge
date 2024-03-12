@@ -45,7 +45,7 @@ namespace DynamicBridge.Configuration
         public bool Cond_World = false;
         public bool Cond_Gearset = false;
 
-        public Dictionary<string, List<GearsetEntry>> GearsetNameCache = [];
+        public Dictionary<ulong, List<GearsetEntry>> GearsetNameCacheCID = [];
     }
 
     public enum GlamourerNoRuleBehavior
