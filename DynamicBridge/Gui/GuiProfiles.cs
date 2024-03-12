@@ -1,4 +1,5 @@
-﻿using DynamicBridge.Configuration;
+﻿using Dalamud.Interface.Components;
+using DynamicBridge.Configuration;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
 using System;
@@ -15,8 +16,16 @@ public static class GuiProfiles
 
     public static void DrawProfiles()
     {
-        ImGuiEx.SetNextItemFullWidth();
-        ImGui.InputTextWithHint($"##Filter0", "Search profile name...", ref Filters[0], 100);
+        ImGuiEx.InputWithRightButtonsArea("DrawProfilesInp", () => ImGui.InputTextWithHint($"##Filter0", "Search profile name...", ref Filters[0], 100), () =>
+        {
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.PlusCircle, "Create Empty"))
+            {
+                var profile = new Profile();
+                C.ProfilesL.Add(profile);
+                profile.Name = $"New Profile {C.ProfilesL.Count}";
+            }
+            ImGuiEx.Tooltip($"Create new empty profile");
+        });
 
         if (ImGui.BeginTable($"##profiles", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
         {
