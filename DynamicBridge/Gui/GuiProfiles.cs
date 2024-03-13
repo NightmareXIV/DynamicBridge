@@ -27,11 +27,12 @@ public static class GuiProfiles
             ImGuiEx.Tooltip($"Create new empty profile");
         });
 
-        if (ImGui.BeginTable($"##profiles", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
+        if (ImGui.BeginTable($"##profiles", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
         {
             //ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort);
             ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn("Used by", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Folder whitelist", ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
 
@@ -55,6 +56,36 @@ public static class GuiProfiles
                 if(profile.Characters.Count > 2)
                 {
                     ImGuiEx.Tooltip($"...\n{profile.Characters.Skip(2).Select(Utils.GetCharaNameFromCID).Print("\n")}");
+                }
+
+                ImGui.TableNextColumn();
+
+                ImGuiEx.SetNextItemFullWidth();
+                if(ImGui.BeginCombo($"##FoldersWhitelist", profile.Pathes.PrintRange(out _), C.ComboSize))
+                {
+                    if(profile.Pathes.Count > 1) ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
+                    if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
+                    var pathes = Utils.GetCombinedPathes();
+                    foreach (var x in pathes)
+                    {
+                        for (int q = 0; q < x.Indentation; q++)
+                        {
+                            ImGuiEx.Spacing();
+                        }
+                        ImGuiEx.CollectionCheckbox($"{x.Name}", x.Name, profile.Pathes);
+                    }
+                    foreach(var x in profile.Pathes)
+                    {
+                        if (pathes.Any(z => z.Name == x)) continue;
+                        ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                        ImGuiEx.CollectionCheckbox($"{x}", x, profile.Pathes);
+                        ImGui.PopStyleColor();
+                    }
+                    ImGui.EndCombo();
+                }
+                else
+                {
+                    if (profile.Pathes.Count > 1) ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
                 }
 
                 ImGui.TableNextColumn();

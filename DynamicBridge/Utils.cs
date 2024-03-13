@@ -1,26 +1,14 @@
 ﻿using Dalamud.Memory;
 using DynamicBridge.Configuration;
-using DynamicBridge.Gui;
-using DynamicBridge.IPC.Customize;
-using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
-using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Action = System.Action;
 
 namespace DynamicBridge
@@ -30,6 +18,52 @@ namespace DynamicBridge
         public const string IconWarning = "\uf071";
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
+
+
+        static List<PathInfo> PathInfos = null;
+        public static List<PathInfo> GetCombinedPathes()
+        {
+            if (PathInfos != null) return PathInfos;
+            var ret = new List<PathInfo>();
+            try
+            {
+                var pathes = new List<string>();
+                foreach (var path in P.GlamourerManager.GetRawPathes()
+                    .Concat(P.CustomizePlusManager.GetRawPathes()))
+                {
+                    var nameParts = path.Split('/');
+                    if (nameParts.Length > 1)
+                    {
+                        var pathParts = nameParts[..^1];
+                        pathes.Add(pathParts.Join("/"));
+                    }
+                }
+                pathes.Sort();
+                foreach (var x in pathes)
+                {
+                    var parts = x.Split('/');
+                    if (parts.Length == 0) continue;
+                    for (int i = 1; i <= parts.Length; i++)
+                    {
+                        var part = parts[..i].Join("/");
+                        var info = new PathInfo(part, i - 1);
+                        if (!ret.Contains(info)) ret.Add(info);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.LogInternal();
+            }
+            PathInfos = ret;
+            return ret;
+        }
+
+        public static void ResetCaches()
+        {
+            P.GlamourerManager.ResetNameCache();
+            PathInfos = null;
+        }
 
         public static IEnumerable<string> HonorificFiltered(this Preset preset)
         {
@@ -47,7 +81,7 @@ namespace DynamicBridge
         public static IEnumerable<string> CustomizeFiltered(this Preset preset)
         {
             var name = Utils.GetCharaNameFromCID(Player.CID);
-            var clist = CustomizePlusManager.GetProfiles([Player.Name]);
+            var clist = P.CustomizePlusManager.GetProfiles([Player.Name]);
             foreach (var x in preset.Customize)
             {
                 if (clist.Any(h => h.ID.ToString() == x))

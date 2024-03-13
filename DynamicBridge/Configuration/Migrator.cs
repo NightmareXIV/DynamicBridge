@@ -102,7 +102,7 @@ public class Migrator
     {
         if (C.EnableCustomize)
         {
-            var entries = CustomizePlusManager.GetProfiles();
+            var entries = P.CustomizePlusManager.GetProfiles();
             if (entries.Any())
             {
                 PluginLog.Information($"Begin Customize+ name to guid migration");

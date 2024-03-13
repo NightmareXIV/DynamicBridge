@@ -37,7 +37,7 @@ public static unsafe class ComplexGlamourer
                 ImGui.SameLine();
                 if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(P.GlamourerManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                 {
-                    if (ImGui.IsWindowAppearing()) P.GlamourerManager.ResetNameCache();
+                    if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                     FiltersSelection();
                     var designs = P.GlamourerManager.GetDesigns().OrderBy(x => x.Name);
                     foreach (var x in designs)

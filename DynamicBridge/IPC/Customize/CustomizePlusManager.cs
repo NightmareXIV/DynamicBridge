@@ -1,21 +1,50 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DynamicBridge.Configuration;
+using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
 using System;
 
 namespace DynamicBridge.IPC.Customize;
-public static class CustomizePlusManager
+public class CustomizePlusManager
 {
-    public static bool WasSet = false;
-    public static Guid SavedProfileID = Guid.Empty;
-    public static Guid LastEnabledProfileID = Guid.Empty;
-    public static CustomizePlusProfile[] GetProfiles(IEnumerable<string> chara = null)
+    public bool WasSet = false;
+    public Guid SavedProfileID = Guid.Empty;
+    public Guid LastEnabledProfileID = Guid.Empty;
+    public CustomizePlusReflector Reflector;
+
+    public CustomizePlusManager()
+    {
+        Reflector = new();
+        EzIPC.Init(this, "CustomizePlus");
+    }
+
+    public List<string> GetRawPathes()
+    {
+        var ret = new List<string>();
+        try
+        {
+            foreach (var x in GetProfiles())
+            {
+                var path = Reflector.GetPathForProfileByGuid(x.ID);
+                if (path != null)
+                {
+                    ret.Add(path);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.LogInternal();
+        }
+        return ret;
+    }
+
+    public CustomizePlusProfile[] GetProfiles(IEnumerable<string> chara = null)
     {
         try
         {
-            //var ret = Svc.PluginInterface.GetIpcSubscriber<CustomizePlusProfile[]>("CustomizePlus.GetProfileList").InvokeFunc();
-            var ret = CustomizePlusReflector.GetProfiles().ToArray();
+            var ret = Reflector.GetProfiles().ToArray();
             if (chara != null)
             {
                 ret = ret.Where(x => chara.Contains(x.characterName)).ToArray();
@@ -29,7 +58,7 @@ public static class CustomizePlusManager
         }
     }
 
-    public static void SetProfile(string profileGuidStr, string charName)
+    public void SetProfile(string profileGuidStr, string charName)
     {
         try
         {
@@ -49,8 +78,7 @@ public static class CustomizePlusManager
             {
                 if (charaProfiles.TryGetFirst(x => x.ID == guid, out var profile))
                 {
-                    //Svc.PluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.EnableProfileByUniqueId").InvokeAction(profile.ID);
-                    CustomizePlusReflector.SetEnabled(profile.ID, true);
+                    Reflector.SetEnabled(profile.ID, true);
                     LastEnabledProfileID = profile.ID;
                 }
             }
@@ -66,7 +94,7 @@ public static class CustomizePlusManager
         WasSet = true;
     }
 
-    public static void RestoreState()
+    public void RestoreState()
     {
         if (WasSet)
         {
@@ -74,13 +102,11 @@ public static class CustomizePlusManager
             {
                 if (SavedProfileID == Guid.Empty)
                 {
-                    //Svc.PluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.DisableProfileByUniqueId").InvokeAction(LastEnabledProfileID);
-                    CustomizePlusReflector.SetEnabled(LastEnabledProfileID, false);
+                    Reflector.SetEnabled(LastEnabledProfileID, false);
                 }
                 else
                 {
-                    //Svc.PluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.EnableProfileByUniqueId").InvokeAction(SavedProfileID);
-                    CustomizePlusReflector.SetEnabled(SavedProfileID, true);
+                    Reflector.SetEnabled(SavedProfileID, true);
                 }
             }
             catch (Exception e)
@@ -94,7 +120,7 @@ public static class CustomizePlusManager
 
 
 
-    public static string TransformName(string originalName)
+    public string TransformName(string originalName)
     {
         if (Guid.TryParse(originalName, out Guid guid))
         {
@@ -102,7 +128,7 @@ public static class CustomizePlusManager
             {
                 if (C.GlamourerFullPath)
                 {
-                    return CustomizePlusReflector.GetPathForProfileByGuid(guid) ?? entry.Name;
+                    return Reflector.GetPathForProfileByGuid(guid) ?? entry.Name;
                 }
                 return entry.Name;
             }

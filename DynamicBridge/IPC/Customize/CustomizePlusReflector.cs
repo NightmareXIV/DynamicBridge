@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DynamicBridge.IPC.Customize;
-public static class CustomizePlusReflector
+public class CustomizePlusReflector
 {
-    public static object GetProfileManager()
+    public object GetProfileManager()
     {
         try
         {
@@ -27,7 +27,7 @@ public static class CustomizePlusReflector
         return null;
     }
 
-    public static List<CustomizePlusProfile> GetProfiles()
+    public List<CustomizePlusProfile> GetProfiles()
     {
         var ret = new List<CustomizePlusProfile>();
         try
@@ -52,7 +52,7 @@ public static class CustomizePlusReflector
         return ret;
     }
 
-    public static void SetEnabled(Guid id, bool enabled)
+    public void SetEnabled(Guid id, bool enabled)
     {
         try
         {
@@ -73,7 +73,7 @@ public static class CustomizePlusReflector
         }
     }
 
-    public static string GetPathForProfileByGuid(Guid guid)
+    public string GetPathForProfileByGuid(Guid guid)
     {
         try
         {

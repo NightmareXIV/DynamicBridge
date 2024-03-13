@@ -42,6 +42,7 @@ namespace DynamicBridge
         public List<uint> LastItems = [];
 
         public GlamourerManager GlamourerManager;
+        public CustomizePlusManager CustomizePlusManager;
 
         public DynamicBridge(DalamudPluginInterface pi)
         {
@@ -83,6 +84,7 @@ namespace DynamicBridge
                 };
                 Migrator = new();
                 GlamourerManager = new();
+                CustomizePlusManager = new();
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
                 Memory = new();
             });

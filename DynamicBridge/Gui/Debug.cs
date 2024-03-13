@@ -27,6 +27,17 @@ namespace DynamicBridge.Gui
         static List<string> TestData = null;
         public static void Draw()
         {
+            if(ImGui.CollapsingHeader("Pathes"))
+            {
+                foreach(var x in Utils.GetCombinedPathes())
+                {
+                    for (int i = 0; i < x.Indentation; i++)
+                    {
+                        ImGuiEx.Spacing();
+                    }
+                    ImGuiEx.TextV($"{x.Name}");
+                }
+            }
             if (ImGui.CollapsingHeader("Items"))
             {
                 ImGuiEx.Text($"Current: {Utils.GetCurrentGear().Print()}");
@@ -90,16 +101,16 @@ namespace DynamicBridge.Gui
 
             if (ImGui.CollapsingHeader("C+ test"))
             {
-                ImGuiEx.Text($"Saved: {CustomizePlusManager.SavedProfileID}");
-                ImGuiEx.Text($"wasset: {CustomizePlusManager.WasSet}");
-                foreach (var d in CustomizePlusManager.GetProfiles())
+                ImGuiEx.Text($"Saved: {P.CustomizePlusManager.SavedProfileID}");
+                ImGuiEx.Text($"wasset: {P.CustomizePlusManager.WasSet}");
+                foreach (var d in P.CustomizePlusManager.GetProfiles())
                 {
                     if (ImGui.Selectable($"{d.Name} / {d.characterName} / {d.ID} / {d.IsEnabled}"))
                     {
-                        CustomizePlusManager.SetProfile(d.Name, Player.Name);
+                        P.CustomizePlusManager.SetProfile(d.Name, Player.Name);
                     }
                 }
-                if (ImGui.Button("Revert c+")) CustomizePlusManager.RestoreState();
+                if (ImGui.Button("Revert c+")) P.CustomizePlusManager.RestoreState();
             }
 
             if(ImGui.CollapsingHeader("C+ reflector"))

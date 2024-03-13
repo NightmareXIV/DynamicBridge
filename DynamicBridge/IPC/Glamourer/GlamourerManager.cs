@@ -1,15 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Plugin.Ipc.Exceptions;
+using DynamicBridge.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
-using ImGuizmoNET;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicBridge.IPC.Glamourer
 {
@@ -152,6 +144,30 @@ namespace DynamicBridge.IPC.Glamourer
             }
         }
 
-        public void ResetNameCache() => TransformNameCache.Clear();
+        public List<string> GetRawPathes()
+        {
+            var ret = new List<string>();
+            try
+            {
+                foreach (var x in GetDesigns())
+                {
+                    var path = Reflector.GetPathForDesignByGuid(x.Identifier);
+                    if (path != null)
+                    {
+                        ret.Add(path);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                e.LogInternal();
+            }
+            return ret;
+        }
+
+        public void ResetNameCache() 
+        {
+            TransformNameCache.Clear();
+        }
     }
 }

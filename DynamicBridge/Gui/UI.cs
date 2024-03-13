@@ -34,7 +34,7 @@ namespace DynamicBridge.Gui
             EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} v{P.GetType().Assembly.GetName().Version} [{resolution}]###{DalamudReflector.GetPluginName()}";
             if (ImGui.IsWindowAppearing())
             {
-                P.GlamourerManager.ResetNameCache();
+                Utils.ResetCaches();
                 foreach (var x in Svc.Data.GetExcelSheet<Weather>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
                 foreach (var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
             }

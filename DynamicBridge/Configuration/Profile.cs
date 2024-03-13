@@ -15,22 +15,10 @@ namespace DynamicBridge.Configuration
         public List<Preset> Presets = [];
         public List<PresetFolder> PresetsFolders = [];
         public string ForcedPreset = null;
-        public int Subprofile = -1;
         public List<Profile> Subprofiles = [];
         public HashSet<ulong> Characters = [];
-
-        internal void SetSuprofile(int i)
-        {
-            if(i < 0 || i >= Subprofiles.Count)
-            {
-                Subprofile = -1;
-            }
-            else
-            {
-                Subprofile = i;
-            }
-            P.ForceUpdate = true;
-        }
+        public List<string> Pathes = [];
+        public Preset FallbackPreset = new();
 
         public bool IsGlobal => C.GlobalProfile == this;
 

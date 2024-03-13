@@ -55,7 +55,7 @@ namespace DynamicBridge.Gui
             {
                 try
                 {
-                    var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Clipboard.GetText()));
+                    var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
                     if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                     {
                         open.Presets.Add(str);
@@ -194,10 +194,11 @@ namespace DynamicBridge.Gui
                     }
                 }
             }
+            DrawPresets(Profile, [Profile.FallbackPreset], $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true);
             Open = newOpen;
         }
 
-        static void DrawPresets(Profile currentProfile, List<Preset> presetList, string extraID = "")
+        static void DrawPresets(Profile currentProfile, List<Preset> presetList, string extraID = "", bool isFallback = false)
         {
             var cnt = 3;
             if (C.EnableHonorific) cnt++;
@@ -214,7 +215,7 @@ namespace DynamicBridge.Gui
                 ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                 ImGui.TableHeadersRow();
 
-                var isStaticExists = currentProfile.IsStaticExists();
+                var isStaticExists = currentProfile.IsStaticExists() && !isFallback;
 
                 for (int i = 0; i < presetList.Count; i++)
                 {
@@ -248,92 +249,106 @@ namespace DynamicBridge.Gui
                     ImGui.TableNextColumn();
 
                     //Sorting
-                    var rowPos = ImGui.GetCursorPos();
-                    if (ImGuiEx.CheckboxBullet("##static", ref preset.IsStatic))
+                    if (isFallback)
                     {
-                        if (preset.IsStatic)
-                        {
-                            currentProfile.SetStatic(preset);
-                        }
-                        P.ForceUpdate = true;
+                        ImGuiEx.TextV(" ");
+                        ImGuiEx.HelpMarker($"Values from this preset will be used as default in current profile.");
                     }
-                    ImGuiEx.Tooltip("Set this preset as static, applying it unconditionally on this character disregarding any rules.");
-                    ImGui.SameLine();
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    var cur = ImGui.GetCursorPos();
-                    var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString());
-                    ImGui.Dummy(size);
-                    ImGui.PopFont();
-                    var moveIndex = i;
-                    MoveCommands.Add((rowPos, cur, delegate
+                    else
                     {
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{preset.GUID}");
-                        ImGui.PopFont();
-                        if (ImGui.IsItemHovered())
+                        var rowPos = ImGui.GetCursorPos();
+                        if (ImGuiEx.CheckboxBullet("##static", ref preset.IsStatic))
                         {
-                            ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
-                        }
-                        if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
-                        {
-                            ImGuiDragDrop.SetDragDropPayload("MovePreset", preset.GUID);
-                            CurrentDrag = preset.GUID;
-                            InternalLog.Verbose($"DragDropSource = {preset.GUID}");
-                            ImGui.EndDragDropSource();
-                        }
-                        else if (CurrentDrag == preset.GUID)
-                        {
-                            InternalLog.Verbose($"Current drag reset!");
-                            CurrentDrag = null;
-                        }
-                    }, delegate { DragDrop.AcceptProfileDragDrop(currentProfile, presetList, moveIndex); }
-                    ));
-
-                    ImGui.SameLine();
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.CaretDown))
-                    {
-                        ImGui.OpenPopup($"MoveTo##{preset.GUID}");
-                    }
-                    if (ImGui.BeginPopup($"MoveTo##{preset.GUID}"))
-                    {
-                        if(ImGui.Selectable("- Main folder -", currentProfile.Presets.Any(x => x.GUID == preset.GUID)))
-                        {
-                            DragDrop.MovePresetToList(currentProfile, preset.GUID, currentProfile.Presets);
-                        }
-                        foreach(var x in currentProfile.PresetsFolders)
-                        {
-                            if (ImGui.Selectable($"{x.Name}##{x.GUID}", x.Presets.Any(x => x.GUID == preset.GUID)))
+                            if (preset.IsStatic)
                             {
-                                DragDrop.MovePresetToList(currentProfile, preset.GUID, x.Presets);
+                                currentProfile.SetStatic(preset);
                             }
+                            P.ForceUpdate = true;
                         }
-                        ImGui.EndPopup();
-                    }
+                        ImGuiEx.Tooltip("Set this preset as static, applying it unconditionally on this character disregarding any rules.");
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        var cur = ImGui.GetCursorPos();
+                        var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString());
+                        ImGui.Dummy(size);
+                        ImGui.PopFont();
+                        var moveIndex = i;
+                        MoveCommands.Add((rowPos, cur, delegate
+                        {
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{preset.GUID}");
+                            ImGui.PopFont();
+                            if (ImGui.IsItemHovered())
+                            {
+                                ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
+                            }
+                            if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
+                            {
+                                ImGuiDragDrop.SetDragDropPayload("MovePreset", preset.GUID);
+                                CurrentDrag = preset.GUID;
+                                InternalLog.Verbose($"DragDropSource = {preset.GUID}");
+                                ImGui.EndDragDropSource();
+                            }
+                            else if (CurrentDrag == preset.GUID)
+                            {
+                                InternalLog.Verbose($"Current drag reset!");
+                                CurrentDrag = null;
+                            }
+                        }, delegate { DragDrop.AcceptProfileDragDrop(currentProfile, presetList, moveIndex); }
+                        ));
 
+                        ImGui.SameLine();
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.CaretDown))
+                        {
+                            ImGui.OpenPopup($"MoveTo##{preset.GUID}");
+                        }
+                        if (ImGui.BeginPopup($"MoveTo##{preset.GUID}"))
+                        {
+                            if (ImGui.Selectable("- Main folder -", currentProfile.Presets.Any(x => x.GUID == preset.GUID)))
+                            {
+                                DragDrop.MovePresetToList(currentProfile, preset.GUID, currentProfile.Presets);
+                            }
+                            foreach (var x in currentProfile.PresetsFolders)
+                            {
+                                if (ImGui.Selectable($"{x.Name}##{x.GUID}", x.Presets.Any(x => x.GUID == preset.GUID)))
+                                {
+                                    DragDrop.MovePresetToList(currentProfile, preset.GUID, x.Presets);
+                                }
+                            }
+                            ImGui.EndPopup();
+                        }
+                    }
                     
                     ImGui.TableNextColumn();
 
                     //name
-                    var isEmpty = preset.Name == "";
-                    var isNonUnique = currentProfile.GetPresetsUnion().Count(x => x.Name == preset.Name) > 1;
-                    if (isEmpty)
+                    if (isFallback)
                     {
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGuiEx.Text(ImGuiColors.DalamudRed, Utils.IconWarning);
-                        ImGui.PopFont();
-                        ImGuiEx.Tooltip("Name can not be empty");
-                        ImGui.SameLine();
+                        ImGuiEx.TextV("Fallback preset");
                     }
-                    else if (isNonUnique)
+                    else
                     {
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGuiEx.Text(ImGuiColors.DalamudRed, Utils.IconWarning);
-                        ImGui.PopFont();
-                        ImGuiEx.Tooltip("Name must be unique");
-                        ImGui.SameLine();
+                        var isEmpty = preset.Name == "";
+                        var isNonUnique = currentProfile.GetPresetsUnion().Count(x => x.Name == preset.Name) > 1;
+                        if (isEmpty)
+                        {
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.Text(ImGuiColors.DalamudRed, Utils.IconWarning);
+                            ImGui.PopFont();
+                            ImGuiEx.Tooltip("Name can not be empty");
+                            ImGui.SameLine();
+                        }
+                        else if (isNonUnique)
+                        {
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGuiEx.Text(ImGuiColors.DalamudRed, Utils.IconWarning);
+                            ImGui.PopFont();
+                            ImGuiEx.Tooltip("Name must be unique");
+                            ImGui.SameLine();
+                        }
+                        ImGuiEx.SetNextItemFullWidth();
+                        ImGui.InputTextWithHint("##name", "Preset name", ref preset.Name, 100);
                     }
-                    ImGuiEx.SetNextItemFullWidth();
-                    ImGui.InputTextWithHint("##name", "Preset name", ref preset.Name, 100);
 
 
                     //Glamourer
@@ -344,7 +359,7 @@ namespace DynamicBridge.Gui
                             ImGuiEx.SetNextItemFullWidth();
                             if (ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(P.GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
-                                if (ImGui.IsWindowAppearing()) P.GlamourerManager.ResetNameCache();
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 FiltersSelection();
 
                                 // normal
@@ -355,6 +370,7 @@ namespace DynamicBridge.Gui
                                         var name = x.Name;
                                         var id = x.Identifier.ToString();
                                         var transformedName = P.GlamourerManager.TransformName(x.Identifier.ToString());
+                                        if (C.GlamourerFullPath && currentProfile.Pathes.Count > 0 && !transformedName.StartsWithAny(currentProfile.Pathes)) continue;
                                         if (Filters[filterCnt].Length > 0 && !transformedName.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         if (OnlySelected[filterCnt] && !preset.Glamourer.Contains(id)) continue;
                                         ImGuiEx.CollectionCheckbox($"{transformedName}##{x.Identifier}", id, preset.Glamourer);
@@ -406,16 +422,17 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##customize", preset.Customize.Select(CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                            if (ImGui.BeginCombo("##customize", preset.Customize.Select(P.CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 FiltersSelection();
-                                var profiles = CustomizePlusManager.GetProfiles(currentProfile.Characters.Select(Utils.GetCharaNameFromCID).Select(z => z.Split("@")[0])).OrderBy(x => CustomizePlusManager.TransformName(x.ID.ToString()));
+                                var profiles = P.CustomizePlusManager.GetProfiles(currentProfile.Characters.Select(Utils.GetCharaNameFromCID).Select(z => z.Split("@")[0])).OrderBy(x => P.CustomizePlusManager.TransformName(x.ID.ToString()));
                                 var index = 0;
                                 foreach (var x in profiles)
                                 {
                                     index++;
                                     ImGui.PushID(index);
-                                    var name = CustomizePlusManager.TransformName(x.ID.ToString());
+                                    var name = P.CustomizePlusManager.TransformName(x.ID.ToString());
+                                    if (C.GlamourerFullPath && currentProfile.Pathes.Count > 0 && !name.StartsWithAny(currentProfile.Pathes)) continue;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !preset.Customize.Contains(x.ID.ToString())) continue;
                                     ImGuiEx.CollectionCheckbox($"{name}", x.ID.ToString(), preset.Customize);
@@ -478,14 +495,18 @@ namespace DynamicBridge.Gui
                     //Delete
                     if (ImGuiEx.IconButton(FontAwesomeIcon.Copy))
                     {
-                        Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(preset)));
+                        Safe(() => Copy(JsonConvert.SerializeObject(preset)));
                     }
-                    ImGui.SameLine();
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)
+                    ImGuiEx.Tooltip("Copy to clipboard");
+                    if (!isFallback)
                     {
-                        new TickScheduler(() => presetList.RemoveAll(x => x.GUID == preset.GUID));
+                        ImGui.SameLine();
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)
+                        {
+                            new TickScheduler(() => presetList.RemoveAll(x => x.GUID == preset.GUID));
+                        }
+                        ImGuiEx.Tooltip("Hold CTRL+Click to delete");
                     }
-                    ImGuiEx.Tooltip("Hold CTRL+Click to delete");
 
                     if (isStaticExists) ImGui.PopStyleColor();
                     ImGui.PopID();
