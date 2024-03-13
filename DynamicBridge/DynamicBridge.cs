@@ -282,116 +282,34 @@ namespace DynamicBridge
                                 {
                                     if (C.EnableGlamourer)
                                     {
-                                        if (preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
-                                        {
-                                            var selectedIndex = Random.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
-                                            var designs = new List<string>();
-                                            if (selectedIndex < preset.Glamourer.Count)
-                                            {
-                                                designs.Add(preset.Glamourer[selectedIndex]);
-                                            }
-                                            else
-                                            {
-                                                var complexEntry = C.ComplexGlamourerEntries.FirstOrDefault(x => x.Name == preset.ComplexGlamourer[selectedIndex - preset.Glamourer.Count]);
-                                                if (complexEntry != null)
-                                                {
-                                                    foreach (var e in complexEntry.Designs)
-                                                    {
-                                                        designs.Add(e);
-                                                    }
-                                                }
-                                            }
-                                            var isNull = true;
-                                            foreach (var name in designs)
-                                            {
-                                                var design = Utils.GetDesignByGUID(name);
-                                                if (design != null)
-                                                {
-                                                    DoNullGlamourer = false;
-                                                    if(isFirst) MyOldDesign ??= GlamourerManager.GetMyCustomization();
-                                                    //TaskManager.DelayNext(60, true);
-                                                    if (isFirst)
-                                                    {
-                                                        if (C.ManageGlamourerAutomation)
-                                                        {
-                                                            TaskManager.Enqueue(() => GlamourerManager.Reflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
-                                                        }
-                                                        if (C.RevertGlamourerBeforeApply)
-                                                        {
-                                                            TaskManager.Enqueue(GlamourerManager.Revert, "Revert character");
-                                                        }
-                                                    }
-                                                    isNull = false;
-                                                    TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                                    TaskManager.Enqueue(() => GlamourerManager.ApplyToSelf(design.Value), $"ApplyToSelf({design})");
-                                                    PluginLog.Debug($"Applying design {design}");
-                                                }
-                                            }
-                                            /*if (isNull)
-                                            {
-                                                NullGlamourer();
-                                                PluginLog.Debug($"Restoring state because design was null");
-                                            }*/
-                                        }
-                                        /*else
-                                        {
-                                            NullGlamourer();
-                                            PluginLog.Debug($"Restoring state because design was null");
-                                        }*/
+                                        ApplyPresetGlamourer(preset, isFirst, ref DoNullGlamourer);
                                     }
                                     if (C.EnableHonorific)
                                     {
-                                        var hfiltered = preset.HonorificFiltered().ToArray();
-                                        if (hfiltered.Length > 0)
-                                        {
-                                            DoNullHonorific = false;
-                                            var randomTitle = hfiltered[Random.Next(hfiltered.Length)];
-                                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                            TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
-                                        }
-                                        /*else
-                                        {
-                                            NullHonorific();
-                                        }*/
+                                        ApplyPresetHonorific(preset, ref DoNullHonorific);
                                     }
                                     if (C.EnableCustomize)
                                     {
-                                        var cfiltered = preset.CustomizeFiltered().ToArray();
-                                        if (cfiltered.Length > 0)
-                                        {
-                                            DoNullCustomize = false;
-                                            var randomCusProfile = cfiltered[Random.Next(cfiltered.Length)];
-                                            TaskManager.Enqueue(Utils.WaitUntilInteractable);
-                                            TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
-                                        }
-                                        /*else
-                                        {
-                                            NullCustomize();
-                                        }*/
+                                        ApplyPresetCustomize(preset, ref DoNullCustomize);
                                     }
                                 }
-                                /*else
-                                {
-                                    Null();
-                                    PluginLog.Debug($"Restoring state because preset was null");
-                                }*/
                             }
-                            /*else
-                            {
-                                Null();
-                                PluginLog.Debug($"Restoring state because no rule was found");
-                            }*/
                         }
 
-                        if (DoNullGlamourer) NullGlamourer();
-                        if (DoNullCustomize) NullCustomize();
-                        if (DoNullHonorific) NullHonorific();
-
-                        void Null()
+                        if (DoNullGlamourer)
                         {
-                            NullGlamourer();
-                            NullHonorific();
-                            NullCustomize();
+                            ApplyPresetGlamourer(profile.FallbackPreset, true, ref DoNullGlamourer);
+                            if(DoNullGlamourer) NullGlamourer();
+                        }
+                        if (DoNullCustomize)
+                        {
+                            ApplyPresetCustomize(profile.FallbackPreset, ref DoNullCustomize);
+                            if(DoNullCustomize) NullCustomize();
+                        }
+                        if (DoNullHonorific)
+                        {
+                            ApplyPresetHonorific(profile.FallbackPreset, ref DoNullHonorific);
+                            if(DoNullHonorific) NullHonorific();
                         }
 
                         void NullHonorific()
@@ -474,6 +392,78 @@ namespace DynamicBridge
         void TerritoryChanged(ushort id)
         {
             SoftForceUpdate = true;
+        }
+
+        void ApplyPresetGlamourer(Preset preset, bool isFirst, ref bool DoNullGlamourer)
+        {
+            if (preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
+            {
+                var selectedIndex = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                var designs = new List<string>();
+                if (selectedIndex < preset.Glamourer.Count)
+                {
+                    designs.Add(preset.Glamourer[selectedIndex]);
+                }
+                else
+                {
+                    var complexEntry = C.ComplexGlamourerEntries.FirstOrDefault(x => x.Name == preset.ComplexGlamourer[selectedIndex - preset.Glamourer.Count]);
+                    if (complexEntry != null)
+                    {
+                        foreach (var e in complexEntry.Designs)
+                        {
+                            designs.Add(e);
+                        }
+                    }
+                }
+                foreach (var name in designs)
+                {
+                    var design = Utils.GetDesignByGUID(name);
+                    if (design != null)
+                    {
+                        DoNullGlamourer = false;
+                        if (isFirst) MyOldDesign ??= GlamourerManager.GetMyCustomization();
+                        //TaskManager.DelayNext(60, true);
+                        if (isFirst)
+                        {
+                            if (C.ManageGlamourerAutomation)
+                            {
+                                TaskManager.Enqueue(() => GlamourerManager.Reflector.SetAutomationGlobalState(false), "GlamourerReflector.SetAutomationGlobalState = false");
+                            }
+                            if (C.RevertGlamourerBeforeApply)
+                            {
+                                TaskManager.Enqueue(GlamourerManager.Revert, "Revert character");
+                            }
+                        }
+                        TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                        TaskManager.Enqueue(() => GlamourerManager.ApplyToSelf(design.Value), $"ApplyToSelf({design})");
+                        PluginLog.Debug($"Applying design {design}");
+                    }
+                }
+            }
+        }
+
+        void ApplyPresetHonorific(Preset preset, ref bool DoNullHonorific)
+        {
+            var hfiltered = preset.HonorificFiltered().ToArray();
+            if (hfiltered.Length > 0)
+            {
+                DoNullHonorific = false;
+                var randomTitle = hfiltered[Random.Next(hfiltered.Length)];
+                TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
+            }
+        }
+
+        void ApplyPresetCustomize(Preset preset, ref bool DoNullCustomize)
+        {
+            var cfiltered = preset.CustomizeFiltered().ToArray();
+            if (cfiltered.Length > 0)
+            {
+                DoNullCustomize = false;
+                var randomCusProfile = cfiltered[Random.Next(cfiltered.Length)];
+                TaskManager.Enqueue(Utils.WaitUntilInteractable);
+                TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
+            }
         }
 
         public void Dispose()

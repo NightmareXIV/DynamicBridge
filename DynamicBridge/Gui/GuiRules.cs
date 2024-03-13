@@ -48,9 +48,9 @@ namespace DynamicBridge.Gui
                     }
                 }
                 ImGui.SameLine();
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Apply Rules and Appearance"))
+                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Reapply Rules and Appearance"))
                 {
-                    P.SoftForceUpdate = true;
+                    P.ForceUpdate = true;
                 }
                 if (Profile.IsStaticExists())
                 {
