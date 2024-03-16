@@ -1,4 +1,5 @@
 ﻿using DynamicBridge.Configuration;
+using DynamicBridge.Core;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
@@ -44,6 +45,8 @@ namespace DynamicBridge
         public GlamourerManager GlamourerManager;
         public CustomizePlusManager CustomizePlusManager;
 
+        public NeoTabs NeoTabs;
+
         public DynamicBridge(DalamudPluginInterface pi)
         {
             P = this;
@@ -87,6 +90,7 @@ namespace DynamicBridge
                 CustomizePlusManager = new();
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
                 Memory = new();
+                NeoTabs = new([new("Presets", () => { }), new("Characters", () => { }), new("Dynamic Rules", () => { }), new("Profiles", () => { }), new("Global Profiles", () => { }), new("Layered Designs", () => { }), new("House Registration", () => { }), new("Settings", () => { })]);
             });
         }
 

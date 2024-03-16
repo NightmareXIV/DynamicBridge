@@ -49,6 +49,18 @@ public static class GuiSettings
             }
             /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
             ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
+            ImGui.Separator();
+            ImGui.Checkbox($"[Beta] Enable Incognito Mode (WORK IN PROGRESS, ONLY HIDES IN SOME PLACES YET)", ref C.NoNames);
+            ImGuiEx.HelpMarker($"Replaces your character name with random animal name and your world name with random fantasy world name. Same name will always generate same counterparts, for you but not for other people. Additionally, hides text in input fields and shows temporary profile/preset ID instead of name.");
+            ImGuiEx.HelpMarker($"Warning! No names will be censored in Log and Debug tabs and Dalamud.log! \nWarning! If you share configuration file AND censored name, original name CAN BE RESTORED. If you need to send configuration file and ensure that you remain anonymous, click Regenerate Censor Seed button, send configuration and click the button again.", ImGuiColors.DalamudOrange);
+            ImGuiEx.Spacing();
+            ImGui.Checkbox($"Use only replacement words with same first letter as original when possible.", ref C.LesserCensor);
+            ImGuiEx.Spacing();
+            if (ImGui.Button("Regenerate Censor Seed"))
+            {
+                C.CensorSeed = Guid.NewGuid().ToString();
+            }
+            ImGuiEx.HelpMarker($"Censored names will change upon pressing this button.");
             ImGuiGroup.EndGroupBox();
         }
 

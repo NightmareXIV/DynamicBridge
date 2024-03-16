@@ -1,4 +1,5 @@
-﻿using DynamicBridge.IPC;
+﻿using DynamicBridge.Core;
+using DynamicBridge.IPC;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;

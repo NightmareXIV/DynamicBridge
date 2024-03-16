@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge
+namespace DynamicBridge.Core
 {
     public static class BiomeChecker
     {
@@ -48,14 +48,14 @@ namespace DynamicBridge
                 Dungeons.the_Stone_Vigil, Dungeons.the_Stone_Vigil_Hard,
                 ],
             [Biome.Wasteland] = [
-                147, 410, 483, 402, 459, 818, 932, 959, 960, 1027, 920, 975, 1071, 1072, 1092, 1140, 1141, 1159, 1168, 1169, 1181, 936, 937, 911, 1077, 1162, 1006, 1007, 1081, 1082, 1083, 1084, 903, 907, 945, 949, 847, 881, 885, 916, 978, 1079, 995, 996, 1030, 1153, 1154, 970, 973, 992, 993, 1028, 997, 998, 1029, 1013, 1026, 897, 912, 793, 830, 1174, 507, 
+                147, 410, 483, 402, 459, 818, 932, 959, 960, 1027, 920, 975, 1071, 1072, 1092, 1140, 1141, 1159, 1168, 1169, 1181, 936, 937, 911, 1077, 1162, 1006, 1007, 1081, 1082, 1083, 1084, 903, 907, 945, 949, 847, 881, 885, 916, 978, 1079, 995, 996, 1030, 1153, 1154, 970, 973, 992, 993, 1028, 997, 998, 1029, 1013, 1026, 897, 912, 793, 830, 1174, 507,
                 1153,1154,
                 Raids.Sigmascape_V2_0, Raids.Sigmascape_V2_0_Savage, Raids.Sigmascape_V3_0, Raids.Sigmascape_V3_0_Savage,
                 799,803,
                 878,965, //empty
                 ],
             [Biome.Urban_Hot] = [
-                 409, 474,  404,   130, 182, 251, 254, 259, 274, 790, 131, 666, 705, 706, 341, 635, 659, 963, 915, 1078, 178, 210, 535, 971,   
+                 409, 474,  404,   130, 182, 251, 254, 259, 274, 790, 131, 666, 705, 706, 341, 635, 659, 963, 915, 1078, 178, 210, 535, 971,
                 ],
             [Biome.Urban] = [
                 132, 183, 133, 238, 865, 340, 144, 832, 641, 628, 664, 665, 667, 710, 682, 739, 759, 819, 820, 863, 1061, 844, 735, 828, 736, 919, 882, 896, 917, 928, 838, 841, 884, 987, 1057, 1073, 744, 629, 639, 353, 806, 738, 679, 727, 740, 829, 658, 690, 724, 756, 800, 801, 804, 805, 807, 808, 812, 1122, 388, 389, 390, 391, 417, 506, 589, 590, 591, 1197, 579, 940, 941, 179, 534, 994, 571, 1094, 626, 1142,136,339,250, 717,
@@ -87,7 +87,7 @@ namespace DynamicBridge
 
         public static bool Check(this Biome biome)
         {
-            if(Cache.TryGetValue(Svc.ClientState.TerritoryType, out var b))
+            if (Cache.TryGetValue(Svc.ClientState.TerritoryType, out var b))
             {
                 return biome == b;
             }
@@ -97,12 +97,12 @@ namespace DynamicBridge
 
         public static Biome FindBiome(this TerritoryType t)
         {
-            foreach(var x in Territories)
+            foreach (var x in Territories)
             {
                 if (x.Value.Contains(t.RowId)) return x.Key;
             }
             if (((TerritoryIntendedUseEnum)t.TerritoryIntendedUse).EqualsAny(TerritoryIntendedUseEnum.Housing_Instances)) return Biome.No_biome;
-            foreach(var x in Regions)
+            foreach (var x in Regions)
             {
                 if (x.Value.Contains((TerritoryRegion)t.PlaceNameRegion.Row)) return x.Key;
             }

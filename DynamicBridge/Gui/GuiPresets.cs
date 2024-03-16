@@ -23,84 +23,97 @@ namespace DynamicBridge.Gui
         static string Open = null;
         public static void DrawUser()
         {
-            UI.ProfileSelectorCommon();
             if (UI.Profile != null)
             {
-                DrawProfile(UI.Profile);
+                DrawProfile(UI.Profile, true);
+            }
+            else
+            {
+                UI.ProfileSelectorCommon();
             }
         }
 
         public static void DrawGlobal()
         {
             ImGuiEx.TextWrapped($"Global presets are available for use on each of your characters.");
-            DrawProfile(C.GlobalProfile);
+            DrawProfile(C.GlobalProfile, false);
         }
 
-        static void DrawProfile(Profile Profile)
+        static void DrawProfile(Profile Profile, bool drawFallback)
         {
             Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new Preset"))
+            
+            void Buttons()
             {
-                if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                 {
-                    open.Presets.Add(new());
-                }
-                else
-                {
-                    Profile.Presets.Add(new());
-                }
-            }
-            ImGui.SameLine();
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
-            {
-                try
-                {
-                    var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
                     if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                     {
-                        open.Presets.Add(str);
+                        open.Presets.Add(new());
                     }
                     else
                     {
-                        Profile.Presets.Add(str);
+                        Profile.Presets.Add(new());
                     }
                 }
-                catch (Exception e)
+                ImGuiEx.Tooltip("Add new empty preset into default or focused folder");
+                ImGui.SameLine();
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Paste))
                 {
-                    Notify.Error(e.Message);
+                    try
+                    {
+                        var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
+                        if (Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                        {
+                            open.Presets.Add(str);
+                        }
+                        else
+                        {
+                            Profile.Presets.Add(str);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Notify.Error(e.Message);
+                    }
                 }
+                ImGuiEx.Tooltip($"Paste previously copied preset from clipboard");
+                ImGui.SameLine();
+
+                if (ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
+                {
+                    Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
+                }
+                ImGuiEx.Tooltip("Add new preset folder");
+
+                ImGui.SameLine();
+
             }
-            ImGui.SameLine();
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Reapply Rules and Appearance"))
+
+            void RightButtons()
             {
-                P.ForceUpdate = true;
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.ButtonCheckbox(FontAwesomeIcon.SearchPlus.ToIconString(), ref Focus);
+                ImGui.PopFont();
+                ImGuiEx.Tooltip("Toggle focus mode. While focus mode active, only one selected folder will be visible.");
+                ImGui.SameLine();
+                UI.ForceUpdateButton();
+                ImGui.SameLine();
             }
 
-            ImGui.SameLine();
-            ImGuiEx.Text($"|");
-            ImGui.SameLine();
-
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.FolderPlus, "Add new folder"))
-            {
-                Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
-            }
-
-            ImGui.SameLine();
-            ImGuiEx.Text($"|");
-            ImGui.SameLine();
-
-            ImGui.Checkbox("Focus mode", ref Focus);
-            ImGuiEx.HelpMarker("While focus mode active, only one selected folder will be visible.");
+            UI.ProfileSelectorCommon(Buttons, RightButtons);
 
             string newOpen = null;
 
             if (!Focus || Open == "" || Open == null)
             {
-                if (ImGui.CollapsingHeader("Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
+                if (ImGui.TreeNodeEx($"Main presets{UI.BunchOfSpaces}##global", ImGuiTreeNodeFlags.DefaultOpen))
                 {
                     newOpen = "";
                     DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
-                    DrawPresets(Profile, Profile.Presets);
+                    DrawPresets(Profile, Profile.Presets, out var postAction);
+                    ImGui.TreePop();
+                    postAction?.Invoke();
                 }
                 else
                 {
@@ -116,12 +129,14 @@ namespace DynamicBridge.Gui
                 {
                     ImGuiEx.RightFloat($"RFCHP{presetFolder.GUID}", () => ImGuiEx.TextV(ImGuiColors.DalamudGrey, "Hidden from rules"));
                 }
-                if (ImGui.CollapsingHeader($"{presetFolder.Name}###presetfolder{presetFolder.GUID}"))
+                if (ImGui.TreeNodeEx($"{presetFolder.Name}{UI.BunchOfSpaces}###presetfolder{presetFolder.GUID}"))
                 {
                     newOpen = presetFolder.GUID;
                     CollapsingHeaderClicked();
                     DragDrop.AcceptFolderDragDrop(Profile, presetFolder.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
-                    DrawPresets(Profile, presetFolder.Presets, presetFolder.GUID);
+                    DrawPresets(Profile, presetFolder.Presets, out var postAction, presetFolder.GUID);
+                    ImGui.TreePop();
+                    postAction?.Invoke();
                 }
                 else
                 {
@@ -194,17 +209,26 @@ namespace DynamicBridge.Gui
                     }
                 }
             }
-            DrawPresets(Profile, [Profile.FallbackPreset], $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true);
-            Open = newOpen;
+            if (drawFallback)
+            {
+                if (ImGui.TreeNode($"Fallback preset" + UI.BunchOfSpaces))
+                {
+                    DrawPresets(Profile, [Profile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true);
+                    Open = newOpen;
+                    ImGui.TreePop();
+                }
+            }
         }
 
-        static void DrawPresets(Profile currentProfile, List<Preset> presetList, string extraID = "", bool isFallback = false)
+        static void DrawPresets(Profile currentProfile, List<Preset> presetList, out Action postAction, string extraID = "", bool isFallback = false)
         {
+            postAction = null;
             var cnt = 3;
             if (C.EnableHonorific) cnt++;
             if (C.EnableCustomize) cnt++;
             if (C.EnableGlamourer) cnt++;
             List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
+            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
             if (ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
             {
                 ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort);
@@ -347,7 +371,7 @@ namespace DynamicBridge.Gui
                             ImGui.SameLine();
                         }
                         ImGuiEx.SetNextItemFullWidth();
-                        ImGui.InputTextWithHint("##name", "Preset name", ref preset.Name, 100);
+                        ImGui.InputTextWithHint("##name", "Preset name", ref preset.Name, 100, Utils.CensorFlags);
                     }
 
 
@@ -393,7 +417,9 @@ namespace DynamicBridge.Gui
                                         var name = x.Name;
                                         if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         if (OnlySelected[filterCnt] && !preset.ComplexGlamourer.Contains(name)) continue;
-                                        FontAwesome.Layers.ImGuiText("Layered Design");
+                                        FontAwesome.Print(null, FontAwesome.Layers);
+                                        ImGui.SameLine();
+                                        ImGuiEx.Text("Layered Design");
                                         ImGui.SameLine();
                                         ImGuiEx.CollectionCheckbox($"{name}##{x.GUID}", x.Name, preset.ComplexGlamourer);
                                     }
@@ -402,7 +428,9 @@ namespace DynamicBridge.Gui
                                     {
                                         if (designs.Any(d => d.Name == x)) continue;
                                         ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                        FontAwesome.Layers.ImGuiText("Layered Design");
+                                        FontAwesome.Print(null, FontAwesome.Layers);
+                                        ImGui.SameLine();
+                                        ImGuiEx.Text("Layered Design");
                                         ImGuiEx.CollectionCheckbox($"{x}", x, preset.ComplexGlamourer, false, true);
                                         ImGui.PopStyleColor();
                                     }
@@ -512,16 +540,20 @@ namespace DynamicBridge.Gui
                     ImGui.PopID();
                 }
                 ImGui.EndTable();
-                foreach(var x in MoveCommands)
+                postAction = () =>
                 {
-                    ImGui.SetCursorPos(x.ButtonPos);
-                    x.BeginDraw();
-                    x.AcceptDraw();
-                    ImGui.SetCursorPos(x.RowPos);
-                    ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize(" ").Y));
-                    x.AcceptDraw();
-                }
+                    foreach (var x in MoveCommands)
+                    {
+                        ImGui.SetCursorPos(x.ButtonPos);
+                        x.BeginDraw();
+                        x.AcceptDraw();
+                        ImGui.SetCursorPos(x.RowPos);
+                        ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize(" ").Y));
+                        x.AcceptDraw();
+                    }
+                };
             }
+            ImGui.PopStyleVar();
         }
     }
 }

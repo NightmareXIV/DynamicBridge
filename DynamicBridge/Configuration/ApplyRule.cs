@@ -1,4 +1,5 @@
-﻿using ECommons.ExcelServices;
+﻿using DynamicBridge.Core;
+using ECommons.ExcelServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

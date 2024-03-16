@@ -11,6 +11,7 @@ namespace DynamicBridge.Configuration
     {
         [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
         public string Name = "";
+        internal string CensoredName => C.NoNames ? GUID : Name;
         public List<string> Glamourer = [];
         public List<string> ComplexGlamourer = [];
         public List<string> Honorific = [];

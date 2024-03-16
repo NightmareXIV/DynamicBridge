@@ -14,6 +14,7 @@ using ECommons.Throttlers;
 using System.Runtime.InteropServices;
 using ECommons;
 using Dalamud.Interface.Components;
+using DynamicBridge.Core;
 
 namespace DynamicBridge.Gui
 {
@@ -26,37 +27,42 @@ namespace DynamicBridge.Gui
 
         public static void Draw()
         {
-            UI.ProfileSelectorCommon();
             if (UI.Profile != null)
             {
                 var Profile = UI.Profile;
                 Profile.Rules.RemoveAll(x => x == null);
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new rule"))
+                void ButtonsLeft()
                 {
-                    Profile.Rules.Add(new());
-                }
-                ImGui.SameLine();
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
-                {
-                    try
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                     {
-                        Profile.Rules.Add(JsonConvert.DeserializeObject<ApplyRule>(Clipboard.GetText()) ?? throw new NullReferenceException());
+                        Profile.Rules.Add(new());
                     }
-                    catch (Exception e)
-                    {
-                        Notify.Error("Failed to paste from clipboard:\n" + e.Message);
-                    }
-                }
-                ImGui.SameLine();
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Tshirt, "Reapply Rules and Appearance"))
-                {
-                    P.ForceUpdate = true;
-                }
-                if (Profile.IsStaticExists())
-                {
+                    ImGuiEx.Tooltip("Add new rule");
                     ImGui.SameLine();
-                    ImGuiEx.Text(EColor.RedBright, $"Preset {Profile.GetStaticPreset()?.Name} is selected as static. Automation disabled.");
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Paste, "Paste rule from Clipboard"))
+                    {
+                        try
+                        {
+                            Profile.Rules.Add(JsonConvert.DeserializeObject<ApplyRule>(Clipboard.GetText()) ?? throw new NullReferenceException());
+                        }
+                        catch (Exception e)
+                        {
+                            Notify.Error("Failed to paste from clipboard:\n" + e.Message);
+                        }
+                    }
+                    if (Profile.IsStaticExists())
+                    {
+                        ImGuiEx.HelpMarker($"Preset {Profile.GetStaticPreset()?.CensoredName} is selected as static. Automation disabled.", GradientColor.Get(EColor.RedBright, EColor.YellowBright, 1000), FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                    }
+                    ImGui.SameLine();
                 }
+                void ButtonsRight()
+                {
+                    UI.ForceUpdateButton();
+                    ImGui.SameLine();
+                }
+                
+                UI.ProfileSelectorCommon(ButtonsLeft, ButtonsRight);
 
                 var active = (bool[])[
                     C.Cond_State,
@@ -73,6 +79,8 @@ namespace DynamicBridge.Gui
                 ];
 
                 List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
+
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
                 if (ImGui.BeginTable("##main", 3 + active.Count(x => x), ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
                 {
                     ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
@@ -518,7 +526,7 @@ namespace DynamicBridge.Gui
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.SelectedPresets.Contains(name)) continue;
                                     if (x.GetFolder(Profile)?.HiddenFromSelection == true) continue;
-                                    ImGuiEx.CollectionCheckbox($"{name}##{x.GUID}", x.Name, rule.SelectedPresets);
+                                    ImGuiEx.CollectionCheckbox($"{x.CensoredName}##{x.GUID}", x.Name, rule.SelectedPresets);
                                 }
                                 foreach (var x in rule.SelectedPresets)
                                 {
@@ -562,6 +570,11 @@ namespace DynamicBridge.Gui
                         x.AcceptDraw();
                     }
                 }
+                ImGui.PopStyleVar();
+            }
+            else
+            {
+                UI.ProfileSelectorCommon();
             }
         }
 

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge
+namespace DynamicBridge.Core
 {
     public static class SpecialTerritoryChecker
     {

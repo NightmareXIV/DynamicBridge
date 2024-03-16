@@ -18,6 +18,8 @@ namespace DynamicBridge
         public const string IconWarning = "\uf071";
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
+        public static ImGuiInputTextFlags CensorFlags => C.NoNames ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None;
+        public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
 
 
         static List<PathInfo> PathInfos = null;
@@ -110,7 +112,6 @@ namespace DynamicBridge
 
         public static bool BannerCombo(string id, string text, Action draw, Vector4? colBg = null)
         {
-            ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0);
             if(colBg != null)
             {
                 ImGui.PushStyleColor(ImGuiCol.FrameBg, colBg.Value);
@@ -129,7 +130,6 @@ namespace DynamicBridge
             {
                 if (colBg != null) ImGui.PopStyleColor(3);
             }
-            ImGui.PopStyleVar();
             return ret;
         }
 

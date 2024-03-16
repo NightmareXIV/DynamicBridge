@@ -46,6 +46,10 @@ namespace DynamicBridge.Configuration
         public bool Cond_Gearset = false;
 
         public Dictionary<ulong, List<GearsetEntry>> GearsetNameCacheCID = [];
+
+        public string CensorSeed = Guid.NewGuid().ToString();
+        public bool NoNames = false;
+        public bool LesserCensor = false;
     }
 
     public enum GlamourerNoRuleBehavior

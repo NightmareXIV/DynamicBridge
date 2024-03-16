@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge;
+namespace DynamicBridge.Core;
 public unsafe static class ETimeChecker
 {
     internal static long* ET = &CSFramework.Instance()->ClientTime.EorzeaTime;

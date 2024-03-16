@@ -16,7 +16,7 @@ namespace DynamicBridge.Gui
             var CurrentHouse = HousingManager.Instance()->GetCurrentHouseId();
             if (CurrentHouse > 0)
             {
-                ImGuiEx.Text($"Current house: {CurrentHouse:X16}");
+                ImGuiEx.Text($"Current house: {Censor.Hide($"{CurrentHouse:X16}")}");
                 if (!C.Houses.TryGetFirst(x => x.ID == CurrentHouse, out var record))
                 {
                     if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Home, "Register this house"))
@@ -45,16 +45,17 @@ namespace DynamicBridge.Gui
                     ImGui.TableNextColumn();
 
                     ImGuiEx.SetNextItemFullWidth();
-                    ImGui.InputText("##name", ref x.Name, 100);
+                    ImGui.InputText("##name", ref x.Name, 100, Utils.CensorFlags);
 
                     ImGui.TableNextColumn();
-                    ImGuiEx.Text($"{x.ID:X16}");
+                    ImGuiEx.Text($"{Censor.Hide($"{x.ID:X16}")}");
 
                     ImGui.TableNextColumn();
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled:ImGuiEx.Ctrl))
                     {
                         new TickScheduler(() => C.Houses.RemoveAll(z => z.GUID == x.GUID));
                     }
+                    ImGuiEx.Tooltip($"Hold CTRL+Click to delete");
 
                     if (col) ImGui.PopStyleColor();
                     ImGui.PopID();

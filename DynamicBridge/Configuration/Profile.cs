@@ -20,7 +20,9 @@ namespace DynamicBridge.Configuration
         public List<string> Pathes = [];
         public Preset FallbackPreset = new();
 
-        public bool IsGlobal => C.GlobalProfile == this;
+        internal bool IsGlobal => C.GlobalProfile == this;
+
+        internal string CensoredName => C.NoNames ? GUID : Name;
 
         public IEnumerable<Preset> GetPresetsUnion(bool includeGlobal = true)
         {

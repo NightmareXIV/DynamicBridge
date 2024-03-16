@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DynamicBridge
+namespace DynamicBridge.Core
 {
     public static class CharacterStateChecker
     {
@@ -25,11 +25,11 @@ namespace DynamicBridge
 
         public static bool Check(this CharacterState state)
         {
-            if(States.TryGetValue(state, out var func))
+            if (States.TryGetValue(state, out var func))
             {
                 return func();
             }
-            if(EzThrottler.Throttle("ErrorReport", 10000)) DuoLog.Error($"Cound not find checker for state {state}. Please report this error with logs.");
+            if (EzThrottler.Throttle("ErrorReport", 10000)) DuoLog.Error($"Cound not find checker for state {state}. Please report this error with logs.");
             return false;
         }
     }
