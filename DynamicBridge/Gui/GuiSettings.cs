@@ -31,6 +31,7 @@ public static class GuiSettings
         ImGui.Checkbox($"Enable Plugin", ref C.Enable);
         if (ImGuiGroup.BeginGroupBox("General"))
         {
+            ImGuiEx.CheckboxInverted("Hide tutorial", ref C.ShowTutorial);
             ImGui.Checkbox($"Allow applying negative conditions", ref C.AllowNegativeConditions);
             ImGuiEx.HelpMarker("If you will enable this option, you will be able to mark any condition with cross marker. If any condition marked with cross within the rule is matching, that entire rule is ignored.");
             ImGui.Checkbox("Display full path in profile editor, where available", ref C.GlamourerFullPath);
@@ -61,6 +62,8 @@ public static class GuiSettings
                 C.CensorSeed = Guid.NewGuid().ToString();
             }
             ImGuiEx.HelpMarker($"Censored names will change upon pressing this button.");
+
+            ImGuiEx.CheckboxInverted($"Split base classes and jobs", ref C.UnifyJobs);
             ImGuiGroup.EndGroupBox();
         }
 

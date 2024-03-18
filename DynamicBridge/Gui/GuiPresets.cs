@@ -25,7 +25,7 @@ namespace DynamicBridge.Gui
         {
             if (UI.Profile != null)
             {
-                DrawProfile(UI.Profile, true);
+                DrawProfile(UI.Profile, true, true);
             }
             else
             {
@@ -36,10 +36,10 @@ namespace DynamicBridge.Gui
         public static void DrawGlobal()
         {
             ImGuiEx.TextWrapped($"Global presets are available for use on each of your characters.");
-            DrawProfile(C.GlobalProfile, false);
+            DrawProfile(C.GlobalProfile, false, false);
         }
 
-        static void DrawProfile(Profile Profile, bool drawFallback)
+        static void DrawProfile(Profile Profile, bool drawFallback, bool drawHeader)
         {
             Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
             
@@ -92,16 +92,16 @@ namespace DynamicBridge.Gui
 
             void RightButtons()
             {
-                ImGui.PushFont(UiBuilder.IconFont);
+                /*ImGui.PushFont(UiBuilder.IconFont);
                 ImGuiEx.ButtonCheckbox(FontAwesomeIcon.SearchPlus.ToIconString(), ref Focus);
                 ImGui.PopFont();
                 ImGuiEx.Tooltip("Toggle focus mode. While focus mode active, only one selected folder will be visible.");
-                ImGui.SameLine();
+                ImGui.SameLine();*/
                 UI.ForceUpdateButton();
                 ImGui.SameLine();
             }
 
-            UI.ProfileSelectorCommon(Buttons, RightButtons);
+            if(drawHeader) UI.ProfileSelectorCommon(Buttons, RightButtons);
 
             string newOpen = null;
 
@@ -281,8 +281,9 @@ namespace DynamicBridge.Gui
                     else
                     {
                         var rowPos = ImGui.GetCursorPos();
-                        if (ImGuiEx.CheckboxBullet("##static", ref preset.IsStatic))
+                        if (ImGui.RadioButton("##static", preset.IsStatic))
                         {
+                            preset.IsStatic = !preset.IsStatic;
                             if (preset.IsStatic)
                             {
                                 currentProfile.SetStatic(preset);
@@ -348,7 +349,7 @@ namespace DynamicBridge.Gui
                     //name
                     if (isFallback)
                     {
-                        ImGuiEx.TextV("Fallback preset");
+                        ImGuiEx.TextV("Base Preset");
                     }
                     else
                     {

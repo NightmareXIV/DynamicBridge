@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using ECommons;
 using Dalamud.Interface.Components;
 using DynamicBridge.Core;
+using Dalamud.Interface.Style;
 
 namespace DynamicBridge.Gui
 {
@@ -421,13 +422,13 @@ namespace DynamicBridge.Gui
                             ImGui.TableNextColumn();
                             //Job
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-                            rule.Jobs.RemoveAll(x => x.IsUpgradeable());
                             if (ImGui.BeginCombo("##job", rule.Jobs.PrintRange(rule.Not.Jobs, out var fullList), C.ComboSize))
                             {
                                 FiltersSelection();
-                                foreach (var cond in Enum.GetValues<Job>().Where(x => !x.IsUpgradeable()).OrderByDescending(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Role))
+                                foreach (var cond in Enum.GetValues<Job>().OrderByDescending(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Role))
                                 {
                                     if (cond == Job.ADV) continue;
+                                    if (cond.IsUpgradeable() && C.UnifyJobs) continue;
                                     var name = cond.ToString().Replace("_", " ");
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.Jobs.Contains(cond)) continue;
@@ -436,7 +437,9 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
+                                    if (cond.IsUpgradeable()) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
                                     DrawSelector(name, cond, rule.Jobs, rule.Not.Jobs);
+                                    if (cond.IsUpgradeable()) ImGui.PopStyleColor();
                                 }
                                 ImGui.EndCombo();
                             }
@@ -452,8 +455,7 @@ namespace DynamicBridge.Gui
                             if (ImGui.BeginCombo("##world", rule.Worlds.ToWorldNames().PrintRange(rule.Not.Worlds.ToWorldNames(), out var fullList), C.ComboSize))
                             {
                                 FiltersSelection();
-                                var currentRegion = ExcelWorldHelper.Get(Profile.Name.Split("@").SafeSelect(1)).GetRegion();
-                                foreach (var dc in ExcelWorldHelper.GetDataCenters(currentRegion))
+                                foreach (var dc in ExcelWorldHelper.GetDataCenters(Enum.GetValues<ExcelWorldHelper.Region>()))
                                 {
                                     var worlds = ExcelWorldHelper.GetPublicWorlds().Where(x => x.DataCenter.Row == dc.RowId);
                                     ImGuiEx.Text($"{dc.Name}");

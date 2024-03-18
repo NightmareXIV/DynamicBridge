@@ -41,19 +41,20 @@ public unsafe static class UI
             foreach (var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
         }
         KoFiButton.DrawRight();
-        ImGuiEx.EzTabBar("TabsNR", true, RequestTab, [
+        ImGuiEx.EzTabBar("TabsNR2", true, RequestTab, [
             //("Settings", Settings, null, true),
-            ("Profiles", GuiProfiles.Draw, Colors.TabBlue, true),
-            ("Characters", GuiCharacters.Draw, Colors.TabBlue, true),
+            (C.ShowTutorial?"Tutorial":null, GuiTutorial.Draw, null, true),
             ("Dynamic Rules", GuiRules.Draw, Colors.TabGreen, true),
             ("Presets", GuiPresets.DrawUser, Colors.TabGreen, true),
             ("Global Presets", GuiPresets.DrawGlobal, Colors.TabYellow, true),
             ("Layered Designs", ComplexGlamourer.Draw, Colors.TabPurple, true),
             ("House Registration", HouseReg.Draw, Colors.TabPurple, true),
+            ("Profiles", GuiProfiles.Draw, Colors.TabBlue, true),
+            ("Characters", GuiCharacters.Draw, Colors.TabBlue, true),
             ("Settings", GuiSettings.Draw, null, true),
             InternalLog.ImGuiTab(),
             (C.Debug?"Debug":null, Debug.Draw, ImGuiColors.DalamudGrey3, true),
-            //("Neo", P.NeoTabs.Draw, null, true),
+            //("Neo", P.NeoTabs.DrawHeaderLine, null, true),
             ]);
         RequestTab = null;
     }

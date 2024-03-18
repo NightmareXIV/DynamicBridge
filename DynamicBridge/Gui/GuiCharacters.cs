@@ -42,7 +42,7 @@ public static class GuiCharacters
                         C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                     }
                     ImGui.SetNextItemWidth(350f);
-                    ImGui.InputTextWithHint($"##selProfileFltr", "Filter...", ref Filters[2], 100);
+                    ImGui.InputTextWithHint($"##selProfileFltr", "Filter...", ref Filters[2], 100, Utils.CensorFlags);
                     foreach (var profile in C.ProfilesL)
                     {
                         if (Filters[2].Length > 0 && !profile.Name.Contains(Filters[2], StringComparison.OrdinalIgnoreCase)) continue;
@@ -62,16 +62,13 @@ public static class GuiCharacters
                     C.Blacklist.Add(x.Key);
                     C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                 }
-                ImGuiEx.Tooltip($"Blacklist {x.Value}. This will prevent it from showing up for profile assignments. This will also undo profile assignments for {x.Value}. ");
+                ImGuiEx.Tooltip($"Blacklist {Censor.Character(x.Value)}. This will prevent it from showing up for profile assignments. This will also undo profile assignments for {Censor.Character(x.Value)}. ");
                 ImGui.SameLine();
 
-                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled: ImGuiEx.Ctrl))
                 {
-                    if (ImGuiEx.Ctrl)
-                    {
-                        new TickScheduler(() => C.SeenCharacters.Remove(x));
-                        C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
-                    }
+                    new TickScheduler(() => C.SeenCharacters.Remove(x));
+                    C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                 }
                 ImGuiEx.Tooltip($"Hold CTRL and click to delete information about {x.Value}. This will also undo profile assignment to the character but and as soon as you relog back onto it, {x.Value} will be registered in a plugin again.");
 

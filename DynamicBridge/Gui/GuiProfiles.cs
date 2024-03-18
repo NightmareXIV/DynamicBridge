@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface.Components;
 using DynamicBridge.Configuration;
+using ECommons.Configuration;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +25,34 @@ public static class GuiProfiles
                 C.ProfilesL.Add(profile);
                 profile.Name = $"New Profile {C.ProfilesL.Count}";
             }
+            ImGui.SameLine();
             ImGuiEx.Tooltip($"Create new empty profile");
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
+            {
+                try
+                {
+                    var x = EzConfig.DefaultSerializationFactory.Deserialize<Profile>(Paste());
+                    var newName = x.Name + $" (copy)";
+                    if(C.ProfilesL.Any(z => z.Name == newName))
+                    {
+                        int i = 2;
+                        do
+                        {
+                            newName = x.Name + $" (copy {i++})";
+                        }
+                        while (C.ProfilesL.Any(z => z.Name == newName));
+                    }
+                    x.Name = newName;
+                    x.Characters.Clear();
+                    C.ProfilesL.Add(x);
+                }
+                catch(Exception e)
+                {
+                    Notify.Error(e.Message);
+                }
+            }
+            ImGuiEx.Tooltip($"Create new profile from data in clipboard");
+            ImGui.SameLine();
         });
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
         if (ImGui.BeginTable($"##profiles", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
@@ -73,6 +101,18 @@ public static class GuiProfiles
                             ImGuiEx.Spacing();
                         }
                         ImGuiEx.CollectionCheckbox($"{x.Name}", x.Name, profile.Pathes);
+                        if (x.Glamourer)
+                        {
+                            ImGui.SameLine();
+                            ImGuiEx.Text(ImGuiColors.DalamudGrey3, UiBuilder.IconFont, "\uf630");
+                            ImGuiEx.Tooltip("This folder is present in Glamourer");
+                        }
+                        if (x.Customize)
+                        {
+                            ImGui.SameLine();
+                            ImGuiEx.Text(ImGuiColors.DalamudGrey3, UiBuilder.IconFont, "\ue541");
+                            ImGuiEx.Tooltip("This folder is present in Customize+");
+                        }
                     }
                     foreach(var x in profile.Pathes)
                     {
@@ -85,7 +125,10 @@ public static class GuiProfiles
                 }
                 else
                 {
-                    if (profile.Pathes.Count > 1) ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
+                    if (profile.Pathes.Count > 1)
+                    {
+                        ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
+                    }
                 }
 
                 ImGui.TableNextColumn();
@@ -102,9 +145,9 @@ public static class GuiProfiles
                 }
                 ImGuiEx.Tooltip("Copy this profile to clipboard");
                 ImGui.SameLine();
-                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash.ToIconString()))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash.ToIconString(), enabled:ImGuiEx.Ctrl))
                 {
-                    if(ImGuiEx.Ctrl) new TickScheduler(() => C.ProfilesL.Remove(profile));
+                    new TickScheduler(() => C.ProfilesL.Remove(profile));
                 }
                 ImGuiEx.Tooltip("Hold CTRL and click to delete");
 

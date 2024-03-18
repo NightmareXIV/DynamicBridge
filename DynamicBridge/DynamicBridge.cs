@@ -90,7 +90,7 @@ namespace DynamicBridge
                 CustomizePlusManager = new();
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
                 Memory = new();
-                NeoTabs = new([new("Presets", () => { }), new("Characters", () => { }), new("Dynamic Rules", () => { }), new("Profiles", () => { }), new("Global Profiles", () => { }), new("Layered Designs", () => { }), new("House Registration", () => { }), new("Settings", () => { })]);
+                NeoTabs = new();
             });
         }
 
@@ -245,8 +245,8 @@ namespace DynamicBridge
                                     (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
                                     && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))))
                                     &&
-                                    (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJob()))
-                                    && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJob()))))
+                                    (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))
+                                    && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))))
                                     &&
                                     (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
                                     && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))

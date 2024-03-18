@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>1.0.4.8</Version>
+        <Version>1.0.4.9</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -188,6 +188,12 @@
         <None Update="res\state\7.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="res\tutorial\1.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="res\tutorial\2.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="res\zgrp\0.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -223,6 +229,6 @@
     <ItemGroup>
       <Folder Include="images\" />
       <Folder Include="IPC\Moodles\" />
-      <Folder Include="res\" />
+      <Folder Include="res\tutorial\" />
     </ItemGroup>
 </Project>

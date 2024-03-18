@@ -21,6 +21,26 @@ namespace DynamicBridge
         public static ImGuiInputTextFlags CensorFlags => C.NoNames ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None;
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
 
+        public static Job GetUpgradedJobIfNeeded(this Job current)
+        {
+            if (C.UnifyJobs) return current.GetUpgradedJob();
+            return current;
+        }
+
+        public static List<string> TrimPathes(IEnumerable<string> origPathes)
+        {
+            var pathes = new List<string>();
+            foreach (var path in origPathes)
+            {
+                var nameParts = path.Split('/');
+                if (nameParts.Length > 1)
+                {
+                    var pathParts = nameParts[..^1];
+                    pathes.Add(pathParts.Join("/"));
+                }
+            }
+            return pathes;
+        }
 
         static List<PathInfo> PathInfos = null;
         public static List<PathInfo> GetCombinedPathes()
@@ -29,17 +49,9 @@ namespace DynamicBridge
             var ret = new List<PathInfo>();
             try
             {
-                var pathes = new List<string>();
-                foreach (var path in P.GlamourerManager.GetRawPathes()
-                    .Concat(P.CustomizePlusManager.GetRawPathes()))
-                {
-                    var nameParts = path.Split('/');
-                    if (nameParts.Length > 1)
-                    {
-                        var pathParts = nameParts[..^1];
-                        pathes.Add(pathParts.Join("/"));
-                    }
-                }
+                var glamPathes = TrimPathes(P.GlamourerManager.GetRawPathes());
+                var custPathes = TrimPathes(P.CustomizePlusManager.GetRawPathes());
+                var pathes = glamPathes.Concat(custPathes).ToList();
                 pathes.Sort();
                 foreach (var x in pathes)
                 {
@@ -48,7 +60,11 @@ namespace DynamicBridge
                     for (int i = 1; i <= parts.Length; i++)
                     {
                         var part = parts[..i].Join("/");
-                        var info = new PathInfo(part, i - 1);
+                        var info = new PathInfo(part, i - 1)
+                        {
+                            Glamourer = glamPathes.Contains(x),
+                            Customize = custPathes.Contains(x),
+                        };
                         if (!ret.Contains(info)) ret.Add(info);
                     }
                 }

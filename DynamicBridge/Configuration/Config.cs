@@ -50,6 +50,8 @@ namespace DynamicBridge.Configuration
         public string CensorSeed = Guid.NewGuid().ToString();
         public bool NoNames = false;
         public bool LesserCensor = false;
+        public bool ShowTutorial = true;
+        public bool UnifyJobs = true;
     }
 
     public enum GlamourerNoRuleBehavior
