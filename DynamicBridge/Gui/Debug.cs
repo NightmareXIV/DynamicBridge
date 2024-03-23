@@ -3,6 +3,7 @@ using DynamicBridge.IPC;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
+using DynamicBridge.IPC.Penumbra;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
@@ -28,6 +29,18 @@ namespace DynamicBridge.Gui
         static List<string> TestData = null;
         public static void Draw()
         {
+            if (ImGui.CollapsingHeader("Penumbra"))
+            {
+                ImGuiEx.Text(EColor.Green, $"Current: {P.PenumbraManager.GetCollectionForType(PenumbraManager.ApiCollectionType.Yourself) ?? "(null)"}");
+                foreach(var x in P.PenumbraManager.GetCollections())
+                {
+                    if (ImGui.Selectable($"{x}"))
+                    {
+                        var ret = P.PenumbraManager.SetCollectionForType(PenumbraManager.ApiCollectionType.Yourself, x, true, true);
+                        DuoLog.Information($"Error: {ret.Error}, old: {ret.OldCollection}");
+                    }
+                }
+            }
             if(ImGui.CollapsingHeader("Pathes"))
             {
                 foreach(var x in Utils.GetCombinedPathes())

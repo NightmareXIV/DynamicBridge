@@ -4,6 +4,7 @@ using DynamicBridge.Gui;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
+using DynamicBridge.IPC.Penumbra;
 using ECommons.Automation;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
@@ -32,7 +33,7 @@ namespace DynamicBridge
         public bool ForceUpdate = false;
         public bool SoftForceUpdate = false;
         public string MyOldDesign = null;
-        public Random Random = new();
+        public Random Random => Random.Shared;
         public TaskManager TaskManager;
         public const int DelayMS = 100;
         public static ApplyRule StaticRule = new();
@@ -44,6 +45,7 @@ namespace DynamicBridge
 
         public GlamourerManager GlamourerManager;
         public CustomizePlusManager CustomizePlusManager;
+        public PenumbraManager PenumbraManager;
 
         public NeoTabs NeoTabs;
 
@@ -91,6 +93,7 @@ namespace DynamicBridge
                 ProperOnLogin.RegisterInteractable(OnLogin, true);
                 Memory = new();
                 NeoTabs = new();
+                PenumbraManager = new();
             });
         }
 
@@ -176,6 +179,10 @@ namespace DynamicBridge
             if (C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
             LastJob = 0;
             LastItems = [];
+            if (C.EnablePenumbra)
+            {
+                PenumbraManager.UnsetAssignmentIfNeeded();
+            }
             //LastGS = -1;
         }
 
@@ -273,6 +280,7 @@ namespace DynamicBridge
                         var DoNullGlamourer = true;
                         var DoNullCustomize = true;
                         var DoNullHonorific = true;
+                        var DoNullPenumbra = true;
                         for (int i = 0; i < newRule.Count; i++)
                         {
                             var rule = newRule[i];
@@ -284,6 +292,10 @@ namespace DynamicBridge
                                 var preset = profile.GetPresetsUnion().FirstOrDefault(s => s.Name == rule.SelectedPresets[index]);
                                 if (preset != null)
                                 {
+                                    if (C.EnablePenumbra)
+                                    {
+                                        ApplyPresetPenumbra(preset, ref DoNullPenumbra);
+                                    }
                                     if (C.EnableGlamourer)
                                     {
                                         ApplyPresetGlamourer(preset, isFirst, ref DoNullGlamourer);
@@ -300,6 +312,11 @@ namespace DynamicBridge
                             }
                         }
 
+                        if (DoNullPenumbra)
+                        {
+                            ApplyPresetPenumbra(profile.FallbackPreset, ref DoNullPenumbra);
+                            if (DoNullPenumbra) NullPenumbra();
+                        }
                         if (DoNullGlamourer)
                         {
                             ApplyPresetGlamourer(profile.FallbackPreset, true, ref DoNullGlamourer);
@@ -314,6 +331,12 @@ namespace DynamicBridge
                         {
                             ApplyPresetHonorific(profile.FallbackPreset, ref DoNullHonorific);
                             if(DoNullHonorific) NullHonorific();
+                        }
+
+                        void NullPenumbra()
+                        {
+                            if (!C.EnablePenumbra) return;
+                            PenumbraManager.UnsetAssignmentIfNeeded();
                         }
 
                         void NullHonorific()
@@ -396,6 +419,16 @@ namespace DynamicBridge
         void TerritoryChanged(ushort id)
         {
             SoftForceUpdate = true;
+        }
+
+        void ApplyPresetPenumbra(Preset preset, ref bool DoNullPenumbra)
+        {
+            if (preset.Penumbra.Count > 0)
+            {
+                var randomAssignment = preset.Penumbra[Random.Next(preset.Penumbra.Count)];
+                PenumbraManager.SetAssignment(randomAssignment);
+                DoNullPenumbra = false;
+            }
         }
 
         void ApplyPresetGlamourer(Preset preset, bool isFirst, ref bool DoNullGlamourer)

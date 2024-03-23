@@ -21,6 +21,7 @@ namespace DynamicBridge.Configuration
         public bool EnableGlamourer = true;
         public bool EnableCustomize = true;
         public bool EnableHonorific = true;
+        public bool EnablePenumbra = true;
         public GlamourerNoRuleBehavior GlamNoRuleBehaviour = GlamourerNoRuleBehavior.RevertToNormal;
         public bool RevertBeforeAutomationRestore = false;
         public bool RevertGlamourerBeforeApply = false;

@@ -227,6 +227,7 @@ namespace DynamicBridge.Gui
             if (C.EnableHonorific) cnt++;
             if (C.EnableCustomize) cnt++;
             if (C.EnableGlamourer) cnt++;
+            if (C.EnablePenumbra) cnt++;
             List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
             ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
             if (ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
@@ -236,6 +237,7 @@ namespace DynamicBridge.Gui
                 if(C.EnableGlamourer) ImGui.TableSetupColumn("Glamourer");
                 if (C.EnableCustomize) ImGui.TableSetupColumn("Customize+");
                 if (C.EnableHonorific) ImGui.TableSetupColumn("Honorific");
+                if (C.EnablePenumbra) ImGui.TableSetupColumn("Penumbra");
                 ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                 ImGui.TableHeadersRow();
 
@@ -510,6 +512,41 @@ namespace DynamicBridge.Gui
                                     if (titles.Any(d => d.Title == x)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                     ImGuiEx.CollectionCheckbox($"{x}", x, preset.Honorific, false, true);
+                                    ImGui.PopStyleColor();
+                                }
+                                ImGui.EndCombo();
+                            }
+                            if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            filterCnt++;
+                        }
+                    }
+                    
+                    //Penumbra
+                    {
+                        if (C.EnablePenumbra)
+                        {
+                            ImGui.TableNextColumn();
+                            ImGuiEx.SetNextItemFullWidth();
+                            if (ImGui.BeginCombo("##penumbra", preset.Penumbra.PrintRange(out var fullList, "- None -"), C.ComboSize))
+                            {
+                                FiltersSelection();
+                                var collections = P.PenumbraManager.GetCollections().Order();
+                                var index = 0;
+                                foreach (var x in collections)
+                                {
+                                    index++;
+                                    ImGui.PushID(index);
+                                    var name = x;
+                                    if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                    if (OnlySelected[filterCnt] && !preset.Penumbra.Contains(name)) continue;
+                                    ImGuiEx.CollectionCheckbox($"{name}", x, preset.Penumbra);
+                                    ImGui.PopID();
+                                }
+                                foreach (var x in preset.Penumbra)
+                                {
+                                    if (collections.Contains(x)) continue;
+                                    ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                                    ImGuiEx.CollectionCheckbox($"{x}", x, preset.Penumbra, false, true);
                                     ImGui.PopStyleColor();
                                 }
                                 ImGui.EndCombo();

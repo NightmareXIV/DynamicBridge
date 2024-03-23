@@ -17,6 +17,7 @@ namespace DynamicBridge.Configuration
         public List<string> Honorific = [];
         public List<string> Palette = [];
         public List<string> Customize = [];
+        public List<string> Penumbra = [];
         public bool IsStatic = false;
     }
 }
