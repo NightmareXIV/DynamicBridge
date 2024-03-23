@@ -128,6 +128,10 @@ public static class GuiSettings
             ImGui.Checkbox("Honorific", ref C.EnableHonorific);
             DrawPluginCheck("Honorific", "1.4.2.0");
 
+            //penumbra
+            ImGui.Checkbox("Penumbra", ref C.EnablePenumbra);
+            DrawPluginCheck("Penumbra", "1.0.0.4");
+
             ImGuiGroup.EndGroupBox();
         }
 

@@ -18,6 +18,7 @@ namespace DynamicBridge.Configuration
         public List<string> Palette = [];
         public List<string> Customize = [];
         public List<string> Penumbra = [];
+        public SpecialPenumbraAssignment PenumbraType = SpecialPenumbraAssignment.Use_Named_Collection;
         public bool IsStatic = false;
     }
 }

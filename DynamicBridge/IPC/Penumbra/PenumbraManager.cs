@@ -11,7 +11,8 @@ public class PenumbraManager
     [EzIPC] public readonly Func<IList<string>> GetCollections;
     [EzIPC] public readonly Func<ApiCollectionType, string> GetCollectionForType;
     [EzIPC] public readonly Func<ApiCollectionType, string, bool, bool, (PenumbraApiEc Error, string OldCollection)> SetCollectionForType;
-
+    [EzIPC] public readonly Func<int, (bool ObjectValid, bool IndividualSet, string EffectiveCollection)> GetCollectionForObject;
+    [EzIPC] public readonly Func<int, string, bool, bool, (PenumbraApiEc Error, string OldCollection)> SetCollectionForObject;
     string OldAssignment;
 
     public PenumbraManager()
@@ -23,7 +24,7 @@ public class PenumbraManager
     {
         try
         {
-            var result = SetCollectionForType(ApiCollectionType.Yourself, newAssignment, true, true);
+            var result = SetCollectionForObject(0, newAssignment, true, true);
             if (!result.Error.EqualsAny(PenumbraApiEc.Success, PenumbraApiEc.NothingChanged))
             {
                 var e = $"Error setting Penumbra assignment: {result.Error}";
@@ -32,7 +33,7 @@ public class PenumbraManager
             }
             else
             {
-                OldAssignment = result.OldCollection;
+                OldAssignment ??= result.OldCollection;
             }
         }
         catch(Exception e)
@@ -46,7 +47,7 @@ public class PenumbraManager
         if (OldAssignment == null) return;
         try
         {
-            SetCollectionForType(ApiCollectionType.Yourself, OldAssignment, true, true);
+            SetCollectionForObject(0, OldAssignment, true, true);
             OldAssignment = null;
         }
         catch(Exception e)

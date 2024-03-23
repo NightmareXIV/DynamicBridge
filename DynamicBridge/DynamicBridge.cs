@@ -181,7 +181,7 @@ namespace DynamicBridge
             LastItems = [];
             if (C.EnablePenumbra)
             {
-                PenumbraManager.UnsetAssignmentIfNeeded();
+                //PenumbraManager.UnsetAssignmentIfNeeded();
             }
             //LastGS = -1;
         }
@@ -405,6 +405,7 @@ namespace DynamicBridge
                 if (Svc.Condition[ConditionFlag.LoggingOut])
                 {
                     if (EzThrottler.Throttle("LogoutUpdateGS", 30000)) Utils.UpdateGearsetCache();
+                    if (C.EnablePenumbra) PenumbraManager.UnsetAssignmentIfNeeded();
                 }
             }
             else
@@ -423,7 +424,17 @@ namespace DynamicBridge
 
         void ApplyPresetPenumbra(Preset preset, ref bool DoNullPenumbra)
         {
-            if (preset.Penumbra.Count > 0)
+            if (preset.PenumbraType == SpecialPenumbraAssignment.Remove_Individual_Assignment)
+            {
+                PenumbraManager.SetAssignment("");
+                DoNullPenumbra = false;
+            }
+            else if(preset.PenumbraType == SpecialPenumbraAssignment.Use_No_Mods)
+            {
+                PenumbraManager.SetAssignment("None");
+                DoNullPenumbra = false;
+            }
+            else if (preset.Penumbra.Count > 0)
             {
                 var randomAssignment = preset.Penumbra[Random.Next(preset.Penumbra.Count)];
                 PenumbraManager.SetAssignment(randomAssignment);

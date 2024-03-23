@@ -527,27 +527,33 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##penumbra", preset.Penumbra.PrintRange(out var fullList, "- None -"), C.ComboSize))
+                            string fullList = null;
+                            if (ImGui.BeginCombo("##penumbra", preset.PenumbraType != SpecialPenumbraAssignment.Use_Named_Collection? preset.PenumbraType.ToString().Replace("_", " "): preset.Penumbra.PrintRange(out fullList, "- None -"), C.ComboSize))
                             {
-                                FiltersSelection();
-                                var collections = P.PenumbraManager.GetCollections().Order();
-                                var index = 0;
-                                foreach (var x in collections)
+                                ImGuiEx.Text($"Assignment Type:");
+                                ImGuiEx.EnumCombo($"##asstype", ref preset.PenumbraType);
+                                if (preset.PenumbraType == SpecialPenumbraAssignment.Use_Named_Collection)
                                 {
-                                    index++;
-                                    ImGui.PushID(index);
-                                    var name = x;
-                                    if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                    if (OnlySelected[filterCnt] && !preset.Penumbra.Contains(name)) continue;
-                                    ImGuiEx.CollectionCheckbox($"{name}", x, preset.Penumbra);
-                                    ImGui.PopID();
-                                }
-                                foreach (var x in preset.Penumbra)
-                                {
-                                    if (collections.Contains(x)) continue;
-                                    ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                    ImGuiEx.CollectionCheckbox($"{x}", x, preset.Penumbra, false, true);
-                                    ImGui.PopStyleColor();
+                                    FiltersSelection();
+                                    var collections = P.PenumbraManager.GetCollections().Order();
+                                    var index = 0;
+                                    foreach (var x in collections)
+                                    {
+                                        index++;
+                                        ImGui.PushID(index);
+                                        var name = x;
+                                        if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                        if (OnlySelected[filterCnt] && !preset.Penumbra.Contains(name)) continue;
+                                        ImGuiEx.CollectionCheckbox($"{name}", x, preset.Penumbra);
+                                        ImGui.PopID();
+                                    }
+                                    foreach (var x in preset.Penumbra)
+                                    {
+                                        if (collections.Contains(x)) continue;
+                                        ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                                        ImGuiEx.CollectionCheckbox($"{x}", x, preset.Penumbra, false, true);
+                                        ImGui.PopStyleColor();
+                                    }
                                 }
                                 ImGui.EndCombo();
                             }
