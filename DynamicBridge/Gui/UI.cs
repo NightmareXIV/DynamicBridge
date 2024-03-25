@@ -23,7 +23,6 @@ public unsafe static class UI
     public const string AnyNotice = "Meeting any of the following conditions will result in rule being triggered:\n";
     static string PSelFilter = "";
     public static string RequestTab = null;
-    public static readonly string BunchOfSpaces = " ".Repeat(500);
 
     public static void DrawMain()
     {

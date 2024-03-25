@@ -31,6 +31,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public AgentMap* AgentMapInst;
     public WeatherManager WeatherManager;
     public List<ApplyRule> LastRule = [];
+    public HashSet<Guid> MoodleCleanupQueue = [];
     public bool ForceUpdate = false;
     public bool SoftForceUpdate = false;
     public string MyOldDesign = null;
@@ -280,10 +281,12 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     LastRule = newRule;
                     ForceUpdate = false;
                     SoftForceUpdate = false;
+                    if (C.EnableMoodles) MoodlesManager.ResetCache();
                     var DoNullGlamourer = true;
                     var DoNullCustomize = true;
                     var DoNullHonorific = true;
                     var DoNullPenumbra = true;
+                    HashSet<Guid> moodleCleanup = [];
                     for (int i = 0; i < newRule.Count; i++)
                     {
                         var rule = newRule[i];
@@ -311,6 +314,10 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 {
                                     ApplyPresetCustomize(preset, ref DoNullCustomize);
                                 }
+                                if (C.EnableMoodles)
+                                {
+                                    ApplyPresetMoodles(preset, moodleCleanup);
+                                }
                             }
                         }
                     }
@@ -335,6 +342,21 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         ApplyPresetHonorific(profile.FallbackPreset, ref DoNullHonorific);
                         if(DoNullHonorific) NullHonorific();
                     }
+                    foreach(var x in MoodleCleanupQueue)
+                    {
+                        if (!moodleCleanup.Contains(x))
+                        {
+                            if(MoodlesManager.GetMoodles().Any(z => z.ID == x))
+                            {
+                                MoodlesManager.RemoveMoodle(x);
+                            }
+                            else if(MoodlesManager.GetPresets().Any(z => z.ID == x))
+                            {
+                                MoodlesManager.RemovePreset(x);
+                            }
+                        }
+                    }
+                    MoodleCleanupQueue = moodleCleanup;
 
                     void NullPenumbra()
                     {
@@ -514,6 +536,26 @@ public unsafe class DynamicBridge : IDalamudPlugin
             var randomCusProfile = cfiltered[Random.Next(cfiltered.Length)];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
             TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
+        }
+    }
+
+    void ApplyPresetMoodles(Preset preset, HashSet<Guid> moodleCleanup)
+    { 
+        MoodlesManager.ResetCache();
+        foreach(var x in preset.Moodles)
+        {
+            if (MoodlesManager.GetMoodles().TryGetFirst(z => z.ID == x.Guid, out var m))
+            {
+                PluginLog.Debug($"Applying Moodle {m}");
+                MoodlesManager.ApplyMoodle(x.Guid);
+                if(x.Cancel) moodleCleanup.Add(x.Guid);
+            }
+            else if(MoodlesManager.GetPresets().TryGetFirst(z => z.ID == x.Guid, out var mp))
+            {
+                PluginLog.Debug($"Applying Moodle preset {mp}");
+                MoodlesManager.ApplyPreset(x.Guid);
+                if (x.Cancel) moodleCleanup.Add(x.Guid);
+            }
         }
     }
 

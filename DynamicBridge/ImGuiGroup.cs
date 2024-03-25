@@ -38,7 +38,7 @@ public static partial class ImGuiGroup
             else
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, options.HeaderTextColor);
-                open = ImGui.TreeNodeEx(id, ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.DefaultOpen);
+                open = ImGuiEx.TreeNode(id, ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.DefaultOpen);
                 ImGui.PopStyleColor();
             }
 

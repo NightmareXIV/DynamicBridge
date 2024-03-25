@@ -132,6 +132,10 @@ public static class GuiSettings
             ImGui.Checkbox("Penumbra", ref C.EnablePenumbra);
             DrawPluginCheck("Penumbra", "1.0.0.4");
 
+            //moodles
+            ImGui.Checkbox("Moodles", ref C.EnableMoodles);
+            DrawPluginCheck("Moodles", "1.0.0.15");
+
             ImGuiGroup.EndGroupBox();
         }
 

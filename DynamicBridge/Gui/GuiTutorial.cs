@@ -11,7 +11,7 @@ public static class GuiTutorial
 {
     static readonly string Content = @"
 Welcome to DynamicBridge plugin!
-This plugin allows you to dynamically change your Glamourer, Customize+ and Honirific presets based on various rules. You can use this plugin for simple means such as switching your appearance manually or you can create very advanced and precise rule set.
+This plugin allows you to dynamically change your Glamourer, Customize+ and Honorific presets based on various rules. You can use this plugin for simple means such as switching your appearance manually or you can create very advanced and precise rule sets.
 ---
 If you have previously used older version of the plugin, your configuration has been converted to use more convenient profile system. In case something went wrong, a backup of your old configuration file has been taken.
 Instead of enforcing per-character profiles, you can now create profiles and assign them to characters. This enables you to use one profile for multiple characters as well as easily changing profiles used for your characters.

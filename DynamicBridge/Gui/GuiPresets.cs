@@ -25,7 +25,7 @@ namespace DynamicBridge.Gui
         {
             if (UI.Profile != null)
             {
-                DrawProfile(UI.Profile, true, true);
+                DrawProfile(UI.Profile, true, true, false);
             }
             else
             {
@@ -35,11 +35,10 @@ namespace DynamicBridge.Gui
 
         public static void DrawGlobal()
         {
-            ImGuiEx.TextWrapped($"Global presets are available for use on each of your characters.");
-            DrawProfile(C.GlobalProfile, false, false);
+            DrawProfile(C.GlobalProfile, false, false, true);
         }
 
-        static void DrawProfile(Profile Profile, bool drawFallback, bool drawHeader)
+        static void DrawProfile(Profile Profile, bool drawFallback, bool drawHeader, bool drawGlobalSection)
         {
             Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
             
@@ -101,13 +100,23 @@ namespace DynamicBridge.Gui
                 ImGui.SameLine();
             }
 
-            if(drawHeader) UI.ProfileSelectorCommon(Buttons, RightButtons);
+            if (drawHeader)
+            {
+                UI.ProfileSelectorCommon(Buttons, RightButtons);
+            }
+            else
+            {
+                ImGuiEx.RightFloat(RightButtons);
+                Buttons();
+                ImGui.SameLine();
+                ImGuiEx.TextWrapped($"Global Presets are available for use on each of your characters.");
+            }
 
             string newOpen = null;
 
             if (!Focus || Open == "" || Open == null)
             {
-                if (ImGui.TreeNodeEx($"Main presets{UI.BunchOfSpaces}##global", ImGuiTreeNodeFlags.DefaultOpen))
+                if (ImGuiEx.TreeNode($"Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
                 {
                     newOpen = "";
                     DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
@@ -127,9 +136,9 @@ namespace DynamicBridge.Gui
                 if (Focus && Open != presetFolder.GUID && Open != null) continue;
                 if (presetFolder.HiddenFromSelection)
                 {
-                    ImGuiEx.RightFloat($"RFCHP{presetFolder.GUID}", () => ImGuiEx.TextV(ImGuiColors.DalamudGrey, "Hidden from rules"));
+                    ImGuiEx.RightFloat($"RFCHP{presetFolder.GUID}", () => ImGuiEx.Text(ImGuiColors.DalamudGrey, "Hidden from rules"));
                 }
-                if (ImGui.TreeNodeEx($"{presetFolder.Name}{UI.BunchOfSpaces}###presetfolder{presetFolder.GUID}"))
+                if (ImGuiEx.TreeNode($"{presetFolder.Name}###presetfolder{presetFolder.GUID}"))
                 {
                     newOpen = presetFolder.GUID;
                     CollapsingHeaderClicked();
@@ -211,7 +220,7 @@ namespace DynamicBridge.Gui
             }
             if (drawFallback)
             {
-                if (ImGui.TreeNode($"Fallback preset" + UI.BunchOfSpaces))
+                if (ImGuiEx.TreeNode($"Fallback preset"))
                 {
                     DrawPresets(Profile, [Profile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true);
                     Open = newOpen;
@@ -228,6 +237,7 @@ namespace DynamicBridge.Gui
             if (C.EnableCustomize) cnt++;
             if (C.EnableGlamourer) cnt++;
             if (C.EnablePenumbra) cnt++;
+            if (C.EnableMoodles) cnt++;
             List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
             ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
             if (ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
@@ -238,6 +248,7 @@ namespace DynamicBridge.Gui
                 if (C.EnableCustomize) ImGui.TableSetupColumn("Customize+");
                 if (C.EnableHonorific) ImGui.TableSetupColumn("Honorific");
                 if (C.EnablePenumbra) ImGui.TableSetupColumn("Penumbra");
+                if (C.EnableMoodles) ImGui.TableSetupColumn("Moodles");
                 ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                 ImGui.TableHeadersRow();
 
@@ -520,7 +531,7 @@ namespace DynamicBridge.Gui
                             filterCnt++;
                         }
                     }
-                    
+
                     //Penumbra
                     {
                         if (C.EnablePenumbra)
@@ -528,7 +539,7 @@ namespace DynamicBridge.Gui
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
                             string fullList = null;
-                            if (ImGui.BeginCombo("##penumbra", preset.PenumbraType != SpecialPenumbraAssignment.Use_Named_Collection? preset.PenumbraType.ToString().Replace("_", " "): preset.Penumbra.PrintRange(out fullList, "- None -"), C.ComboSize))
+                            if (ImGui.BeginCombo("##penumbra", preset.PenumbraType != SpecialPenumbraAssignment.Use_Named_Collection ? preset.PenumbraType.ToString().Replace("_", " ") : preset.Penumbra.PrintRange(out fullList, "- None -"), C.ComboSize))
                             {
                                 ImGuiEx.Text($"Assignment Type:");
                                 ImGuiEx.EnumCombo($"##asstype", ref preset.PenumbraType);
@@ -558,6 +569,89 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if (fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            filterCnt++;
+                        }
+                    }
+                    
+                    //Moodles
+                    {
+                        if (C.EnableMoodles)
+                        {
+                            ImGui.TableNextColumn();
+                            ImGuiEx.SetNextItemFullWidth();
+                            if (ImGui.BeginCombo("##moodles", preset.Moodles.Select(Utils.GetName).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                            {
+                                void ToggleMoodle(Guid id, string name)
+                                {
+                                    var cont = preset.Moodles.Any(x => x.Guid == id);
+                                    if (ImGui.Checkbox(name, ref cont))
+                                    {
+                                        if (cont)
+                                        {
+                                            preset.Moodles.Add(new(id, false));
+                                        }
+                                        else
+                                        {
+                                            new TickScheduler(() => preset.Moodles.RemoveAll(z => z.Guid == id));
+                                        }
+                                    }
+                                    if (cont)
+                                    {
+                                        var e = preset.Moodles.First(x => x.Guid == id);
+                                        ImGui.SameLine();
+                                        ImGui.PushFont(UiBuilder.IconFont);
+                                        ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Link.ToIconString(), ref e.Cancel);
+                                        ImGui.PopFont();
+                                        ImGuiEx.Tooltip($"Cancel this moodle(s) once preset is no longer applied");
+                                    }
+                                }
+
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
+
+                                FiltersSelection();
+                                var moodles = P.MoodlesManager.GetMoodles().OrderBy(x => x.FullPath);
+                                var moodlePresets = P.MoodlesManager.GetPresets().OrderBy(x => x.FullPath);
+                                var index = 0;
+                                if (ImGuiEx.TreeNode(Colors.TabGreen, "Moodles", ImGuiTreeNodeFlags.DefaultOpen))
+                                {
+                                    foreach (var x in moodles)
+                                    {
+                                        index++;
+                                        ImGui.PushID(index);
+                                        var name = x.FullPath;
+                                        if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                        if (OnlySelected[filterCnt] && !preset.Moodles.Any(z => z.Guid == x.ID)) continue;
+                                        ToggleMoodle(x.ID, name);
+                                        ImGui.PopID();
+                                    }
+                                    ImGui.TreePop();
+                                }
+                                if (ImGuiEx.TreeNode(Colors.TabYellow, "Moodle Presets", ImGuiTreeNodeFlags.DefaultOpen))
+                                {
+                                    foreach (var x in moodlePresets)
+                                    {
+                                        index++;
+                                        ImGui.PushID(index);
+                                        var name = x.FullPath;
+                                        if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                        if (OnlySelected[filterCnt] && !preset.Moodles.Any(z => z.Guid == x.ID)) continue;
+                                        ToggleMoodle(x.ID, name);
+                                        ImGui.PopID();
+                                    }
+                                    ImGui.TreePop();
+                                }
+                                foreach (var x in preset.Moodles)
+                                {
+                                    if (moodles.Any(z => z.ID == x.Guid)) continue;
+                                    if (moodlePresets.Any(z => z.ID == x.Guid)) continue;
+                                    ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                                    ImGuiEx.CollectionCheckbox($"{x}", x, preset.Moodles, false, true);
+                                    ImGui.PopStyleColor();
+                                }
+
+                                ImGui.EndCombo();
+                            }
+                            if (fullList != null) ImGuiEx.Tooltip("All of these Moodles/Presets will be applied:\n" + fullList);
                             filterCnt++;
                         }
                     }

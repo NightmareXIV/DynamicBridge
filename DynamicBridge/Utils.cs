@@ -80,7 +80,7 @@ namespace DynamicBridge
         public static void ResetCaches()
         {
             P.GlamourerManager.ResetNameCache();
-            P.MoodlesManager.ResetNameCache();
+            P.MoodlesManager.ResetCache();
             PathInfos = null;
         }
 
@@ -287,6 +287,23 @@ namespace DynamicBridge
             if (list.Length == 1) return list[0].ToString();
             FullList = list.Select(x => x.ToString()).Join("\n");
             return $"{list.Length} selected";
+        }
+
+        public static string GetName(this MoodleInfo info) => GetName(info, out _);
+
+        public static string GetName(this MoodleInfo info, out bool success)
+        {
+            success = true;
+            foreach (var x in P.MoodlesManager.GetMoodles())
+            {
+                if (x.ID == info.Guid) return x.FullPath.Split("/")[^1];
+            }
+            foreach (var x in P.MoodlesManager.GetPresets())
+            {
+                if (x.ID == info.Guid) return x.FullPath.Split("/")[^1];
+            }
+            success = false;
+            return info.Guid.ToString();
         }
 
         public static string PrintRange<T>(this IEnumerable<T> s, IEnumerable<T> notS, out string FullList, string noneStr = "Any")

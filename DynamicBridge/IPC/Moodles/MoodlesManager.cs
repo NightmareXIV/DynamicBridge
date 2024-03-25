@@ -22,10 +22,10 @@ public class MoodlesManager
         EzIPC.Init(this, "Moodles");
     }
 
-    public void ResetNameCache()
+    public void ResetCache()
     {
         MoodleCache = null;
-        MoodleProfiles = null;
+        MoodleProfilesCache = null;
     }
 
     List<MoodlesMoodleInfo> MoodleCache = null;
@@ -44,14 +44,14 @@ public class MoodlesManager
         return [];
     }
 
-    List<MoodlesProfileInfo> MoodleProfiles = null;
-    public List<MoodlesProfileInfo> GetProfiles()
+    List<MoodlesProfileInfo> MoodleProfilesCache = null;
+    public List<MoodlesProfileInfo> GetPresets()
     {
-        if(MoodleProfiles != null) return MoodleProfiles;
+        if(MoodleProfilesCache != null) return MoodleProfilesCache;
         try
         {
-            MoodleProfiles = GetRegisteredProfiles();
-            return MoodleProfiles;
+            MoodleProfilesCache = GetRegisteredProfiles();
+            return MoodleProfilesCache;
         }
         catch(Exception e)
         {

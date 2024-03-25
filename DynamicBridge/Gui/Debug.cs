@@ -35,6 +35,8 @@ namespace DynamicBridge.Gui
         {
             if (ImGui.CollapsingHeader("Moodles"))
             {
+                ImGuiEx.Text($"MCQ");
+                ImGuiEx.Text($"{P.MoodleCleanupQueue.Print("\n")}");
                 ImGuiEx.Text($"Moodles");
                 foreach (var x in P.MoodlesManager.GetMoodles())
                 {
@@ -45,7 +47,7 @@ namespace DynamicBridge.Gui
                     if (ImGui.SmallButton($"Remove##{x.ID}")) P.MoodlesManager.RemoveMoodle(x.ID);
                 }
                 ImGuiEx.Text($"Profiles");
-                foreach (var x in P.MoodlesManager.GetProfiles())
+                foreach (var x in P.MoodlesManager.GetPresets())
                 {
                     ImGuiEx.Text($"{x.FullPath}");
                     ImGui.SameLine();
