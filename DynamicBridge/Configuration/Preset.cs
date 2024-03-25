@@ -15,9 +15,9 @@ namespace DynamicBridge.Configuration
         public List<string> Glamourer = [];
         public List<string> ComplexGlamourer = [];
         public List<string> Honorific = [];
-        public List<string> Palette = [];
         public List<string> Customize = [];
         public List<string> Penumbra = [];
+        public List<MoodleInfo> Moodles = [];
         public SpecialPenumbraAssignment PenumbraType = SpecialPenumbraAssignment.Use_Named_Collection;
         public bool IsStatic = false;
     }

@@ -3,171 +3,170 @@ using DynamicBridge.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 
-namespace DynamicBridge.IPC.Glamourer
+namespace DynamicBridge.IPC.Glamourer;
+
+public unsafe class GlamourerManager
 {
-    public unsafe class GlamourerManager
+    public GlamourerReflector Reflector;
+    public GlamourerCommands Commands;
+
+    [EzIPC] Func<Character, string> GetAllCustomizationFromCharacter;
+    [EzIPC] Action<string, Character> ApplyAllOnceToCharacter;
+    [EzIPC] Action<Character> RevertCharacter;
+    [EzIPC] Action<Guid, Character> ApplyByGuidOnceToCharacter;
+    [EzIPC] Func<GlamourerDesignInfo[]> GetDesignList;
+
+    public GlamourerManager()
     {
-        public GlamourerReflector Reflector;
-        public GlamourerCommands Commands;
+        EzIPC.Init(this, "Glamourer");
+        Reflector = new();
+        Commands = new();
+    }
 
-        [EzIPC] Func<Character, string> GetAllCustomizationFromCharacter;
-        [EzIPC] Action<string, Character> ApplyAllOnceToCharacter;
-        [EzIPC] Action<Character> RevertCharacter;
-        [EzIPC] Action<Guid, Character> ApplyByGuidOnceToCharacter;
-        [EzIPC] Func<GlamourerDesignInfo[]> GetDesignList;
+    public void RevertToAutomation()
+    {
+        Commands.RevertToAutomation();
+    }
 
-        public GlamourerManager()
+    public void ApplyByGuid(Guid guid)
+    {
+        try
         {
-            EzIPC.Init(this, "Glamourer");
-            Reflector = new();
-            Commands = new();
+            ApplyByGuidOnceToCharacter(guid, Player.Object);
         }
-
-        public void RevertToAutomation()
+        catch (Exception ex)
         {
-            Commands.RevertToAutomation();
+            ex.Log();
         }
+    }
 
-        public void ApplyByGuid(Guid guid)
+    GlamourerDesignInfo[] GetDesignListIPC()
+    {
+        try
         {
-            try
-            {
-                ApplyByGuidOnceToCharacter(guid, Player.Object);
-            }
-            catch (Exception ex)
-            {
-                ex.Log();
-            }
+            return GetDesignList();
         }
-
-        GlamourerDesignInfo[] GetDesignListIPC()
+        catch (Exception ex)
         {
-            try
-            {
-                return GetDesignList();
-            }
-            catch (Exception ex)
-            {
-                InternalLog.Error(ex.ToString());
-            }
-            return [];
+            InternalLog.Error(ex.ToString());
         }
+        return [];
+    }
 
-        public string GetMyCustomization()
+    public string GetMyCustomization()
+    {
+        try
         {
-            try
-            {
-                return GetAllCustomizationFromCharacter(Player.Object);
-            }
-            catch (Exception e)
-            {
-                e.Log();
-                return null;
-            }
+            return GetAllCustomizationFromCharacter(Player.Object);
         }
-
-        public void SetMyCustomization(string customization)
+        catch (Exception e)
         {
-            try
-            {
-                ApplyAllOnceToCharacter(customization, Player.Object);
-            }
-            catch (Exception e)
-            {
-                e.Log();
-            }
+            e.Log();
+            return null;
         }
+    }
 
-        public void ApplyToSelf(GlamourerDesignInfo design)
+    public void SetMyCustomization(string customization)
+    {
+        try
         {
-            try
-            {
-                ApplyByGuid(design.Identifier);
-            }
-            catch (Exception e)
-            {
-                Notify.Error(e.Message);
-                e.Log();
-            }
+            ApplyAllOnceToCharacter(customization, Player.Object);
         }
-
-        public void Revert()
+        catch (Exception e)
         {
-            try
-            {
-                RevertCharacter(Player.Object);
-            }
-            catch (Exception e)
-            {
-                Notify.Error(e.Message);
-                e.Log();
-            }
+            e.Log();
         }
+    }
 
-        GlamourerDesignInfo[] CachedDesignInfo = [];
-        ulong ValidCacheFrame = 0;
-        public GlamourerDesignInfo[] GetDesigns()
+    public void ApplyToSelf(GlamourerDesignInfo design)
+    {
+        try
         {
-            var fc = CSFramework.Instance()->FrameCounter;
-            if (fc != ValidCacheFrame)
-            {
-                ValidCacheFrame = fc;
-                CachedDesignInfo = GetDesignListIPC();
-            }
-            return CachedDesignInfo;
+            ApplyByGuid(design.Identifier);
         }
-
-        Dictionary<string, string> TransformNameCache = [];
-        public string TransformName(string originalName)
+        catch (Exception e)
         {
-            if(TransformNameCache.TryGetValue(originalName, out var ret))
-            {
-                return ret;
-            }
-            if (Guid.TryParse(originalName, out Guid guid))
-            {
-                if (GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
-                {
-                    if (C.GlamourerFullPath)
-                    {
-                        return CacheAndReturn(Reflector.GetPathForDesignByGuid(guid) ?? entry.Name);
-                    }
-                    return CacheAndReturn(entry.Name);
-                }
-            }
-            return CacheAndReturn(originalName);
-
-            string CacheAndReturn(string name)
-            {
-                TransformNameCache[originalName] = name;
-                return TransformNameCache[originalName];
-            }
+            Notify.Error(e.Message);
+            e.Log();
         }
+    }
 
-        public List<string> GetRawPathes()
+    public void Revert()
+    {
+        try
         {
-            var ret = new List<string>();
-            try
-            {
-                foreach (var x in GetDesigns())
-                {
-                    var path = Reflector.GetPathForDesignByGuid(x.Identifier);
-                    if (path != null)
-                    {
-                        ret.Add(path);
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                e.LogInternal();
-            }
+            RevertCharacter(Player.Object);
+        }
+        catch (Exception e)
+        {
+            Notify.Error(e.Message);
+            e.Log();
+        }
+    }
+
+    GlamourerDesignInfo[] CachedDesignInfo = [];
+    ulong ValidCacheFrame = 0;
+    public GlamourerDesignInfo[] GetDesigns()
+    {
+        var fc = CSFramework.Instance()->FrameCounter;
+        if (fc != ValidCacheFrame)
+        {
+            ValidCacheFrame = fc;
+            CachedDesignInfo = GetDesignListIPC();
+        }
+        return CachedDesignInfo;
+    }
+
+    Dictionary<string, string> TransformNameCache = [];
+    public string TransformName(string originalName)
+    {
+        if(TransformNameCache.TryGetValue(originalName, out var ret))
+        {
             return ret;
         }
-
-        public void ResetNameCache() 
+        if (Guid.TryParse(originalName, out Guid guid))
         {
-            TransformNameCache.Clear();
+            if (GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
+            {
+                if (C.GlamourerFullPath)
+                {
+                    return CacheAndReturn(Reflector.GetPathForDesignByGuid(guid) ?? entry.Name);
+                }
+                return CacheAndReturn(entry.Name);
+            }
         }
+        return CacheAndReturn(originalName);
+
+        string CacheAndReturn(string name)
+        {
+            TransformNameCache[originalName] = name;
+            return TransformNameCache[originalName];
+        }
+    }
+
+    public List<string> GetRawPathes()
+    {
+        var ret = new List<string>();
+        try
+        {
+            foreach (var x in GetDesigns())
+            {
+                var path = Reflector.GetPathForDesignByGuid(x.Identifier);
+                if (path != null)
+                {
+                    ret.Add(path);
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            e.LogInternal();
+        }
+        return ret;
+    }
+
+    public void ResetNameCache() 
+    {
+        TransformNameCache.Clear();
     }
 }

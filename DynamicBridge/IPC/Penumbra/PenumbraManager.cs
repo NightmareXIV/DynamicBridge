@@ -1,4 +1,6 @@
-﻿using ECommons.EzIpcManager;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using ECommons.EzIpcManager;
+using ECommons.GameHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +15,15 @@ public class PenumbraManager
     [EzIPC] public readonly Func<ApiCollectionType, string, bool, bool, (PenumbraApiEc Error, string OldCollection)> SetCollectionForType;
     [EzIPC] public readonly Func<int, (bool ObjectValid, bool IndividualSet, string EffectiveCollection)> GetCollectionForObject;
     [EzIPC] public readonly Func<int, string, bool, bool, (PenumbraApiEc Error, string OldCollection)> SetCollectionForObject;
+    [EzIPC] public readonly Action<GameObject, RedrawType> RedrawObject;
     string OldAssignment;
 
     public PenumbraManager()
     {
         EzIPC.Init(this, "Penumbra");
     }
+
+    public void Redraw() => RedrawObject.TryInvoke(Player.Object, RedrawType.Redraw);
 
     public void SetAssignment(string newAssignment)
     {
@@ -34,6 +39,7 @@ public class PenumbraManager
             else
             {
                 OldAssignment ??= result.OldCollection;
+                if(result.Error == PenumbraApiEc.Success) P.TaskManager.Enqueue(Redraw);
             }
         }
         catch(Exception e)
@@ -47,8 +53,9 @@ public class PenumbraManager
         if (OldAssignment == null) return;
         try
         {
-            SetCollectionForObject(0, OldAssignment, true, true);
+            var result = SetCollectionForObject(0, OldAssignment, true, true);
             OldAssignment = null;
+            if (result.Error == PenumbraApiEc.Success) P.TaskManager.Enqueue(Redraw);
         }
         catch(Exception e)
         {
@@ -89,4 +96,9 @@ public class PenumbraManager
         UnknownError = 255,
     }
 
+    public enum RedrawType
+    {
+        Redraw,
+        AfterGPose,
+    }
 }

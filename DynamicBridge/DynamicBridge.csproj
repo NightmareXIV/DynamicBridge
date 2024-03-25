@@ -228,7 +228,6 @@
 
     <ItemGroup>
       <Folder Include="images\" />
-      <Folder Include="IPC\Moodles\" />
       <Folder Include="res\tutorial\" />
     </ItemGroup>
 </Project>

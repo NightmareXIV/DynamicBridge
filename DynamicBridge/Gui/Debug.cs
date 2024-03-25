@@ -1,4 +1,7 @@
-﻿using DynamicBridge.Core;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using DynamicBridge.Core;
 using DynamicBridge.IPC;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
@@ -27,10 +30,32 @@ namespace DynamicBridge.Gui
         static string cont = "Test button";
         public static bool? ForceDisguise = null;
         static List<string> TestData = null;
+
         public static void Draw()
         {
-            if (ImGui.CollapsingHeader("Penumbra"))
+            if (ImGui.CollapsingHeader("Moodles"))
             {
+                ImGuiEx.Text($"Moodles");
+                foreach (var x in P.MoodlesManager.GetMoodles())
+                {
+                    ImGuiEx.Text($"{x.FullPath}");
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton($"Apply##{x.ID}")) P.MoodlesManager.ApplyMoodle(x.ID);
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton($"Remove##{x.ID}")) P.MoodlesManager.RemoveMoodle(x.ID);
+                }
+                ImGuiEx.Text($"Profiles");
+                foreach (var x in P.MoodlesManager.GetProfiles())
+                {
+                    ImGuiEx.Text($"{x.FullPath}");
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton($"Apply##{x.ID}")) P.MoodlesManager.ApplyPreset(x.ID);
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton($"Remove##{x.ID}")) P.MoodlesManager.RemovePreset(x.ID);
+                }
+            }
+                if (ImGui.CollapsingHeader("Penumbra"))
+                {
                 ImGuiEx.Text(EColor.Green, $"Current: {P.PenumbraManager.GetCollectionForType(PenumbraManager.ApiCollectionType.Yourself) ?? "(null)"}");
                 foreach(var x in P.PenumbraManager.GetCollections())
                 {
