@@ -1,0 +1,1 @@
+﻿global using CustomizePlusProfile = (System.Guid ID, string Name, string VirtualPath, string CharacterName, bool IsEnabled);

@@ -1,6 +1,7 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.Core;
 using DynamicBridge.Gui;
+using DynamicBridge.IPC;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
@@ -49,6 +50,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public CustomizePlusManager CustomizePlusManager;
     public PenumbraManager PenumbraManager;
     public MoodlesManager MoodlesManager;
+    public IpcTester IpcTester;
 
     public NeoTabs NeoTabs;
 

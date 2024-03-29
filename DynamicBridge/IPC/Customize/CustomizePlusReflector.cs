@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace DynamicBridge.IPC.Customize;
 public class CustomizePlusReflector
 {
-    public object GetProfileManager()
+    /*public object GetProfileManager()
     {
         try
         {
@@ -103,5 +103,5 @@ public class CustomizePlusReflector
             InternalLog.Warning(ex.ToString());
         }
         return null;
-    }
+    }*/
 }

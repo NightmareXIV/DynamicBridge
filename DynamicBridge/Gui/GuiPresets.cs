@@ -466,6 +466,7 @@ namespace DynamicBridge.Gui
                             ImGuiEx.SetNextItemFullWidth();
                             if (ImGui.BeginCombo("##customize", preset.Customize.Select(P.CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 FiltersSelection();
                                 var profiles = P.CustomizePlusManager.GetProfiles(currentProfile.Characters.Select(Utils.GetCharaNameFromCID).Select(z => z.Split("@")[0])).OrderBy(x => P.CustomizePlusManager.TransformName(x.ID.ToString()));
                                 var index = 0;
@@ -503,6 +504,7 @@ namespace DynamicBridge.Gui
                             ImGuiEx.SetNextItemFullWidth();
                             if (ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 FiltersSelection();
                                 var titles = HonorificManager.GetTitleData(currentProfile.Characters).OrderBy(x => x.Title);
                                 var index = 0;
@@ -541,6 +543,7 @@ namespace DynamicBridge.Gui
                             string fullList = null;
                             if (ImGui.BeginCombo("##penumbra", preset.PenumbraType != SpecialPenumbraAssignment.Use_Named_Collection ? preset.PenumbraType.ToString().Replace("_", " ") : preset.Penumbra.PrintRange(out fullList, "- None -"), C.ComboSize))
                             {
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 ImGuiEx.Text($"Assignment Type:");
                                 ImGuiEx.EnumCombo($"##asstype", ref preset.PenumbraType);
                                 if (preset.PenumbraType == SpecialPenumbraAssignment.Use_Named_Collection)
@@ -581,6 +584,7 @@ namespace DynamicBridge.Gui
                             ImGuiEx.SetNextItemFullWidth();
                             if (ImGui.BeginCombo("##moodles", preset.Moodles.Select(Utils.GetName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
+                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 void ToggleMoodle(Guid id, string name)
                                 {
                                     var cont = preset.Moodles.Any(x => x.Guid == id);
@@ -605,8 +609,6 @@ namespace DynamicBridge.Gui
                                         ImGuiEx.Tooltip($"Cancel this moodle(s) once preset is no longer applied");
                                     }
                                 }
-
-                                if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
 
                                 FiltersSelection();
                                 var moodles = P.MoodlesManager.GetMoodles().OrderBy(x => x.FullPath);

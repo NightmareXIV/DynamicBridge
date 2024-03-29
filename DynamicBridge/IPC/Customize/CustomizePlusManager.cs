@@ -13,10 +13,14 @@ public class CustomizePlusManager
     public Guid LastEnabledProfileID = Guid.Empty;
     public CustomizePlusReflector Reflector;
 
+    [EzIPC("Profile.GetList")] Func<IList<CustomizePlusProfile>> GetProfileList;
+    [EzIPC("Profile.EnableByUniqueId")] Func<Guid, int> EnableProfileByUniqueId;
+    [EzIPC("Profile.DisableByUniqueId")] Func<Guid, int> DisableProfileByUniqueId;
+
     public CustomizePlusManager()
     {
         Reflector = new();
-        EzIPC.Init(this, "CustomizePlus");
+        EzIPC.Init(this, "CustomizePlus", safeWrapper:SafeWrapper.IPCException);
     }
 
     public List<string> GetRawPathes()
@@ -26,7 +30,7 @@ public class CustomizePlusManager
         {
             foreach (var x in GetProfiles())
             {
-                var path = Reflector.GetPathForProfileByGuid(x.ID);
+                var path = x.VirtualPath;
                 if (path != null)
                 {
                     ret.Add(path);
@@ -40,29 +44,23 @@ public class CustomizePlusManager
         return ret;
     }
 
-    public CustomizePlusProfile[] GetProfiles(IEnumerable<string> chara = null)
+    IList<CustomizePlusProfile> Cache = null;
+    public IEnumerable<CustomizePlusProfile> GetProfiles(IEnumerable<string> chara = null)
     {
-        try
+        Cache ??= GetProfileList();
+        foreach(var x in (Cache ?? []))
         {
-            var ret = Reflector.GetProfiles().ToArray();
-            if (chara != null)
-            {
-                ret = ret.Where(x => chara.Contains(x.characterName)).ToArray();
-            }
-            return ret;
-        }
-        catch (Exception e)
-        {
-            e.Log();
-            return [];
+            if (chara == null || chara.Contains(x.CharacterName)) yield return x;
         }
     }
+
+    public void ResetCache() => Cache = null;
 
     public void SetProfile(string profileGuidStr, string charName)
     {
         try
         {
-            var charaProfiles = GetProfiles().Where(x => x.characterName == charName).ToArray();
+            var charaProfiles = GetProfiles().Where(x => x.CharacterName == charName).ToArray();
             if (!WasSet)
             {
                 if (charaProfiles.TryGetFirst(x => x.IsEnabled, out var enabledProfile))
@@ -78,7 +76,7 @@ public class CustomizePlusManager
             {
                 if (charaProfiles.TryGetFirst(x => x.ID == guid, out var profile))
                 {
-                    Reflector.SetEnabled(profile.ID, true);
+                    EnableProfileByUniqueId(profile.ID);
                     LastEnabledProfileID = profile.ID;
                 }
             }
@@ -102,11 +100,11 @@ public class CustomizePlusManager
             {
                 if (SavedProfileID == Guid.Empty)
                 {
-                    Reflector.SetEnabled(LastEnabledProfileID, false);
+                    DisableProfileByUniqueId(LastEnabledProfileID);
                 }
                 else
                 {
-                    Reflector.SetEnabled(SavedProfileID, true);
+                    EnableProfileByUniqueId(SavedProfileID);
                 }
             }
             catch (Exception e)
@@ -128,7 +126,7 @@ public class CustomizePlusManager
             {
                 if (C.GlamourerFullPath)
                 {
-                    return Reflector.GetPathForProfileByGuid(guid) ?? entry.Name;
+                    return entry.VirtualPath;
                 }
                 return entry.Name;
             }

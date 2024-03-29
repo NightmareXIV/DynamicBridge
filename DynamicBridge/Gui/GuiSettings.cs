@@ -121,7 +121,7 @@ public static class GuiSettings
             //customize
 
             ImGui.Checkbox("Customize+", ref C.EnableCustomize);
-            DrawPluginCheck("CustomizePlus", "2.0.1.0");
+            DrawPluginCheck("CustomizePlus", "2.0.2.3");
 
             //honorific
 

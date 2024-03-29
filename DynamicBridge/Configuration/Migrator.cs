@@ -117,7 +117,7 @@ public class Migrator
         }
     }
 
-    void MigrateProfileCustomize(Profile p, CustomizePlusProfile[] entries)
+    void MigrateProfileCustomize(Profile p, IEnumerable<CustomizePlusProfile> entries)
     {
         try
         {

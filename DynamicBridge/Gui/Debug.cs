@@ -7,6 +7,7 @@ using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
 using DynamicBridge.IPC.Penumbra;
+using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
@@ -33,6 +34,114 @@ namespace DynamicBridge.Gui
 
         public static void Draw()
         {
+            if(ImGui.CollapsingHeader("IPC Tester"))
+            {
+                if (ImGui.Button("Register AnyException"))
+                {
+                    P.IpcTester?.Unregister();
+                    P.IpcTester = new(SafeWrapper.AnyException);
+                }
+                if (ImGui.Button("Register IPCException"))
+                {
+                    P.IpcTester?.Unregister();
+                    P.IpcTester = new(SafeWrapper.IPCException);
+                }
+                if (ImGui.Button("Register None"))
+                {
+                    P.IpcTester?.Unregister();
+                    P.IpcTester = new(SafeWrapper.None);
+                }
+                if (ImGui.Button("Register Inherit"))
+                {
+                    P.IpcTester?.Unregister();
+                    P.IpcTester = new(SafeWrapper.Inherit);
+                }
+                if (ImGui.Button("UnRegister"))
+                {
+                    P.IpcTester?.Unregister();
+                }
+                if (P.IpcTester != null) {
+                    ImGui.Checkbox($"Throw", ref P.IpcTester.Throw);
+                    ImGui.Checkbox($"ThrowIpcError", ref P.IpcTester.ThrowIpcError);
+                    ImGuiEx.Text($"JustFunctionInherit {P.IpcTester.JustFunctionInherit()}");
+                    ImGuiEx.Text($"JustFunctionIpcException {P.IpcTester.JustFunctionIpcException()}");
+                    ImGuiEx.Text($"JustFunctionNormalCall {P.IpcTester.JustFunctionNormalCall()}");
+                    ImGuiEx.Text($"JustFunctionNoWrapper {P.IpcTester.JustFunctionNoWrapper()}");
+                    try
+                    {
+                        ImGuiEx.Text($"ThrowsExceptionInherit");
+                        ImGuiEx.Text($"{P.IpcTester.ThrowsExceptionInherit()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"ThrowsExceptionNormalCall");
+                        ImGuiEx.Text($"{P.IpcTester.ThrowsExceptionNormalCall()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"ThrowsExceptionNoWrapper");
+                        ImGuiEx.Text($"{P.IpcTester.ThrowsExceptionNoWrapper()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"ThrowsExceptionIpcException");
+                        ImGuiEx.Text($"{P.IpcTester.ThrowsExceptionIpcException()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+
+                    try
+                    {
+                        ImGuiEx.Text($"NonExistingFunctionInherit");
+                        ImGuiEx.Text($"{P.IpcTester.NonExistingFunctionInherit()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"NonExistingFunctionNormalCall");
+                        ImGuiEx.Text($"{P.IpcTester.NonExistingFunctionNormalCall()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"NonExistingFunctionNoWrapper");
+                        ImGuiEx.Text($"{P.IpcTester.NonExistingFunctionNoWrapper()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                    try
+                    {
+                        ImGuiEx.Text($"NonExistingFunctionIpcException");
+                        ImGuiEx.Text($"{P.IpcTester.NonExistingFunctionIpcException()}");
+                    }
+                    catch (Exception e)
+                    {
+                        ImGuiEx.Text($"{e.Message}");
+                    }
+                }
+            }
             if (ImGui.CollapsingHeader("Moodles"))
             {
                 ImGuiEx.Text($"MCQ");
@@ -146,7 +255,7 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Text($"wasset: {P.CustomizePlusManager.WasSet}");
                 foreach (var d in P.CustomizePlusManager.GetProfiles())
                 {
-                    if (ImGui.Selectable($"{d.Name} / {d.characterName} / {d.ID} / {d.IsEnabled}"))
+                    if (ImGui.Selectable($"{d.Name} / {d.CharacterName} / {d.ID} / {d.IsEnabled}"))
                     {
                         P.CustomizePlusManager.SetProfile(d.Name, Player.Name);
                     }

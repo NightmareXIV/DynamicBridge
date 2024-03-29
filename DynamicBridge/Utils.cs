@@ -81,6 +81,7 @@ namespace DynamicBridge
         {
             P.GlamourerManager.ResetNameCache();
             P.MoodlesManager.ResetCache();
+            P.CustomizePlusManager.ResetCache();
             PathInfos = null;
         }
 
