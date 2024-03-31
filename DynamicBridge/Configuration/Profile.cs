@@ -18,6 +18,8 @@ namespace DynamicBridge.Configuration
         public List<Profile> Subprofiles = [];
         public HashSet<ulong> Characters = [];
         public List<string> Pathes = [];
+        public List<string> CustomizePathes = [];
+        public List<string> MoodlesPathes = [];
         public Preset FallbackPreset = new();
 
         internal bool IsGlobal => C.GlobalProfile == this;

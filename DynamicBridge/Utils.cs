@@ -20,6 +20,7 @@ namespace DynamicBridge
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
         public static ImGuiInputTextFlags CensorFlags => C.NoNames ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None;
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
+        public const float IndentSpacing = 5f;
 
         public static void DrawFolder(IEnumerable<(string[] Folder, Action Draw)> values)
         {
@@ -58,16 +59,12 @@ namespace DynamicBridge
             return pathes;
         }
 
-        static List<PathInfo> PathInfos = null;
-        public static List<PathInfo> GetCombinedPathes()
+        public static List<PathInfo> BuildPathes(List<string> rawPathes)
         {
-            if (PathInfos != null) return PathInfos;
             var ret = new List<PathInfo>();
             try
             {
-                var glamPathes = TrimPathes(P.GlamourerManager.GetRawPathes());
-                var custPathes = TrimPathes(P.CustomizePlusManager.GetRawPathes());
-                var pathes = glamPathes.Concat(custPathes).ToList();
+                var pathes = Utils.TrimPathes(rawPathes);
                 pathes.Sort();
                 foreach (var x in pathes)
                 {
@@ -76,11 +73,7 @@ namespace DynamicBridge
                     for (int i = 1; i <= parts.Length; i++)
                     {
                         var part = parts[..i].Join("/");
-                        var info = new PathInfo(part, i - 1)
-                        {
-                            Glamourer = glamPathes.Contains(x),
-                            Customize = custPathes.Contains(x),
-                        };
+                        var info = new PathInfo(part, i - 1);
                         if (!ret.Contains(info)) ret.Add(info);
                     }
                 }
@@ -89,16 +82,14 @@ namespace DynamicBridge
             {
                 e.LogInternal();
             }
-            PathInfos = ret;
             return ret;
         }
 
         public static void ResetCaches()
         {
-            P.GlamourerManager.ResetNameCache();
+            P.GlamourerManager.ResetCache();
             P.MoodlesManager.ResetCache();
             P.CustomizePlusManager.ResetCache();
-            PathInfos = null;
         }
 
         public static IEnumerable<string> HonorificFiltered(this Preset preset)

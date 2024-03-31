@@ -89,38 +89,51 @@ public static class GuiProfiles
                 ImGui.TableNextColumn();
 
                 ImGuiEx.SetNextItemFullWidth();
-                if(ImGui.BeginCombo($"##FoldersWhitelist", profile.Pathes.PrintRange(out _), C.ComboSize))
+                if (ImGui.BeginCombo($"##FoldersWhitelist", profile.Pathes.Union(profile.CustomizePathes).Union(profile.MoodlesPathes).PrintRange(out _), C.ComboSize))
                 {
-                    if(profile.Pathes.Count > 1) ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
+                    if (profile.Pathes.Count > 1) ImGuiEx.Tooltip(profile.Pathes.Join("\n"));
                     if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
-                    var pathes = Utils.GetCombinedPathes();
-                    foreach (var x in pathes)
+                    void DrawPathes(List<PathInfo> pathes, List<string> targetCollection)
                     {
-                        for (int q = 0; q < x.Indentation; q++)
+                        foreach (var x in pathes)
                         {
-                            ImGuiEx.Spacing();
+                            for (int q = 0; q < x.Indentation; q++)
+                            {
+                                ImGuiEx.Spacing();
+                            }
+                            Utils.CollectionSelectable(null, $"{x.Name}", x.Name, targetCollection);
                         }
-                        ImGuiEx.CollectionCheckbox($"{x.Name}", x.Name, profile.Pathes);
-                        if (x.Glamourer)
+                        foreach (var x in targetCollection)
                         {
-                            ImGui.SameLine();
-                            ImGuiEx.Text(ImGuiColors.DalamudGrey3, UiBuilder.IconFont, "\uf630");
-                            ImGuiEx.Tooltip("This folder is present in Glamourer");
-                        }
-                        if (x.Customize)
-                        {
-                            ImGui.SameLine();
-                            ImGuiEx.Text(ImGuiColors.DalamudGrey3, UiBuilder.IconFont, "\ue541");
-                            ImGuiEx.Tooltip("This folder is present in Customize+");
+                            if (pathes.Any(z => z.Name == x)) continue;
+                            ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                            Utils.CollectionSelectable(null, $"{x}", x, targetCollection, true);
+                            ImGui.PopStyleColor();
                         }
                     }
-                    foreach(var x in profile.Pathes)
+                    ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
+                    if (C.EnableGlamourer && ImGuiEx.TreeNode(Colors.TabBlue, "Glamourer", ImGuiTreeNodeFlags.DefaultOpen))
                     {
-                        if (pathes.Any(z => z.Name == x)) continue;
-                        ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                        ImGuiEx.CollectionCheckbox($"{x}", x, profile.Pathes);
-                        ImGui.PopStyleColor();
+                        ImGui.PushID("Glam");
+                        DrawPathes(P.GlamourerManager.GetCombinedPathes(), profile.Pathes);
+                        ImGui.PopID();
+                        ImGui.TreePop();
                     }
+                    if (C.EnableCustomize && ImGuiEx.TreeNode(Colors.TabBlue, "Customize+", ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        ImGui.PushID("Customize");
+                        DrawPathes(P.CustomizePlusManager.GetCombinedPathes(), profile.CustomizePathes);
+                        ImGui.PopID();
+                        ImGui.TreePop();
+                    }
+                    if (C.EnableMoodles && ImGuiEx.TreeNode(Colors.TabBlue, "Moodles", ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        ImGui.PushID("Moodles");
+                        DrawPathes(P.MoodlesManager.GetCombinedPathes(), profile.MoodlesPathes);
+                        ImGui.PopID();
+                        ImGui.TreePop();
+                    }
+                    ImGui.PopStyleVar();
                     ImGui.EndCombo();
                 }
                 else

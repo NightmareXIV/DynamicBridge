@@ -70,17 +70,20 @@ public static class GuiSettings
         if(ImGuiGroup.BeginGroupBox("Configure rule conditions"))
         {
             ImGuiEx.TextWrapped($"Enable extra conditions or disable unused for convenience and performance boost.");
-            ImGui.Checkbox($"State", ref C.Cond_State);
-            ImGui.Checkbox($"Biome", ref C.Cond_Biome);
-            ImGui.Checkbox($"Weather", ref C.Cond_Weather);
-            ImGui.Checkbox($"Time", ref C.Cond_Time);
-            ImGui.Checkbox($"Zone group", ref C.Cond_ZoneGroup);
-            ImGui.Checkbox($"Zone", ref C.Cond_Zone);
-            ImGui.Checkbox($"House", ref C.Cond_House);
-            ImGui.Checkbox($"Emote", ref C.Cond_Emote);
-            ImGui.Checkbox($"Job", ref C.Cond_Job);
-            ImGui.Checkbox($"World", ref C.Cond_World);
-            ImGui.Checkbox($"Gearset", ref C.Cond_Gearset);
+            ImGuiEx.EzTableColumns("extras", [
+                () => ImGui.Checkbox($"State", ref C.Cond_State),
+                () => ImGui.Checkbox($"Biome", ref C.Cond_Biome),
+                () => ImGui.Checkbox($"Weather", ref C.Cond_Weather),
+                () => ImGui.Checkbox($"Time", ref C.Cond_Time),
+                () => ImGui.Checkbox($"Zone group", ref C.Cond_ZoneGroup),
+                () => ImGui.Checkbox($"Zone", ref C.Cond_Zone),
+                () => ImGui.Checkbox($"House", ref C.Cond_House),
+                () => ImGui.Checkbox($"Emote", ref C.Cond_Emote),
+                () => ImGui.Checkbox($"Job", ref C.Cond_Job),
+                () => ImGui.Checkbox($"World", ref C.Cond_World),
+                () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
+            ],
+                (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             ImGuiGroup.EndGroupBox();
         }
 
@@ -91,8 +94,10 @@ public static class GuiSettings
 
             ImGui.Checkbox("Glamourer", ref C.EnableGlamourer);
             DrawPluginCheck("Glamourer", "1.2.0.2");
+            ImGuiEx.Spacing();
             ImGuiEx.TextV($"DynamicBridge behavior when no Glamourer rule is found:");
             ImGui.SameLine();
+            ImGuiEx.Spacing();
             ImGuiEx.SetNextItemWidthScaled(200f);
             ImGuiEx.EnumCombo("##dbglamdef", ref C.GlamNoRuleBehaviour, GlamourerNoRuleBehaviorNames);
             if (C.ManageGlamourerAutomation)
@@ -102,7 +107,7 @@ public static class GuiSettings
                     ImGuiEx.HelpMarker("Revert to Automation is recommended if you are using Glamourer automation.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
             }
-            var c = new CancellationTokenSource();
+            ImGuiEx.Spacing();
             ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
             ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
             if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
@@ -112,8 +117,12 @@ public static class GuiSettings
                     ImGuiEx.HelpMarker("You MUST enable this setting or disable Glamourer's automation, otherwise either Glamourer's or DynamicBridge's automation will not work correctly.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
             }
-            ImGui.Checkbox("[Beta] Revert character before restoring automation", ref C.RevertBeforeAutomationRestore);
-            ImGui.Checkbox("[Beta] Revert character before applying rule", ref C.RevertGlamourerBeforeApply);
+            ImGuiEx.Spacing();
+            ImGui.Checkbox("Revert character before restoring automation", ref C.RevertBeforeAutomationRestore);
+            ImGuiEx.Spacing();
+            ImGui.Checkbox("Revert character before applying rule", ref C.RevertGlamourerBeforeApply);
+            ImGuiEx.Spacing();
+            ImGui.Checkbox("Autofill preset name with Glamourer's preset name upon selecting it", ref C.AutofillFromGlam);
 
 
             ImGui.Separator();

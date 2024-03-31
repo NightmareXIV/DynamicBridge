@@ -179,7 +179,7 @@ namespace DynamicBridge.Gui
                     }
                 }
             }
-            if(ImGui.CollapsingHeader("Pathes"))
+            /*if(ImGui.CollapsingHeader("Pathes"))
             {
                 foreach(var x in Utils.GetCombinedPathes())
                 {
@@ -189,7 +189,7 @@ namespace DynamicBridge.Gui
                     }
                     ImGuiEx.TextV($"{x.Name}");
                 }
-            }
+            }*/
             if (ImGui.CollapsingHeader("Items"))
             {
                 ImGuiEx.Text($"Current: {Utils.GetCurrentGear().Print()}");

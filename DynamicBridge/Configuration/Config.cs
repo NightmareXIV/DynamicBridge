@@ -55,6 +55,7 @@ namespace DynamicBridge.Configuration
         public bool ShowTutorial = true;
         public bool UnifyJobs = true;
         public bool HonotificUnfiltered = false;
+        public bool AutofillFromGlam = false;
     }
 
     public enum GlamourerNoRuleBehavior

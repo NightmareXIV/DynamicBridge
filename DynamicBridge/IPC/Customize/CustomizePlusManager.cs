@@ -4,6 +4,7 @@ using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using Newtonsoft.Json;
 using System;
+using static System.Windows.Forms.AxHost;
 
 namespace DynamicBridge.IPC.Customize;
 public class CustomizePlusManager
@@ -22,7 +23,14 @@ public class CustomizePlusManager
         Reflector = new();
         EzIPC.Init(this, "CustomizePlus", SafeWrapper.AnyException);
     }
-    
+
+    List<PathInfo> PathInfos = null;
+    public List<PathInfo> GetCombinedPathes()
+    {
+        PathInfos ??= Utils.BuildPathes(GetRawPathes());
+        return PathInfos;
+    }
+
     public List<string> GetRawPathes()
     {
         var ret = new List<string>();
@@ -54,7 +62,11 @@ public class CustomizePlusManager
         }
     }
 
-    public void ResetCache() => Cache = null;
+    public void ResetCache()
+    {
+        Cache = null;
+        PathInfos = null;
+    }
 
     public void SetProfile(string profileGuidStr, string charName)
     {

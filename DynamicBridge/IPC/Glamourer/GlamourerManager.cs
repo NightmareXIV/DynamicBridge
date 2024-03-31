@@ -23,6 +23,13 @@ public unsafe class GlamourerManager
         Commands = new();
     }
 
+    List<PathInfo> PathInfos = null;
+    public List<PathInfo> GetCombinedPathes()
+    {
+        PathInfos ??= Utils.BuildPathes(GetRawPathes());
+        return PathInfos;
+    }
+
     public void RevertToAutomation()
     {
         Commands.RevertToAutomation();
@@ -165,8 +172,9 @@ public unsafe class GlamourerManager
         return ret;
     }
 
-    public void ResetNameCache() 
+    public void ResetCache() 
     {
         TransformNameCache.Clear();
+        PathInfos = null;
     }
 }

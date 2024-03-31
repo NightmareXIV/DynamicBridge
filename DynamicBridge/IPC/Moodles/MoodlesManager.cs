@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using DynamicBridge.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using System;
@@ -10,22 +11,59 @@ using System.Threading.Tasks;
 namespace DynamicBridge.IPC.Moodles;
 public class MoodlesManager
 {
-    [EzIPC] Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles { get; init; }
-    [EzIPC] Func<List<MoodlesProfileInfo>> GetRegisteredProfiles { get; init; }
-    [EzIPC] Action<Guid, PlayerCharacter> AddOrUpdateMoodleByGUID { get; init; }
-    [EzIPC] Action<Guid, PlayerCharacter> ApplyPresetByGUID { get; init; }
-    [EzIPC] Action<Guid, PlayerCharacter> RemoveMoodleByGUID { get; init; }
-    [EzIPC] Action<Guid, PlayerCharacter> RemovePresetByGUID { get; init; }
+    [EzIPC] readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
+    [EzIPC] readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
+    [EzIPC] readonly Action<Guid, PlayerCharacter> AddOrUpdateMoodleByGUID;
+    [EzIPC] readonly Action<Guid, PlayerCharacter> ApplyPresetByGUID;
+    [EzIPC] readonly Action<Guid, PlayerCharacter> RemoveMoodleByGUID;
+    [EzIPC] readonly Action<Guid, PlayerCharacter> RemovePresetByGUID;
 
     public MoodlesManager()
     {
         EzIPC.Init(this, "Moodles");
     }
 
+    List<PathInfo> PathInfos = null;
+    public List<PathInfo> GetCombinedPathes()
+    {
+        PathInfos ??= Utils.BuildPathes(GetRawPathes());
+        return PathInfos;
+    }
+
+    public List<string> GetRawPathes()
+    {
+        var ret = new List<string>();
+        try
+        {
+            foreach (var x in GetMoodles())
+            {
+                var path = x.FullPath;
+                if (path != null)
+                {
+                    ret.Add(path);
+                }
+            }
+            foreach (var x in GetPresets())
+            {
+                var path = x.FullPath;
+                if (path != null)
+                {
+                    ret.Add(path);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.LogInternal();
+        }
+        return ret;
+    }
+
     public void ResetCache()
     {
         MoodleCache = null;
         MoodleProfilesCache = null;
+        PathInfos = null;
     }
 
     List<MoodlesMoodleInfo> MoodleCache = null;
