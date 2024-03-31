@@ -127,6 +127,8 @@ public static class GuiSettings
 
             ImGui.Checkbox("Honorific", ref C.EnableHonorific);
             DrawPluginCheck("Honorific", "1.4.2.0");
+            ImGuiEx.Spacing();
+            ImGui.Checkbox($"Allow selecting titles registered for other characters", ref C.HonotificUnfiltered);
 
             //penumbra
             ImGui.Checkbox("Penumbra", ref C.EnablePenumbra);

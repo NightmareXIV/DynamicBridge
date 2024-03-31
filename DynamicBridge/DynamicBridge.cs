@@ -51,8 +51,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public PenumbraManager PenumbraManager;
     public MoodlesManager MoodlesManager;
     public IpcTester IpcTester;
-
-    public NeoTabs NeoTabs;
+    public HonorificManager HonorificManager;
 
     public DynamicBridge(DalamudPluginInterface pi)
     {
@@ -97,9 +96,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
             CustomizePlusManager = new();
             ProperOnLogin.RegisterInteractable(OnLogin, true);
             Memory = new();
-            NeoTabs = new();
             PenumbraManager = new();
             MoodlesManager = new();
+            HonorificManager = new();
         });
     }
 

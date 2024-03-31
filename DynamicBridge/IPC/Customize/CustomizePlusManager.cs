@@ -20,9 +20,9 @@ public class CustomizePlusManager
     public CustomizePlusManager()
     {
         Reflector = new();
-        EzIPC.Init(this, "CustomizePlus", safeWrapper:SafeWrapper.IPCException);
+        EzIPC.Init(this, "CustomizePlus", SafeWrapper.AnyException);
     }
-
+    
     public List<string> GetRawPathes()
     {
         var ret = new List<string>();

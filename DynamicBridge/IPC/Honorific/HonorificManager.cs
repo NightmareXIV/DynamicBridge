@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.ExcelServices;
+using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
@@ -10,14 +11,24 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DynamicBridge.IPC.Honorific;
-public static class HonorificManager
+public class HonorificManager
 {
-    public static bool WasSet = false;
-    public static List<TitleData> GetTitleData(IEnumerable<ulong> CIDs)
+    [EzIPC] readonly Func<string, uint, TitleData[]> GetCharacterTitleList;
+    [EzIPC] readonly Action<Character> ClearCharacterTitle;
+    [EzIPC] readonly Action<Character, string> SetCharacterTitle;
+
+    public HonorificManager()
+    {
+        EzIPC.Init(this, "Honorific", SafeWrapper.AnyException);
+    }
+
+    public bool WasSet = false;
+    public List<TitleData> GetTitleData(IEnumerable<ulong> CIDs)
     {
         try
         {
             List<TitleData> ret = [];
+            CIDs ??= C.SeenCharacters.Keys;
             foreach (var c in CIDs)
             {
                 var nameWithWorld = Utils.GetCharaNameFromCID(c);
@@ -28,7 +39,7 @@ public static class HonorificManager
                     {
                         var name = parts[0];
                         var world = ExcelWorldHelper.Get(parts[1]);
-                        ret.AddRange(Svc.PluginInterface.GetIpcSubscriber<string, uint, TitleData[]>("Honorific.GetCharacterTitleList").InvokeFunc(name, world.RowId));
+                        ret.AddRange(GetCharacterTitleList(name, world.RowId) ?? []);
                     }
                 }
             }
@@ -41,21 +52,21 @@ public static class HonorificManager
         }
     }
 
-    public static void SetTitle(string title = null)
+    public void SetTitle(string title = null)
     {
         try
         {
             if (title.IsNullOrEmpty())
             {
                 WasSet = false;
-                Svc.PluginInterface.GetIpcSubscriber<Character, object>("Honorific.ClearCharacterTitle").InvokeAction(Player.Object);
+                ClearCharacterTitle(Player.Object);
             }
             else
             {
                 WasSet = true;
-                if (GetTitleData([Player.CID]).TryGetFirst(x => x.Title == title, out var t))
+                if (GetTitleData(C.HonotificUnfiltered?null:[Player.CID]).TryGetFirst(x => x.Title == title, out var t))
                 {
-                    Svc.PluginInterface.GetIpcSubscriber<Character, string, object>("Honorific.SetCharacterTitle").InvokeAction(Player.Object, JsonConvert.SerializeObject(t));
+                    SetCharacterTitle(Player.Object, JsonConvert.SerializeObject(t));
                 }
                 else
                 {

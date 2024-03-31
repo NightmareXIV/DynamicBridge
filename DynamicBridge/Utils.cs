@@ -21,6 +21,22 @@ namespace DynamicBridge
         public static ImGuiInputTextFlags CensorFlags => C.NoNames ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None;
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
 
+        public static void DrawFolder(IEnumerable<(string[] Folder, Action Draw)> values)
+        {
+            var folder = new Folder(null, []);
+            foreach(var x in values)
+            {
+                folder.AddItem(x.Folder, new(x.Draw));
+            }
+            folder.Draw();
+        }
+
+        public static bool CollectionSelectable<T>(Vector4? color, string label, T value, ICollection<T> collection, bool delayedOperation = false)
+        {
+            bool Draw(ref bool x) => ImGuiEx.Selectable(color ?? ImGuiEx.Vector4FromRGB(0xDDDDDD), label, ref x, collection.Contains(value)? ImGuiTreeNodeFlags.Bullet: ImGuiTreeNodeFlags.Leaf);
+            return ImGuiEx.CollectionCore(Draw, value, collection, false, delayedOperation);
+        }
+
         public static Job GetUpgradedJobIfNeeded(this Job current)
         {
             if (C.UnifyJobs) return current.GetUpgradedJob();
@@ -88,7 +104,7 @@ namespace DynamicBridge
         public static IEnumerable<string> HonorificFiltered(this Preset preset)
         {
             var name = Utils.GetCharaNameFromCID(Player.CID);
-            var hlist = HonorificManager.GetTitleData([Player.CID]);
+            var hlist = P.HonorificManager.GetTitleData(C.HonotificUnfiltered?null:[Player.CID]);
             foreach (var x in preset.Honorific)
             {
                 if (hlist.Any(h => h.Title == x))

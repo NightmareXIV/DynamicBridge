@@ -53,7 +53,6 @@ public unsafe static class UI
             ("Settings", GuiSettings.Draw, null, true),
             InternalLog.ImGuiTab(),
             (C.Debug?"Debug":null, Debug.Draw, ImGuiColors.DalamudGrey3, true),
-            //("Neo", P.NeoTabs.DrawHeaderLine, null, true),
             ]);
         RequestTab = null;
     }

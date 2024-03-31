@@ -11,6 +11,7 @@ using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
+using OtterGui.Filesystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Action = System.Action;
 
 namespace DynamicBridge.Gui
 {
@@ -239,14 +241,14 @@ namespace DynamicBridge.Gui
 
             if(ImGui.CollapsingHeader("Honorific test"))
             {
-                foreach (var d in HonorificManager.GetTitleData([Player.CID]))
+                foreach (var d in P.HonorificManager.GetTitleData(C.HonotificUnfiltered?null:[Player.CID]))
                 {
                     if (ImGui.Selectable($"{d.Title}"))
                     {
-                        HonorificManager.SetTitle(d.Title);
+                        P.HonorificManager.SetTitle(d.Title);
                     }
                 }
-                if (ImGui.Button("Revert title")) HonorificManager.SetTitle();
+                if (ImGui.Button("Revert title")) P.HonorificManager.SetTitle();
             }
 
             if (ImGui.CollapsingHeader("C+ test"))

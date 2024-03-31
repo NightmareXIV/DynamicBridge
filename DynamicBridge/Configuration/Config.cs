@@ -54,6 +54,7 @@ namespace DynamicBridge.Configuration
         public bool LesserCensor = false;
         public bool ShowTutorial = true;
         public bool UnifyJobs = true;
+        public bool HonotificUnfiltered = false;
     }
 
     public enum GlamourerNoRuleBehavior
