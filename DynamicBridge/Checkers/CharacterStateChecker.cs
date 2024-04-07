@@ -21,6 +21,7 @@ namespace DynamicBridge.Core
             [CharacterState.Wading_in_water] = () => !Svc.Condition[ConditionFlag.Diving] && !Svc.Condition[ConditionFlag.Swimming] && Utils.IsInWater,
             [CharacterState.Watching_cutscene] = () => Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
                 || Svc.Condition[ConditionFlag.WatchingCutscene78],
+            [CharacterState.In_combat] = () => Svc.Condition[ConditionFlag.InCombat],
         };
 
         public static bool Check(this CharacterState state)

@@ -22,6 +22,13 @@ namespace DynamicBridge
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
         public const float IndentSpacing = 5f;
 
+        public static string[] SplitDirectories(this string path)
+        {
+            var ret = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (ret.Length == 0) return [""];
+            return ret;
+        }
+
         public static void DrawFolder(IEnumerable<(string[] Folder, Action Draw)> values)
         {
             var folder = new Folder(null, []);
