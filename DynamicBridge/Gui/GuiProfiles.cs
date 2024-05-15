@@ -32,19 +32,26 @@ public static class GuiProfiles
                 try
                 {
                     var x = EzConfig.DefaultSerializationFactory.Deserialize<Profile>(Paste());
-                    var newName = x.Name + $" (copy)";
-                    if(C.ProfilesL.Any(z => z.Name == newName))
+                    if (x != null)
                     {
-                        int i = 2;
-                        do
+                        var newName = x.Name + $" (copy)";
+                        if (C.ProfilesL.Any(z => z.Name == newName))
                         {
-                            newName = x.Name + $" (copy {i++})";
+                            int i = 2;
+                            do
+                            {
+                                newName = x.Name + $" (copy {i++})";
+                            }
+                            while (C.ProfilesL.Any(z => z.Name == newName));
                         }
-                        while (C.ProfilesL.Any(z => z.Name == newName));
+                        x.Name = newName;
+                        x.Characters.Clear();
+                        C.ProfilesL.Add(x);
                     }
-                    x.Name = newName;
-                    x.Characters.Clear();
-                    C.ProfilesL.Add(x);
+                    else
+                    {
+                        Notify.Error($"Could not import from clipboard");
+                    }
                 }
                 catch(Exception e)
                 {

@@ -64,6 +64,8 @@ public static class GuiSettings
             ImGuiEx.HelpMarker($"Censored names will change upon pressing this button.");
 
             ImGuiEx.CheckboxInverted($"Split base classes and jobs", ref C.UnifyJobs);
+            
+            ImGui.Checkbox("Autofill empty preset name with first selected plugin's option name upon selecting it", ref C.AutofillFromGlam);
             ImGuiGroup.EndGroupBox();
         }
 
@@ -121,8 +123,6 @@ public static class GuiSettings
             ImGui.Checkbox("Revert character before restoring automation", ref C.RevertBeforeAutomationRestore);
             ImGuiEx.Spacing();
             ImGui.Checkbox("Revert character before applying rule", ref C.RevertGlamourerBeforeApply);
-            ImGuiEx.Spacing();
-            ImGui.Checkbox("Autofill preset name with Glamourer's preset name upon selecting it", ref C.AutofillFromGlam);
 
 
             ImGui.Separator();
