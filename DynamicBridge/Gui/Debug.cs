@@ -36,7 +36,7 @@ namespace DynamicBridge.Gui
 
         public static void Draw()
         {
-            if(ImGui.CollapsingHeader("IPC Tester"))
+            if (ImGui.CollapsingHeader("IPC Tester"))
             {
                 if (ImGui.Button("Register AnyException"))
                 {
@@ -167,7 +167,7 @@ namespace DynamicBridge.Gui
                     if (ImGui.SmallButton($"Remove##{x.ID}")) P.MoodlesManager.RemovePreset(x.ID);
                 }
             }
-                if (ImGui.CollapsingHeader("Penumbra"))
+                /*if (ImGui.CollapsingHeader("Penumbra"))
                 {
                 ImGuiEx.Text(EColor.Green, $"Current: {P.PenumbraManager.GetCollectionForType(PenumbraManager.ApiCollectionType.Yourself) ?? "(null)"}");
                 foreach(var x in P.PenumbraManager.GetCollections())
@@ -178,7 +178,7 @@ namespace DynamicBridge.Gui
                         DuoLog.Information($"Error: {ret.Error}, old: {ret.OldCollection}");
                     }
                 }
-            }
+            }*/
             /*if(ImGui.CollapsingHeader("Pathes"))
             {
                 foreach(var x in Utils.GetCombinedPathes())

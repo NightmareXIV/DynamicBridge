@@ -626,7 +626,7 @@ namespace DynamicBridge.Gui
                                 if (preset.PenumbraType == SpecialPenumbraAssignment.Use_Named_Collection)
                                 {
                                     FiltersSelection();
-                                    var collections = P.PenumbraManager.GetCollections().Order();
+                                    var collections = P.PenumbraManager.GetCollectionNames().Order();
                                     var index = 0;
                                     List<(string[], Action)> items = [];
                                     foreach (var x in collections)

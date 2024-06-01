@@ -20,6 +20,7 @@ public class GlamourerReflector
         }
         return false;
     }
+
     public void SetAutomationGlobalState(bool state)
     {
         try

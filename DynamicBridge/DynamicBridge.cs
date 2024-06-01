@@ -8,6 +8,7 @@ using DynamicBridge.IPC.Honorific;
 using DynamicBridge.IPC.Moodles;
 using DynamicBridge.IPC.Penumbra;
 using ECommons.Automation;
+using ECommons.Automation.LegacyTaskManager;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
 using ECommons.Events;

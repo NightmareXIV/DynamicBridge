@@ -3,6 +3,7 @@ using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
 using ECommons;
 using ECommons.Configuration;
+using ECommons.Funding;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using ECommons.SimpleGui;
@@ -39,8 +40,8 @@ public unsafe static class UI
             foreach (var x in Svc.Data.GetExcelSheet<Weather>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
             foreach (var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
         }
-        KoFiButton.DrawRight();
-        ImGuiEx.EzTabBar("TabsNR2", true, RequestTab, [
+        PatreonBanner.DrawRight();
+        ImGuiEx.EzTabBar("TabsNR2", PatreonBanner.Text, RequestTab, ImGuiTabBarFlags.Reorderable, [
             //("Settings", Settings, null, true),
             (C.ShowTutorial?"Tutorial":null, GuiTutorial.Draw, null, true),
             ("Dynamic Rules", GuiRules.Draw, Colors.TabGreen, true),

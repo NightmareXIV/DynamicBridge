@@ -1,7 +1,6 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using DynamicBridge.Configuration;
+﻿using DynamicBridge.Configuration;
 using ECommons.EzIpcManager;
-using ECommons.GameHelpers;
+using Glamourer.Api.IpcSubscribers;
 
 namespace DynamicBridge.IPC.Glamourer;
 
@@ -10,12 +9,6 @@ public unsafe class GlamourerManager
     public GlamourerReflector Reflector;
     public GlamourerCommands Commands;
 
-    [EzIPC] Func<Character, string> GetAllCustomizationFromCharacter;
-    [EzIPC] Action<string, Character> ApplyAllOnceToCharacter;
-    [EzIPC] Action<Character> RevertCharacter;
-    [EzIPC] Action<Guid, Character> ApplyByGuidOnceToCharacter;
-    [EzIPC] Func<GlamourerDesignInfo[]> GetDesignList;
-
     public GlamourerManager()
     {
         EzIPC.Init(this, "Glamourer");
@@ -23,7 +16,7 @@ public unsafe class GlamourerManager
         Commands = new();
     }
 
-    List<PathInfo> PathInfos = null;
+    private List<PathInfo> PathInfos = null;
     public List<PathInfo> GetCombinedPathes()
     {
         PathInfos ??= Utils.BuildPathes(GetRawPathes());
@@ -35,11 +28,12 @@ public unsafe class GlamourerManager
         Commands.RevertToAutomation();
     }
 
+    private ApplyDesign ApplyDesign = new(Svc.PluginInterface);
     public void ApplyByGuid(Guid guid)
     {
         try
         {
-            ApplyByGuidOnceToCharacter(guid, Player.Object);
+            ApplyDesign.Invoke(guid, 0);
         }
         catch (Exception ex)
         {
@@ -47,11 +41,13 @@ public unsafe class GlamourerManager
         }
     }
 
-    GlamourerDesignInfo[] GetDesignListIPC()
+    private GetDesignList GetDesignList = new(Svc.PluginInterface);
+
+    private GlamourerDesignInfo[] GetDesignListIPC()
     {
         try
         {
-            return GetDesignList();
+            return GetDesignList.Invoke().Select(x => (x.Value, x.Key)).ToArray();
         }
         catch (Exception ex)
         {
@@ -60,11 +56,12 @@ public unsafe class GlamourerManager
         return [];
     }
 
+    private GetStateBase64 GetStateBase64 = new(Svc.PluginInterface);
     public string GetMyCustomization()
     {
         try
         {
-            return GetAllCustomizationFromCharacter(Player.Object);
+            return GetStateBase64.Invoke(0).Item2;
         }
         catch (Exception e)
         {
@@ -73,11 +70,12 @@ public unsafe class GlamourerManager
         }
     }
 
+    private ApplyState ApplyState = new(Svc.PluginInterface);
     public void SetMyCustomization(string customization)
     {
         try
         {
-            ApplyAllOnceToCharacter(customization, Player.Object);
+            ApplyState.Invoke(customization, 0);
         }
         catch (Exception e)
         {
@@ -98,11 +96,12 @@ public unsafe class GlamourerManager
         }
     }
 
+    private RevertState RevertState = new(Svc.PluginInterface);
     public void Revert()
     {
         try
         {
-            RevertCharacter(Player.Object);
+            RevertState.Invoke(0);
         }
         catch (Exception e)
         {
@@ -111,8 +110,8 @@ public unsafe class GlamourerManager
         }
     }
 
-    GlamourerDesignInfo[] CachedDesignInfo = [];
-    ulong ValidCacheFrame = 0;
+    private GlamourerDesignInfo[] CachedDesignInfo = [];
+    private ulong ValidCacheFrame = 0;
     public GlamourerDesignInfo[] GetDesigns()
     {
         var fc = CSFramework.Instance()->FrameCounter;
@@ -124,14 +123,14 @@ public unsafe class GlamourerManager
         return CachedDesignInfo;
     }
 
-    Dictionary<string, string> TransformNameCache = [];
+    private Dictionary<string, string> TransformNameCache = [];
     public string TransformName(string originalName)
     {
-        if(TransformNameCache.TryGetValue(originalName, out var ret))
+        if (TransformNameCache.TryGetValue(originalName, out var ret))
         {
             return ret;
         }
-        if (Guid.TryParse(originalName, out Guid guid))
+        if (Guid.TryParse(originalName, out var guid))
         {
             if (GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
             {
@@ -165,14 +164,14 @@ public unsafe class GlamourerManager
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.LogInternal();
         }
         return ret;
     }
 
-    public void ResetCache() 
+    public void ResetCache()
     {
         TransformNameCache.Clear();
         PathInfos = null;
