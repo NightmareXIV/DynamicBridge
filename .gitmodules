@@ -4,3 +4,9 @@
 [submodule "OtterGui"]
 	path = OtterGui
 	url = https://github.com/Limiana/OtterGui
+[submodule "Glamourer.Api"]
+	path = Glamourer.Api
+	url = https://github.com/Limiana/Glamourer.Api
+[submodule "Penumbra.Api"]
+	path = Penumbra.Api
+	url = https://github.com/Limiana/Penumbra.Api
