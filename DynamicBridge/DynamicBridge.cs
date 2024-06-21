@@ -14,6 +14,7 @@ using ECommons.Configuration;
 using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
+using ECommons.Funding;
 using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
@@ -59,6 +60,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
+        PatreonBanner.IsOfficialPlugin = Utils.IsDisguise;
         new TickScheduler(() =>
         {
             C = EzConfig.Init<Config>();
