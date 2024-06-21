@@ -438,9 +438,6 @@
   <data name="EnableThisRule" xml:space="preserve">
     <value>Enable this rule</value>
   </data>
-  <data name="EnablePassthroughForThisRuleDynamicBridgeWillContinueSearchingAfterEncounteringThisRuleAllValidFoundRulesWillBeAppliedOneAfterAnotherSequentially" xml:space="preserve">
-    <value>Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially.</value>
-  </data>
   <data name="PassthroughTooltip" xml:space="preserve">
     <value>Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially.</value>
   </data>

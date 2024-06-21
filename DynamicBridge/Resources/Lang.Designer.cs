@@ -493,16 +493,6 @@ namespace DynamicBridge.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially..
-        /// </summary>
-        public static string EnablePassthroughForThisRuleDynamicBridgeWillContinueSearchingAfterEncounteringThisRuleAllValidFoundRulesWillBeAppliedOneAfterAnotherSequentially {
-            get {
-                return ResourceManager.GetString("EnablePassthroughForThisRuleDynamicBridgeWillContinueSearchingAfterEncounteringTh" +
-                        "isRuleAllValidFoundRulesWillBeAppliedOneAfterAnotherSequentially", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enable this rule.
         /// </summary>
         public static string EnableThisRule {
