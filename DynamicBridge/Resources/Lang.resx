@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Presets.AddNewEmpty" xml:space="preserve">
+    <value>Add new empty preset into default or focused folder</value>
+  </data>
+  <data name="Presets_PresetFolder" xml:space="preserve">
+    <value>Preset folder $</value>
+  </data>
+  <data name="CouldNotImportFromClipboard" xml:space="preserve">
+    <value>Could not import from clipboard</value>
+  </data>
+  <data name="PastePreviouslyCopiedPresetFromClipboard" xml:space="preserve">
+    <value>Paste previously copied preset from clipboard</value>
+  </data>
+  <data name="AddNewPresetFolder" xml:space="preserve">
+    <value>Add new preset folder</value>
+  </data>
+  <data name="GlobalPresetsNote" xml:space="preserve">
+    <value>Global Presets are available for use on each of your characters.</value>
+  </data>
+  <data name="MainPresetsFolder" xml:space="preserve">
+    <value>Main presets</value>
+  </data>
+  <data name="ExportToClipboard" xml:space="preserve">
+    <value>Export to clipboard</value>
+  </data>
+  <data name="ShowInRulesSection" xml:space="preserve">
+    <value>Show in Rules section</value>
+  </data>
+  <data name="HideFromRulesSection" xml:space="preserve">
+    <value>Hide from Rules section</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="DeleteFolder" xml:space="preserve">
+    <value>Delete folder...</value>
+  </data>
+  <data name="AndMoveProfilesToDefaultFolderHoldCTRL" xml:space="preserve">
+    <value>...and move profiles to default folder (Hold CTRL)</value>
+  </data>
+  <data name="AndDeleteIncludedProfilesHoldCTRLSHIFT" xml:space="preserve">
+    <value>...and delete included profiles (Hold CTRL+SHIFT)</value>
+  </data>
+  <data name="RightClickToOpenContextMenu" xml:space="preserve">
+    <value>Right-click to open context menu</value>
+  </data>
+  <data name="FallbackPresetSection" xml:space="preserve">
+    <value>Fallback preset</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter...</value>
+  </data>
+  <data name="OnlySelected" xml:space="preserve">
+    <value>Only selected</value>
+  </data>
+  <data name="FallbackNotice" xml:space="preserve">
+    <value>Values from this preset will be used as default in current profile.</value>
+  </data>
+  <data name="PresetStaticSetNotice" xml:space="preserve">
+    <value>Set this preset as static, applying it unconditionally on this character disregarding any rules.</value>
+  </data>
+  <data name="MoveToMainFolder" xml:space="preserve">
+    <value>- Main folder -</value>
+  </data>
+  <data name="BasePreset" xml:space="preserve">
+    <value>Base Preset</value>
+  </data>
+  <data name="ErrorNameCanNotBeEmpty" xml:space="preserve">
+    <value>Name can not be empty</value>
+  </data>
+  <data name="ErrorNameMustBeUnique" xml:space="preserve">
+    <value>Name must be unique</value>
+  </data>
+  <data name="PresetName" xml:space="preserve">
+    <value>Preset name</value>
+  </data>
+  <data name="LayeredDesigns" xml:space="preserve">
+    <value>Layered Designs</value>
+  </data>
+  <data name="CustomizePlusGlobalNotice" xml:space="preserve">
+    <value>All registered profiles are displayed in global profile, but only ones that are assigned to your current character will be used.</value>
+  </data>
+  <data name="NoneSelection" xml:space="preserve">
+    <value>- None -</value>
+  </data>
+  <data name="HonotificGlobalProfileNotice" xml:space="preserve">
+    <value>All registered titles are displayed in global profile, but only ones that are assigned to your current character will be used UNLESS \</value>
+  </data>
+  <data name="HonorificGlobalPresetNotice" xml:space="preserve">
+    <value>All registered titles are displayed in global profile, but only ones that are assigned to your current character will be used UNLESS \"Allow selecting titles registered for other characters\" is enabled in settings.</value>
+  </data>
+  <data name="AssignmentType" xml:space="preserve">
+    <value>Assignment Type:</value>
+  </data>
+  <data name="MoodlesCancelTooltip" xml:space="preserve">
+    <value>Cancel this moodle(s) once preset is no longer applied</value>
+  </data>
+  <data name="MoodlePresets" xml:space="preserve">
+    <value>Moodle Presets</value>
+  </data>
+  <data name="MoodlesApplicationTooltip" xml:space="preserve">
+    <value>All of these Moodles/Presets will be applied:\n$</value>
+  </data>
+  <data name="CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="HoldCTRLClickToDelete" xml:space="preserve">
+    <value>Hold CTRL+Click to delete</value>
+  </data>
+  <data name="FolderName" xml:space="preserve">
+    <value>Folder name</value>
+  </data>
+  <data name="HiddenFromRules" xml:space="preserve">
+    <value>Hidden from rules</value>
+  </data>
+  <data name="SearchProfileName" xml:space="preserve">
+    <value>Search profile name...</value>
+  </data>
+  <data name="CreateEmpty" xml:space="preserve">
+    <value>Create Empty</value>
+  </data>
+  <data name="PasteFromClipboard" xml:space="preserve">
+    <value>Paste from Clipboard</value>
+  </data>
+  <data name="CreateNewEmptyProfile" xml:space="preserve">
+    <value>Create new empty profile</value>
+  </data>
+  <data name="CopySuffix" xml:space="preserve">
+    <value> (copy)</value>
+  </data>
+  <data name="CopySuffixWithNumber" xml:space="preserve">
+    <value> (copy $)</value>
+  </data>
+  <data name="NewProfileName" xml:space="preserve">
+    <value>New Profile $</value>
+  </data>
+  <data name="NewProfilePasteTooltip" xml:space="preserve">
+    <value>Create new profile from data in clipboard</value>
+  </data>
+  <data name="NameColumn" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="UsedByColumn" xml:space="preserve">
+    <value>Used by</value>
+  </data>
+  <data name="FolderWhitelistColumn" xml:space="preserve">
+    <value>Folder whitelist</value>
+  </data>
+  <data name="AndMore" xml:space="preserve">
+    <value> and $ more</value>
+  </data>
+  <data name="SelectThisProfileForEditing" xml:space="preserve">
+    <value>Select this profile for editing</value>
+  </data>
+  <data name="CopyThisProfileToClipboard" xml:space="preserve">
+    <value>Copy this profile to clipboard</value>
+  </data>
+  <data name="HoldCTRLAndClickToDelete" xml:space="preserve">
+    <value>Hold CTRL and click to delete</value>
+  </data>
+  <data name="WillBeRandomlySelectedBetween" xml:space="preserve">
+    <value>Will be randomly selected between:\n</value>
+  </data>
+  <data name="MeetingAnyOfTheFollowingConditionsWillResultInRuleBeingTriggeredN" xml:space="preserve">
+    <value>Meeting any of the following conditions will result in rule being triggered:\n</value>
+  </data>
+  <data name="NotLoggedIn" xml:space="preserve">
+    <value>Not logged in</value>
+  </data>
+  <data name="CharacterBlacklisted" xml:space="preserve">
+    <value>Character blacklisted</value>
+  </data>
+  <data name="NoAssociatedProfile" xml:space="preserve">
+    <value>No associated profile</value>
+  </data>
+  <data name="ProfileTitle" xml:space="preserve">
+    <value>Profile $</value>
+  </data>
+  <data name="PLUGINDISABLEDBYSETTINGS" xml:space="preserve">
+    <value>PLUGIN DISABLED BY SETTINGS</value>
+  </data>
+  <data name="TabTutorial" xml:space="preserve">
+    <value>Tutorial</value>
+  </data>
+  <data name="TabDynamicRules" xml:space="preserve">
+    <value>Dynamic Rules</value>
+  </data>
+  <data name="TabPresets" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="TabGlobalPresets" xml:space="preserve">
+    <value>Global Presets</value>
+  </data>
+  <data name="TabHouseRegistration" xml:space="preserve">
+    <value>House Registration</value>
+  </data>
+  <data name="TabProfiles" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="TabCharacters" xml:space="preserve">
+    <value>Characters</value>
+  </data>
+  <data name="TabSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="BlacklistedCharacter" xml:space="preserve">
+    <value>\"$\" is blacklisted. Select another profile to edit it.</value>
+  </data>
+  <data name="UnblacklistThisCharacter" xml:space="preserve">
+    <value>Unblacklist this character.</value>
+  </data>
+  <data name="CharaNoAssociation" xml:space="preserve">
+    <value>\"$\" has no associated profile. Select other profile to edit or associate profile in Characters tab.</value>
+  </data>
+</root>

@@ -16,6 +16,7 @@ using ECommons.ExcelServices;
 using ECommons.EzEventManager;
 using ECommons.GameHelpers;
 using ECommons.SimpleGui;
+using ECommons.Singletons;
 using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game.Housing;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -100,6 +101,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             PenumbraManager = new();
             MoodlesManager = new();
             HonorificManager = new();
+            SingletonServiceManager.Initialize(typeof(S));
         });
     }
 

@@ -21,3 +21,5 @@ global using Dalamud.Game.ClientState.Conditions;
 global using CSFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 global using ECommons.DalamudServices.Legacy;
 global using Dalamud.Interface.Utility;
+global using S = DynamicBridge.Services.Service;
+global using DynamicBridge.Resources; 

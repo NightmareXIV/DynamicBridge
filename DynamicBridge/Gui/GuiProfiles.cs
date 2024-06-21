@@ -17,30 +17,30 @@ public static class GuiProfiles
 
     public static void Draw()
     {
-        ImGuiEx.InputWithRightButtonsArea("DrawProfilesInp", () => ImGui.InputTextWithHint($"##Filter0", "Search profile name...", ref Filters[0], 100), () =>
+        ImGuiEx.InputWithRightButtonsArea("DrawProfilesInp", () => ImGui.InputTextWithHint($"##Filter0", Lang.SearchProfileName, ref Filters[0], 100), () =>
         {
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.PlusCircle, "Create Empty"))
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.PlusCircle, Lang.CreateEmpty))
             {
                 var profile = new Profile();
                 C.ProfilesL.Add(profile);
-                profile.Name = $"New Profile {C.ProfilesL.Count}";
+                profile.Name = Lang.NewProfileName.Params(C.ProfilesL.Count);
             }
             ImGui.SameLine();
-            ImGuiEx.Tooltip($"Create new empty profile");
-            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, "Paste from Clipboard"))
+            ImGuiEx.Tooltip(Lang.CreateNewEmptyProfile);
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Paste, Lang.PasteFromClipboard))
             {
                 try
                 {
                     var x = EzConfig.DefaultSerializationFactory.Deserialize<Profile>(Paste());
                     if (x != null)
                     {
-                        var newName = x.Name + $" (copy)";
+                        var newName = x.Name + Lang.CopySuffix;
                         if (C.ProfilesL.Any(z => z.Name == newName))
                         {
                             int i = 2;
                             do
                             {
-                                newName = x.Name + $" (copy {i++})";
+                                newName = x.Name + Lang.CopySuffixWithNumber.Params(i++);
                             }
                             while (C.ProfilesL.Any(z => z.Name == newName));
                         }
@@ -50,7 +50,7 @@ public static class GuiProfiles
                     }
                     else
                     {
-                        Notify.Error($"Could not import from clipboard");
+                        Notify.Error($Lang.CouldNotImportFromClipboard);
                     }
                 }
                 catch(Exception e)
@@ -58,16 +58,16 @@ public static class GuiProfiles
                     Notify.Error(e.Message);
                 }
             }
-            ImGuiEx.Tooltip($"Create new profile from data in clipboard");
+            ImGuiEx.Tooltip(Lang.NewProfilePasteTooltip);
             ImGui.SameLine();
         });
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
         if (ImGui.BeginTable($"##profiles", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
         {
             //ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed | ImGuiTableColumnFlags.NoSort);
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Used by", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Folder whitelist", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(Lang.NameColumn, ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(Lang.UsedByColumn, ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(Lang.FolderWhitelistColumn, ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
 
@@ -85,7 +85,7 @@ public static class GuiProfiles
                 ImGui.InputText($"##profilename", ref profile.Name, 100, Utils.CensorFlags);
 
                 ImGui.TableNextColumn();
-                var text = profile.Characters.Take(2).Select(s => Censor.Character(Utils.GetCharaNameFromCID(s))).Print() + (profile.Characters.Count > 2?$" and {profile.Characters.Count-2} more":"");
+                var text = profile.Characters.Take(2).Select(s => Censor.Character(Utils.GetCharaNameFromCID(s))).Print() + (profile.Characters.Count > 2?Lang.AndMore.Params(profile.Characters.Count - 2) :"");
                 ImGuiEx.SetNextItemFullWidth();
                 ImGuiEx.Text($"{text}");
                 if(profile.Characters.Count > 2)
@@ -157,19 +157,19 @@ public static class GuiProfiles
                     UI.SelectedProfile = profile;
                     new TickScheduler(() => UI.RequestTab = "Dynamic Rules");
                 }
-                ImGuiEx.Tooltip("Select this profile for editing");
+                ImGuiEx.Tooltip(Lang.SelectThisProfileForEditing);
                 ImGui.SameLine();
                 if (ImGuiEx.IconButton(FontAwesomeIcon.Copy.ToIconString()))
                 {
                     Copy(JsonConvert.SerializeObject(profile));
                 }
-                ImGuiEx.Tooltip("Copy this profile to clipboard");
+                ImGuiEx.Tooltip(Lang.CopyThisProfileToClipboard);
                 ImGui.SameLine();
                 if (ImGuiEx.IconButton(FontAwesomeIcon.Trash.ToIconString(), enabled:ImGuiEx.Ctrl))
                 {
                     new TickScheduler(() => C.ProfilesL.Remove(profile));
                 }
-                ImGuiEx.Tooltip("Hold CTRL and click to delete");
+                ImGuiEx.Tooltip(Lang.HoldCTRLAndClickToDelete);
 
                 ImGui.PopID();
             }
