@@ -16,11 +16,11 @@ public static unsafe class ComplexGlamourer
     {
         if (!C.EnableGlamourer)
         {
-            ImGuiEx.Text(EColor.RedBright, "Glamourer disabled in settings. Function unavailable.");
+            ImGuiEx.Text(EColor.RedBright, Lang.GlamourerDisabledInSettingsFunctionUnavailable);
             return;
         }
-        ImGuiEx.TextWrapped($"Here you can create layered designs for Glamourer. Upon application, they will be applied sequentially one after another. You will be able to select layered designs for profiles together with normal entries.");
-        if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, "Add new entry"))
+        ImGuiEx.TextWrapped(Lang.ComplexGlamourerHelp);
+        if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, Lang.AddNewEntry))
         {
             C.ComplexGlamourerEntries.Add(new());
         }
@@ -29,13 +29,13 @@ public static unsafe class ComplexGlamourer
             ImGui.PushID(gEntry.GUID);
             if (ImGui.CollapsingHeader($"{gEntry.Name}###entry"))
             {
-                ImGuiEx.TextV($"1. Name Layered Design:");
+                ImGuiEx.TextV(Lang._1NameLayeredDesign);
                 ImGui.SameLine();
                 ImGuiEx.SetNextItemFullWidth();
                 ImGui.InputText($"##name", ref gEntry.Name, 100);
-                ImGuiEx.TextV($"2. Select Glamourer designs:");
+                ImGuiEx.TextV(Lang._2SelectGlamourerDesigns);
                 ImGui.SameLine();
-                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(P.GlamourerManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                if (ImGui.BeginCombo("##glamour", gEntry.Designs.Select(P.GlamourerManager.TransformName).PrintRange(out var fullList, Lang.NoneSelection), C.ComboSize))
                 {
                     if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                     FiltersSelection();
@@ -58,7 +58,7 @@ public static unsafe class ComplexGlamourer
                     }
                     ImGui.EndCombo();
                 }
-                ImGuiEx.Text($"3. Change order if needed");
+                ImGuiEx.Text(Lang._3ChangeOrderIfNeeded);
                 for (int i = 0; i < gEntry.Designs.Count; i++)
                 {
                     var design = gEntry.Designs[i];
@@ -76,7 +76,7 @@ public static unsafe class ComplexGlamourer
                     ImGuiEx.Text($"{P.GlamourerManager.TransformName(design)}");
                     ImGui.PopID();
                 }
-                if (ImGuiEx.ButtonCtrl("Delete"))
+                if (ImGuiEx.ButtonCtrl(Lang.Delete))
                 {
                     new TickScheduler(() => C.ComplexGlamourerEntries.RemoveAll(x => x.GUID == gEntry.GUID));
                 }
@@ -88,8 +88,8 @@ public static unsafe class ComplexGlamourer
         {
             ImGui.SetWindowFontScale(0.8f);
             ImGuiEx.SetNextItemFullWidth();
-            ImGui.InputTextWithHint($"##fltr", "Filter...", ref Filter, 50);
-            ImGui.Checkbox($"Only selected", ref OnlySelected);
+            ImGui.InputTextWithHint($"##fltr", Lang.Filter, ref Filter, 50);
+            ImGui.Checkbox(Lang.OnlySelected, ref OnlySelected);
             ImGui.SetWindowFontScale(1f);
             ImGui.Separator();
         }

@@ -13,31 +13,31 @@ public static class GuiSettings
 {
     public static Dictionary<GlamourerNoRuleBehavior, string> GlamourerNoRuleBehaviorNames = new()
     {
-        [GlamourerNoRuleBehavior.RevertToNormal] = "Revert to game state",
-        [GlamourerNoRuleBehavior.RevertToAutomation] = "Revert to Glamourer's automation",
-        [GlamourerNoRuleBehavior.StoreRestore] = "[Beta] Restore appearance as it was before applying rule",
+        [GlamourerNoRuleBehavior.RevertToNormal] = Lang.GuiSettings_RevertToGameState,
+        [GlamourerNoRuleBehavior.RevertToAutomation] = Lang.GuiSettings_RevertToGlamourerSAutomation,
+        [GlamourerNoRuleBehavior.StoreRestore] = Lang.GuiSettings_BetaRestoreAppearanceAsItWasBeforeApplyingRule,
     };
 
     public static Dictionary<ImGuiComboFlags, string> ComboFlagNames = new()
     {
-        [ImGuiComboFlags.HeightSmall] = "Small",
-        [ImGuiComboFlags.HeightRegular] = "Standard",
-        [ImGuiComboFlags.HeightLarge] = "Large",
-        [ImGuiComboFlags.HeightLargest] = "Maximum possible",
+        [ImGuiComboFlags.HeightSmall] = Lang.GuiSettings_Small,
+        [ImGuiComboFlags.HeightRegular] = Lang.GuiSettings_Standard,
+        [ImGuiComboFlags.HeightLarge] = Lang.GuiSettings_Large,
+        [ImGuiComboFlags.HeightLargest] = Lang.GuiSettings_MaximumPossible,
     };
 
     public static void Draw()
     {
-        ImGui.Checkbox($"Enable Plugin", ref C.Enable);
-        if (ImGuiGroup.BeginGroupBox("General"))
+        ImGui.Checkbox(Lang.Draw_EnablePlugin, ref C.Enable);
+        if (ImGuiGroup.BeginGroupBox(Lang.Draw_General))
         {
-            ImGuiEx.CheckboxInverted("Hide tutorial", ref C.ShowTutorial);
-            ImGui.Checkbox($"Allow applying negative conditions", ref C.AllowNegativeConditions);
-            ImGuiEx.HelpMarker("If you will enable this option, you will be able to mark any condition with cross marker. If any condition marked with cross within the rule is matching, that entire rule is ignored.");
-            ImGui.Checkbox("Display full path in profile editor, where available", ref C.GlamourerFullPath);
+            ImGuiEx.CheckboxInverted(Lang.Draw_HideTutorial, ref C.ShowTutorial);
+            ImGui.Checkbox(Lang.Draw_AllowApplyingNegativeConditions, ref C.AllowNegativeConditions);
+            ImGuiEx.HelpMarker(Lang.DenyCondHelp);
+            ImGui.Checkbox(Lang.FullPath, ref C.GlamourerFullPath);
             ImGuiEx.SetNextItemWidthScaled(150f);
-            ImGuiEx.EnumCombo("Dropdown menu size", ref C.ComboSize, ComboFlagNames.ContainsKey, ComboFlagNames);
-            if(ImGui.Checkbox($"Force update appearance on job and gearset changes", ref C.UpdateJobGSChange))
+            ImGuiEx.EnumCombo(Lang.Draw_DropdownMenuSize, ref C.ComboSize, ComboFlagNames.ContainsKey, ComboFlagNames);
+            if(ImGui.Checkbox(Lang.ForceUpdateSetting, ref C.UpdateJobGSChange))
             {
                 if (C.UpdateJobGSChange)
                 {
@@ -51,53 +51,53 @@ public static class GuiSettings
             /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
             ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
             ImGui.Separator();
-            ImGui.Checkbox($"[Beta] Enable Incognito Mode (WORK IN PROGRESS, ONLY HIDES IN SOME PLACES YET)", ref C.NoNames);
-            ImGuiEx.HelpMarker($"Replaces your character name with random animal name and your world name with random fantasy world name. Same name will always generate same counterparts, for you but not for other people. Additionally, hides text in input fields and shows temporary profile/preset ID instead of name.");
-            ImGuiEx.HelpMarker($"Warning! No names will be censored in Log and Debug tabs and Dalamud.log! \nWarning! If you share configuration file AND censored name, original name CAN BE RESTORED. If you need to send configuration file and ensure that you remain anonymous, click Regenerate Censor Seed button, send configuration and click the button again.", ImGuiColors.DalamudOrange);
+            ImGui.Checkbox(Lang.IncognitoEnable, ref C.NoNames);
+            ImGuiEx.HelpMarker(Lang.IncognitoHelp);
+            ImGuiEx.HelpMarker(Lang.IncognitoWarning, ImGuiColors.DalamudOrange);
             ImGuiEx.Spacing();
-            ImGui.Checkbox($"Use only replacement words with same first letter as original when possible.", ref C.LesserCensor);
+            ImGui.Checkbox(Lang.IncognitoReplacement, ref C.LesserCensor);
             ImGuiEx.Spacing();
-            if (ImGui.Button("Regenerate Censor Seed"))
+            if (ImGui.Button(Lang.IncognitoCensor))
             {
                 C.CensorSeed = Guid.NewGuid().ToString();
             }
-            ImGuiEx.HelpMarker($"Censored names will change upon pressing this button.");
+            ImGuiEx.HelpMarker(Lang.CensorHelp);
 
-            ImGuiEx.CheckboxInverted($"Split base classes and jobs", ref C.UnifyJobs);
+            ImGuiEx.CheckboxInverted(Lang.SplitBaseClassesAndJobs, ref C.UnifyJobs);
             
-            ImGui.Checkbox("Autofill empty preset name with first selected plugin's option name upon selecting it", ref C.AutofillFromGlam);
+            ImGui.Checkbox(Lang.AutofillEmptyNames, ref C.AutofillFromGlam);
             ImGuiGroup.EndGroupBox();
         }
 
-        if(ImGuiGroup.BeginGroupBox("Configure rule conditions"))
+        if(ImGuiGroup.BeginGroupBox(Lang.ConfigureRuleConditions))
         {
-            ImGuiEx.TextWrapped($"Enable extra conditions or disable unused for convenience and performance boost.");
+            ImGuiEx.TextWrapped(Lang.ExtraHelp);
             ImGuiEx.EzTableColumns("extras", [
-                () => ImGui.Checkbox($"State", ref C.Cond_State),
-                () => ImGui.Checkbox($"Biome", ref C.Cond_Biome),
-                () => ImGui.Checkbox($"Weather", ref C.Cond_Weather),
-                () => ImGui.Checkbox($"Time", ref C.Cond_Time),
-                () => ImGui.Checkbox($"Zone group", ref C.Cond_ZoneGroup),
-                () => ImGui.Checkbox($"Zone", ref C.Cond_Zone),
-                () => ImGui.Checkbox($"House", ref C.Cond_House),
-                () => ImGui.Checkbox($"Emote", ref C.Cond_Emote),
-                () => ImGui.Checkbox($"Job", ref C.Cond_Job),
-                () => ImGui.Checkbox($"World", ref C.Cond_World),
-                () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
+                () => ImGui.Checkbox(Lang.RuleState, ref C.Cond_State),
+                () => ImGui.Checkbox(Lang.RuleBiome, ref C.Cond_Biome),
+                () => ImGui.Checkbox(Lang.RuleWeather, ref C.Cond_Weather),
+                () => ImGui.Checkbox(Lang.RuleTime, ref C.Cond_Time),
+                () => ImGui.Checkbox(Lang.ZoneGroup, ref C.Cond_ZoneGroup),
+                () => ImGui.Checkbox(Lang.RuleZone, ref C.Cond_Zone),
+                () => ImGui.Checkbox(Lang.RuleHouse, ref C.Cond_House),
+                () => ImGui.Checkbox(Lang.RuleEmote, ref C.Cond_Emote),
+                () => ImGui.Checkbox(Lang.RuleJob, ref C.Cond_Job),
+                () => ImGui.Checkbox(Lang.RuleWorld, ref C.Cond_World),
+                () => ImGui.Checkbox(Lang.RuleGearset, ref C.Cond_Gearset),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             ImGuiGroup.EndGroupBox();
         }
 
-        if (ImGuiGroup.BeginGroupBox("Integrations"))
+        if (ImGuiGroup.BeginGroupBox(Lang.Integrations))
         {
-            ImGuiEx.Text($"Here you can individually enable/disable plugin integrations and configure appropriate related settings.");
+            ImGuiEx.Text(Lang.IntegrationsHelp);
             //glam
 
             ImGui.Checkbox("Glamourer", ref C.EnableGlamourer);
             DrawPluginCheck("Glamourer", "1.2.2.2");
             ImGuiEx.Spacing();
-            ImGuiEx.TextV($"DynamicBridge behavior when no Glamourer rule is found:");
+            ImGuiEx.TextV(Lang.DynamicBridgeBehaviorWhenNoGlamourerRuleIsFound);
             ImGui.SameLine();
             ImGuiEx.Spacing();
             ImGuiEx.SetNextItemWidthScaled(200f);
@@ -106,23 +106,23 @@ public static class GuiSettings
             {
                 if (C.GlamNoRuleBehaviour != GlamourerNoRuleBehavior.RevertToAutomation)
                 {
-                    ImGuiEx.HelpMarker("Revert to Automation is recommended if you are using Glamourer automation.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                    ImGuiEx.HelpMarker(Lang.RevertTooltip, ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
             }
             ImGuiEx.Spacing();
-            ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
-            ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
+            ImGui.Checkbox(Lang.ReflectAutomation, ref C.ManageGlamourerAutomation);
+            ImGuiEx.HelpMarker(Lang.ReflectAutomationHelp);
             if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
             {
                 if (!C.ManageGlamourerAutomation)
                 {
-                    ImGuiEx.HelpMarker("You MUST enable this setting or disable Glamourer's automation, otherwise either Glamourer's or DynamicBridge's automation will not work correctly.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                    ImGuiEx.HelpMarker(Lang.AutomationWarning, ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
             }
             ImGuiEx.Spacing();
-            ImGui.Checkbox("Revert character before restoring automation", ref C.RevertBeforeAutomationRestore);
+            ImGui.Checkbox(Lang.RevertCharacterBeforeRestoringAutomation, ref C.RevertBeforeAutomationRestore);
             ImGuiEx.Spacing();
-            ImGui.Checkbox("Revert character before applying rule", ref C.RevertGlamourerBeforeApply);
+            ImGui.Checkbox(Lang.RevertCharacterBeforeApplyingRule, ref C.RevertGlamourerBeforeApply);
 
 
             ImGui.Separator();
@@ -137,7 +137,7 @@ public static class GuiSettings
             ImGui.Checkbox("Honorific", ref C.EnableHonorific);
             DrawPluginCheck("Honorific", "1.4.2.0");
             ImGuiEx.Spacing();
-            ImGui.Checkbox($"Allow selecting titles registered for other characters", ref C.HonotificUnfiltered);
+            ImGui.Checkbox(Lang.AllowSelectingTitlesRegisteredForOtherCharacters, ref C.HonotificUnfiltered);
 
             //penumbra
             ImGui.Checkbox("Penumbra", ref C.EnablePenumbra);
@@ -150,7 +150,7 @@ public static class GuiSettings
             ImGuiGroup.EndGroupBox();
         }
 
-        if (ImGuiGroup.BeginGroupBox("About"))
+        if (ImGuiGroup.BeginGroupBox(Lang.About))
         {
             GuiAbout.Draw();
             ImGuiGroup.EndGroupBox();
@@ -167,7 +167,7 @@ public static class GuiSettings
             ImGuiEx.Text(EColor.RedBright, "\uf00d");
             ImGui.PopFont();
             ImGui.SameLine();
-            ImGuiEx.Text($"not installed");
+            ImGuiEx.Text(Lang.NotInstalled);
         }
         else
         {
@@ -177,7 +177,7 @@ public static class GuiSettings
                 ImGuiEx.Text(EColor.RedBright, "\uf00d");
                 ImGui.PopFont();
                 ImGui.SameLine();
-                ImGuiEx.Text($"unsupported version");
+                ImGuiEx.Text(Lang.UnsupportedVersion);
             }
             else
             {

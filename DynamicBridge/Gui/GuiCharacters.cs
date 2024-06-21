@@ -12,13 +12,13 @@ public static class GuiCharacters
     public static void Draw()
     {
         ImGuiEx.SetNextItemFullWidth();
-        ImGui.InputTextWithHint($"##Filter1", "Search character name...", ref Filters[1], 100, Utils.CensorFlags);
+        ImGui.InputTextWithHint($"##Filter1", Lang.SearchCharacterName, ref Filters[1], 100, Utils.CensorFlags);
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
         if (ImGui.BeginTable($"##characters", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedSame))
         {
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Assigned profile", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(Lang.NameColumn, ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn(Lang.AssignedProfile, ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
 
@@ -37,12 +37,12 @@ public static class GuiCharacters
                 ImGuiEx.SetNextItemFullWidth();
                 if (ImGui.BeginCombo($"selProfile", currentProfile?.CensoredName ?? "- No profile -", C.ComboSize))
                 {
-                    if (ImGui.Selectable("- No profile -"))
+                    if (ImGui.Selectable(Lang.NoProfileSelectable))
                     {
                         C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                     }
                     ImGui.SetNextItemWidth(350f);
-                    ImGui.InputTextWithHint($"##selProfileFltr", "Filter...", ref Filters[2], 100, Utils.CensorFlags);
+                    ImGui.InputTextWithHint($"##selProfileFltr", Lang.Filter, ref Filters[2], 100, Utils.CensorFlags);
                     foreach (var profile in C.ProfilesL)
                     {
                         if (Filters[2].Length > 0 && !profile.Name.Contains(Filters[2], StringComparison.OrdinalIgnoreCase)) continue;
@@ -62,7 +62,7 @@ public static class GuiCharacters
                     C.Blacklist.Add(x.Key);
                     C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                 }
-                ImGuiEx.Tooltip($"Blacklist {Censor.Character(x.Value)}. This will prevent it from showing up for profile assignments. This will also undo profile assignments for {Censor.Character(x.Value)}. ");
+                ImGuiEx.Tooltip(Lang.BlacklistCharaTooltip.Params(Censor.Character(x.Value)) );
                 ImGui.SameLine();
 
                 if (ImGuiEx.IconButton(FontAwesomeIcon.Trash, enabled: ImGuiEx.Ctrl))
@@ -70,7 +70,7 @@ public static class GuiCharacters
                     new TickScheduler(() => C.SeenCharacters.Remove(x));
                     C.ProfilesL.Each(z => z.Characters.Remove(x.Key));
                 }
-                ImGuiEx.Tooltip($"Hold CTRL and click to delete information about {x.Value}. This will also undo profile assignment to the character but and as soon as you relog back onto it, {x.Value} will be registered in a plugin again.");
+                ImGuiEx.Tooltip(Lang.DeleteTooltip.Params(x.Value));
 
                 ImGui.PopID();
             }
@@ -91,7 +91,7 @@ public static class GuiCharacters
                     var item = x;
                     new TickScheduler(() => C.Blacklist.Remove(item));
                 }
-                ImGuiEx.Tooltip("Unblacklist this character");
+                ImGuiEx.Tooltip(Lang.UnblacklistThisCharacter);
                 ImGui.PopID();
             }
 

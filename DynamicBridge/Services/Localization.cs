@@ -1,5 +1,4 @@
-﻿using ECommons.EzLocalizationManager;
-using Microsoft.VisualBasic.Logging;
+﻿using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

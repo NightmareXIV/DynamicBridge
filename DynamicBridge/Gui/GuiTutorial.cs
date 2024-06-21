@@ -9,66 +9,10 @@ using static System.Net.Mime.MediaTypeNames;
 namespace DynamicBridge.Gui;
 public static class GuiTutorial
 {
-    static readonly string Content = @"
-Welcome to DynamicBridge plugin!
-This plugin allows you to dynamically change your Glamourer, Customize+ and Honorific presets based on various rules. You can use this plugin for simple means such as switching your appearance manually or you can create very advanced and precise rule sets.
----
-If you have previously used older version of the plugin, your configuration has been converted to use more convenient profile system. In case something went wrong, a backup of your old configuration file has been taken.
-Instead of enforcing per-character profiles, you can now create profiles and assign them to characters. This enables you to use one profile for multiple characters as well as easily changing profiles used for your characters.
----
-+Quick start
-I will describe minimal amount of steps you will need to take to begin using this plugin.
-First, assuming you have never created profiles before, log in to your character, navigate to ""Dynamic Rules"" or ""Presets"" tab and press the ""+"" button:
-image=1
-This will create new profile and associate it with your current character. Now you can create rules and presets to your liking.
-+Rules and Presets
-DynamicBridge constantly monitors your character states and checks rules top to bottom. Once correct rule is found, a random preset among selected ones will be applied to your character and no further rules will be processed. Currently applying rule will be highlighted in green. 
-Preset is a set of Glamourer, Customize+ and Honorific customizations that will be applied to your character. 
-Overview of a header of Rules and Presets section:
-image=2
-
-fai=Plus
-is used to create new, empty dynamic rule or preset and add it to the end of the list. 
-
-fai=FolderPlus
-is used to create new folder in Presets section. Folders are used only to visually separate your presets.
-
-fai=Paste
-is used to paste an existing rule or preset from clipboard, if you have previously copied any.
-
-fai=Tshirt
-is used to reapply rules and presets to your character. You should use it after you have modified your rules or presets if you want these changes to be immediately reflected.
-
-fai=Unlink
-is used to unlink profile from current character. The profile itself is not deleted and can be linked to your character once again. This button is changed to ""Link profile"" when you are editing profile that is not assigned to your current character.
-
-Middle section indicates which profile is currently selected for editing and whether it's linked to your character or not. Click on the middle section to select a profile that you want to edit.
----
-+Dynamic Rules
-You may go to Settings tab to enable extra conditions or disable unused conditions. Please note: the more conditions you have enabled, the more processing time plugin will be taking. The same goes for rules - the more rules you have, the higher processing time is. Fortunately, you will have to go well over few hundreds of rules before you start to notice the effect.
-
-fai=Check
-Indicates whether rule is enabled or not. Disabled rules are completely ignored.
-
-fai=ArrowsUpDownLeftRight
-Grab this button and drag the rule up or down to reorder it.
-
-fai=f103
-Enabling passthrough indicator will prevent rule engine from stopping upon matching with that rule. When 2 or more rules are matching, their presets are applied sequentially one after another.
-
-fai=Copy
-Copy this rule to clipboard for future use. You may save it and share with others.
-+Presets
-You may go to Settings tab to disable plugins that you don't use.
-
-fai=Circle
-Use this button to set preset as static. While preset is set as static, rules and base preset are completely ignored and your appearance will always be set to be according to the preset.
-
-If you choose to set any values in base preset, they will be used when there is no other value in corresponding plugin section.
-";
+    static readonly string Content = Lang.Tutorial;
     public static void Draw()
     {
-        ImGuiEx.CheckboxInverted("Hide tutorial", ref C.ShowTutorial);
+        ImGuiEx.CheckboxInverted(Lang.Draw_HideTutorial, ref C.ShowTutorial);
         var array = Content.ReplaceLineEndings().Split(Environment.NewLine);
         for (int i = 0; i < array.Length; i++)
         {
