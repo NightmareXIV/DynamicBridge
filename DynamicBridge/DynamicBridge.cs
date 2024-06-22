@@ -60,7 +60,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
-        PatreonBanner.IsOfficialPlugin = Utils.IsDisguise;
+        ECommonsMain.IsOfficialPlugin = Utils.IsDisguise;
         new TickScheduler(() =>
         {
             C = EzConfig.Init<Config>();
@@ -167,7 +167,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 var profile = Utils.Profile();
                 if (profile != null)
                 {
-                    profile.Presets.Each(x => x.IsStatic = false);
+                    profile.GetPresetsListUnion().Each(x => x.Each(z => z.IsStatic = false));
                     Notify.Success(Lang.UsingDynamicRulesNow);
                     P.ForceUpdate = true;
                 }

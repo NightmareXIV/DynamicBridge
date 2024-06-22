@@ -394,12 +394,15 @@ namespace DynamicBridge.Gui
                                         ImGui.SameLine();
                                     }
                                     ImGui.PushStyleColor(ImGuiCol.Text, EColor.CyanBright);
-                                    DrawSelector(Lang.CurrentEmote.Params(id, cond.Name.ExtractText())+"##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
+                                    DrawSelector(
+                                        Lang.CurrentEmote
+                                        .Params(cond.RowId, cond.Name.ExtractText().NullWhenEmpty() ?? $"Unnamed")
+                                        +"##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
                                     ImGui.PopStyleColor();
                                     ImGui.Separator();
                                 }
 
-                                foreach (var cond in Svc.Data.GetExcelSheet<Emote>().Where(e => e.Name?.ExtractText().IsNullOrEmpty() == false || e.Icon != 0))
+                                foreach (var cond in Svc.Data.GetExcelSheet<Emote>().Where(e => e.Name?.ExtractText().IsNullOrEmpty() == false || e.Icon != 0 || rule.Emotes.Contains(e.RowId)))
                                 {
                                     var name = cond.Name?.ExtractText() ?? "";
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
@@ -409,7 +412,7 @@ namespace DynamicBridge.Gui
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
                                     }
-                                    DrawSelector($"{name}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
+                                    DrawSelector($"{name.NullWhenEmpty() ?? $"Unnamed/{cond.RowId}"}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
                                 }
                                 ImGui.EndCombo();
                             }

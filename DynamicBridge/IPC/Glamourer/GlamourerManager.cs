@@ -29,6 +29,7 @@ public unsafe class GlamourerManager
     }
 
     private ApplyDesign ApplyDesign = new(Svc.PluginInterface);
+
     public void ApplyByGuid(Guid guid)
     {
         try
@@ -88,6 +89,7 @@ public unsafe class GlamourerManager
         try
         {
             ApplyByGuid(design.Identifier);
+            //Commands.ApplyByGuid(design.Identifier);
         }
         catch (Exception e)
         {
@@ -101,6 +103,7 @@ public unsafe class GlamourerManager
     {
         try
         {
+            //Commands.Revert();
             RevertState.Invoke(0);
         }
         catch (Exception e)
