@@ -384,9 +384,9 @@ namespace DynamicBridge.Gui
                             {
                                 FiltersSelection();
 
-                                if (Player.Available && Player.Object.Character()->EmoteController.EmoteId != 0)
+                                if (Player.Available && Utils.GetAdjustedEmote() != 0)
                                 {
-                                    var id = Player.Object.Character()->EmoteController.EmoteId;
+                                    var id = Utils.GetAdjustedEmote();
                                     var cond = Svc.Data.GetExcelSheet<Emote>().GetRow(id);
                                     if (ThreadLoadImageHandler.TryGetIconTextureWrap(cond.Icon, false, out var texture))
                                     {

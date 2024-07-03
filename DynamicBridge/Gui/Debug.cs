@@ -1,26 +1,9 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using DynamicBridge.Core;
-using DynamicBridge.IPC;
-using DynamicBridge.IPC.Customize;
-using DynamicBridge.IPC.Glamourer;
-using DynamicBridge.IPC.Honorific;
-using DynamicBridge.IPC.Penumbra;
+﻿using DynamicBridge.Core;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using Lumina.Excel.GeneratedSheets;
-using OtterGui.Filesystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Loader;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Action = System.Action;
 
 namespace DynamicBridge.Gui
 {
@@ -36,6 +19,14 @@ namespace DynamicBridge.Gui
 
         public static void Draw()
         {
+            if (ImGui.CollapsingHeader("Emote"))
+            {
+                ImGuiEx.Text($"""
+                    Emote: {Player.Character->EmoteController.EmoteId}
+                    Adjusted: {Utils.GetAdjustedEmote()}
+                    Excel: {Svc.Data.GetExcelSheet<Emote>().GetRow(Utils.GetAdjustedEmote())}
+                    """);
+            }
             if (ImGui.CollapsingHeader("IPC Tester"))
             {
                 if (ImGui.Button("Register AnyException"))
@@ -231,6 +222,7 @@ namespace DynamicBridge.Gui
                     {
                         P.GlamourerManager.ApplyByGuid(d.Identifier);
                     }
+                    ImGuiEx.Text($"    {P.GlamourerManager.Reflector.GetPathForDesignByGuid(d.Identifier)}");
                 }
                 if (ImGui.Button("Revert")) P.GlamourerManager.Revert();
                 ImGuiEx.Text($"Automation state: {P.GlamourerManager.Reflector.GetAutomationGlobalState()}");

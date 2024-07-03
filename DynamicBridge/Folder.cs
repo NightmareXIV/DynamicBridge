@@ -20,21 +20,31 @@ public class Folder
 
     public void AddItem(string[] path, FolderItem item)
     {
+        PluginLog.Information($"Adding with path {path.Print()}");
         if (path.Length == 0)
         {
             Items.Add(item);
         }
         else
         {
+            string[] newPath;
+            if(path.Length >= 1)
+            {
+                newPath = path;
+            }
+            else
+            {
+                newPath = path[1..^1];
+            }
             if(Subfolders.TryGetFirst(x => x.Name == path[0], out var target))
             {
-                target.AddItem(path[0..^1], item);
+                target.AddItem(newPath, item);
             }
             else
             {
                 var newSubfolder = new Folder(path[0], []) { Identifier = path.Join(",") };
                 Subfolders.Add(newSubfolder);
-                newSubfolder.AddItem(path[0..^1], item);
+                newSubfolder.AddItem(newPath, item);
             }
         }
     }

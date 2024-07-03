@@ -259,8 +259,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))
                                 && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentHouseId()))))
                                 &&
-                                (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Player.Character->EmoteController.EmoteId))
-                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Player.Character->EmoteController.EmoteId))))
+                                (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Utils.GetAdjustedEmote()))
+                                && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Utils.GetAdjustedEmote()))))
                                 &&
                                 (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))
                                 && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))))

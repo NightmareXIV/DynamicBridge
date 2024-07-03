@@ -21,6 +21,16 @@ namespace DynamicBridge
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);
         public const float IndentSpacing = 5f;
 
+        public static uint GetAdjustedEmote()
+        {
+            var em = Player.Character->EmoteController.EmoteId;
+            if (Data.EmoteGroups.TryGetFirst(x => x.Contains(em), out var array))
+            {
+                return array[0];
+            }
+            return em;
+        }
+
         public static string[] SplitDirectories(this string path)
         {
             var ret = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
