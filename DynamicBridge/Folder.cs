@@ -18,34 +18,46 @@ public class Folder
         this.Subfolders = subfolders;
     }
 
-    public void AddItem(string[] path, FolderItem item)
+    public void AddItem(string[] path, FolderItem item, int num = 0)
     {
-        PluginLog.Information($"Adding with path {path.Print()}");
-        if (path.Length == 0)
+        try
         {
-            Items.Add(item);
+            num++;
+            if (num >= 50)
+            {
+                throw new InvalidOperationException("Nested path was too long");
+            }
+            PluginLog.Information($"Adding {item} with path {path.Print()}");
+            if (path.Length == 0)
+            {
+                Items.Add(item);
+            }
+            else
+            {
+                string[] newPath;
+                if (path.Length < 1)
+                {
+                    newPath = path;
+                }
+                else
+                {
+                    newPath = path[1..];
+                }
+                if (Subfolders.TryGetFirst(x => x.Name == path[0], out var target))
+                {
+                    target.AddItem(newPath, item, num);
+                }
+                else
+                {
+                    var newSubfolder = new Folder(path[0], []) { Identifier = path.Join(",") };
+                    Subfolders.Add(newSubfolder);
+                    newSubfolder.AddItem(newPath, item, num);
+                }
+            }
         }
-        else
+        catch(Exception e)
         {
-            string[] newPath;
-            if(path.Length >= 1)
-            {
-                newPath = path;
-            }
-            else
-            {
-                newPath = path[1..^1];
-            }
-            if(Subfolders.TryGetFirst(x => x.Name == path[0], out var target))
-            {
-                target.AddItem(newPath, item);
-            }
-            else
-            {
-                var newSubfolder = new Folder(path[0], []) { Identifier = path.Join(",") };
-                Subfolders.Add(newSubfolder);
-                newSubfolder.AddItem(newPath, item);
-            }
+            e.Log();
         }
     }
 
