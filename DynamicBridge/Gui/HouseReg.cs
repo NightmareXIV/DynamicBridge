@@ -1,5 +1,5 @@
 ﻿using Dalamud.Interface.Components;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

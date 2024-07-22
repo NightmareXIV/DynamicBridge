@@ -19,7 +19,7 @@ using ECommons.GameHelpers;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using ECommons.Throttlers;
-using FFXIVClientStructs.FFXIV.Client.Game.Housing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System.IO;
@@ -56,11 +56,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public IpcTester IpcTester;
     public HonorificManager HonorificManager;
 
-    public DynamicBridge(DalamudPluginInterface pi)
+    public DynamicBridge(IDalamudPluginInterface pi)
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
-        ECommonsMain.IsOfficialPlugin = Utils.IsDisguise;
+        PatreonBanner.IsOfficialPlugin = Utils.IsDisguise;
         new TickScheduler(() =>
         {
             C = EzConfig.Init<Config>();
