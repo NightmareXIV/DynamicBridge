@@ -14,8 +14,8 @@ namespace DynamicBridge.IPC.Honorific;
 public class HonorificManager
 {
     [EzIPC] readonly Func<string, uint, TitleData[]> GetCharacterTitleList;
-    [EzIPC] readonly Action<Character> ClearCharacterTitle;
-    [EzIPC] readonly Action<Character, string> SetCharacterTitle;
+    [EzIPC] readonly Action<ICharacter> ClearCharacterTitle;
+    [EzIPC] readonly Action<ICharacter, string> SetCharacterTitle;
 
     public HonorificManager()
     {

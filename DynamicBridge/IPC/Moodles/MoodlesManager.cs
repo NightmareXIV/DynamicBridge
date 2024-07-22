@@ -13,10 +13,10 @@ public class MoodlesManager
 {
     [EzIPC] readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
     [EzIPC] readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
-    [EzIPC] readonly Action<Guid, PlayerCharacter> AddOrUpdateMoodleByGUID;
-    [EzIPC] readonly Action<Guid, PlayerCharacter> ApplyPresetByGUID;
-    [EzIPC] readonly Action<Guid, PlayerCharacter> RemoveMoodleByGUID;
-    [EzIPC] readonly Action<Guid, PlayerCharacter> RemovePresetByGUID;
+    [EzIPC] readonly Action<Guid, IPlayerCharacter> AddOrUpdateMoodleByGUID;
+    [EzIPC] readonly Action<Guid, IPlayerCharacter> ApplyPresetByGUID;
+    [EzIPC] readonly Action<Guid, IPlayerCharacter> RemoveMoodleByGUID;
+    [EzIPC] readonly Action<Guid, IPlayerCharacter> RemovePresetByGUID;
 
     public MoodlesManager()
     {

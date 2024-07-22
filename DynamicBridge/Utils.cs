@@ -197,7 +197,7 @@ namespace DynamicBridge
             for (int i = 0; i < cont->Size; i++)
             {
                 var item = cont->GetInventorySlot(i);
-                ret.Add((uint)(item->ItemID + (item->Flags.HasFlag(InventoryItem.ItemFlags.HQ) ? 1000000 : 0)));
+                ret.Add((uint)(item->ItemId + (item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) ? 1000000 : 0)));
             }
             return ret;
         }
@@ -356,7 +356,7 @@ namespace DynamicBridge
             var ret = new List<uint>();
             for (int i = 0; i < cont->Size; i++)
             {
-                ret.Add(cont->GetInventorySlot(i)->ItemID);
+                ret.Add(cont->GetInventorySlot(i)->ItemId);
             }
             return ret;
         }
@@ -388,10 +388,10 @@ namespace DynamicBridge
             if (Player.Available)
             {
                 var list = new List<GearsetEntry>();
-                foreach (var x in RaptureGearsetModule.Instance()->EntriesSpan)
+                foreach (var x in RaptureGearsetModule.Instance()->Entries)
                 {
-                    if (*x.Name == 0) continue;
-                    list.Add(new(x.ID, MemoryHelper.ReadStringNullTerminated((nint)x.Name), x.ClassJob));
+                    if (x.Name[0] == 0) continue;
+                    list.Add(new(x.Id, GenericHelpers.Read(x.Name), x.ClassJob));
                 }
                 C.GearsetNameCacheCID[Player.CID] = list;
             }
