@@ -38,7 +38,7 @@ public class PenumbraManager
     {
         try
         {
-            return new GetCollectionsByIdentifier(Svc.PluginInterface).Invoke(collectionName).First().Id;
+            return new GetCollectionsByIdentifier(Svc.PluginInterface).Invoke(collectionName).FirstOrDefault().Id;
         }
         catch(Exception e)
         {

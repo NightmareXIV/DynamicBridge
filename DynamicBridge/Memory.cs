@@ -1,20 +1,26 @@
-﻿using ECommons.EzHookManager;
+﻿using Dalamud.Utility.Signatures;
+using ECommons.EzHookManager;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DynamicBridge;
-public class Memory : IDisposable
+public unsafe class Memory : IDisposable
 {
     public delegate nint RaptureGearsetModule_EquipGearsetInternal(nint a1, uint a2, byte a3);
     [EzHook("40 55 53 56 57 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 4C 63 FA", false)]
     public EzHook<RaptureGearsetModule_EquipGearsetInternal> EquipGearsetHook;
 
+    public byte* IsLPInWater;
+
     public Memory()
     {
         EzSignatureHelper.Initialize(this);
+        var addr = Svc.SigScanner.GetStaticAddressFromSig("44 38 35 ?? ?? ?? ?? 74 10");
+        IsLPInWater = (byte*)(addr + 2);
         if(C.UpdateJobGSChange)
         {
             EquipGearsetHook.Enable();

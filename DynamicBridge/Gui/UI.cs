@@ -139,7 +139,7 @@ public unsafe static class UI
 
         void UsedByCurrent()
         {
-            ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("EditNotify", Lang.YouAreEditingProfile1WhichIsUsedBy2.Params(currentCharaProfile.CensoredName, Censor.Character(Player.NameWithWorld)), ProfileSelectable, EColor.GreenDark), () =>
+            ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("EditNotify", Lang.YouAreEditingProfile1WhichIsUsedBy2.Params(Censor.Character(Player.NameWithWorld), currentCharaProfile.CensoredName), ProfileSelectable, EColor.GreenDark), () =>
             {
                 after?.Invoke();
                 if (ImGuiEx.IconButton(FontAwesomeIcon.Unlink, enabled:ImGuiEx.Ctrl))

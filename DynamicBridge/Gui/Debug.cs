@@ -281,9 +281,9 @@ namespace DynamicBridge.Gui
                 }
             }
 
-            ImGuiEx.Text($"In water: {Utils.IsInWater}");
+            ImGuiEx.Text($"In water: {*P.Memory.IsLPInWater}");
 
-            if(ImGui.CollapsingHeader("Query territory IDs"))
+            if (ImGui.CollapsingHeader("Query territory IDs"))
             {
                 ImGuiEx.InputTextMultilineExpanding("##1", ref Input, 100000);
                 List<uint> result = [];
