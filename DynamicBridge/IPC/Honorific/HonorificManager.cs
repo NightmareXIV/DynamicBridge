@@ -14,8 +14,8 @@ namespace DynamicBridge.IPC.Honorific;
 public class HonorificManager
 {
     [EzIPC] readonly Func<string, uint, TitleData[]> GetCharacterTitleList;
-    [EzIPC] readonly Action<ICharacter> ClearCharacterTitle;
-    [EzIPC] readonly Action<ICharacter, string> SetCharacterTitle;
+    [EzIPC] readonly Action<int> ClearCharacterTitle;
+    [EzIPC] readonly Action<int, string> SetCharacterTitle;
 
     public HonorificManager()
     {
@@ -59,14 +59,14 @@ public class HonorificManager
             if (title.IsNullOrEmpty())
             {
                 WasSet = false;
-                ClearCharacterTitle(Player.Object);
+                ClearCharacterTitle(Player.Object.ObjectIndex);
             }
             else
             {
                 WasSet = true;
                 if (GetTitleData(C.HonotificUnfiltered?null:[Player.CID]).TryGetFirst(x => x.Title == title, out var t))
                 {
-                    SetCharacterTitle(Player.Object, JsonConvert.SerializeObject(t));
+                    SetCharacterTitle(Player.Object.ObjectIndex, JsonConvert.SerializeObject(t));
                 }
                 else
                 {
