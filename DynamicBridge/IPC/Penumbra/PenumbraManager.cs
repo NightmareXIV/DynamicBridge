@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace DynamicBridge.IPC.Penumbra;
 public class PenumbraManager
 {
+    bool IsAssignmentSet = false;
     Guid? OldAssignment = null;
 
     public PenumbraManager()
@@ -60,7 +61,11 @@ public class PenumbraManager
             }
             else
             {
-                OldAssignment ??= result.OldCollection?.Id;
+                if(!IsAssignmentSet)
+                {
+                    IsAssignmentSet = true;
+                    OldAssignment ??= result.OldCollection?.Id;
+                }
                 if(result.Item1 == PenumbraApiEc.Success) P.TaskManager.Enqueue(RedrawLocalPlayer);
             }
         }
@@ -72,11 +77,12 @@ public class PenumbraManager
 
     public void UnsetAssignmentIfNeeded()
     {
-        if (OldAssignment == null) return;
+        if (!IsAssignmentSet) return;
         try
         {
             var result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, OldAssignment, true, true);
             OldAssignment = null;
+            IsAssignmentSet = false;
             if (result.Item1 == PenumbraApiEc.Success) P.TaskManager.Enqueue(RedrawLocalPlayer);
         }
         catch(Exception e)

@@ -259,26 +259,7 @@ namespace DynamicBridge.Gui
 
             if(ImGui.CollapsingHeader("C+ reflector"))
             {
-                try
-                {
-                    if (DalamudReflector.TryGetDalamudPlugin("CustomizePlus", out var plugin, false, true) && DalamudReflector.TryGetLocalPlugin(plugin, out var lp, out var lpType))
-                    {
-                        var context = lp.GetFoP("loader").GetFoP<AssemblyLoadContext>("context");
-                        ImGuiEx.Text(context.Assemblies.Select(x => x).Print("\n"));
-                        var profileManager = plugin.GetFoP("_services").Call([plugin.GetType().Assembly], "GetService", ["CustomizePlus.Profiles.ProfileManager"], []);
-                            //ReflectionHelper.CallStatic(context.Assemblies, "Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions",null, "GetRequiredService", ["CustomizePlus.Profiles.ProfileManager"], [plugin.GetFoP("_services")]);
-                        ImGuiEx.TextWrapped(profileManager.GetType().GetMethods().Select(x => x.Name).Print());
-                    }
-                    else
-                    {
-                        ImGuiEx.Text($"Could not find plugin");
-                    }
-                }
-                catch(Exception e)
-                {
-                    e.Log();
-                    ImGuiEx.Text(e.ToString());
-                }
+                
             }
 
             ImGuiEx.Text($"In water: {*P.Memory.IsLPInWater}");
