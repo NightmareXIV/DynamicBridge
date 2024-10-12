@@ -177,6 +177,28 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
             });
         }
+        else if (arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "characterprofile", "chp"))
+        {
+            var name = arguments[(arguments.IndexOf(" ") + 1)..];
+            var profile = C.ProfilesL.FirstOrDefault(p => p.Name == name);
+
+            if (profile != null)
+            {
+                if (C.SeenCharacters.ContainsKey(Player.CID) && !C.Blacklist.Contains(Player.CID))
+                {
+                    profile.SetCharacter(Player.CID);
+
+                }
+                else
+                {
+                    Notify.Error(Lang.NotifyProfileSwapCharacterNotFoundOrBlacklisted);
+                }
+            }
+            else
+            {
+                Notify.Error(Lang.NoticeProfileSwapProfileNotFound.Params(name));
+            }
+        }
         else
         {
             EzConfigGui.Window.IsOpen ^= true;

@@ -1069,6 +1069,24 @@ namespace DynamicBridge.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find profile $..
+        /// </summary>
+        public static string NoticeProfileSwapProfileNotFound {
+            get {
+                return ResourceManager.GetString("NoticeProfileSwapProfileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find valid Character based on your current Player ID..
+        /// </summary>
+        public static string NotifyProfileSwapCharacterNotFoundOrBlacklisted {
+            get {
+                return ResourceManager.GetString("NotifyProfileSwapCharacterNotFoundOrBlacklisted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to $ was made static..
         /// </summary>
         public static string NotifyWasMadeStatic {
