@@ -702,4 +702,10 @@ If you choose to set any values in base preset, they will be used when there is 
   <data name="GearsetFallbackName" xml:space="preserve">
     <value>$ No name found</value>
   </data>
+  <data name="NotifyProfileSwapCharacterNotFoundOrBlacklisted" xml:space="preserve">
+    <value>Could not find valid Character based on your current Player ID.</value>
+  </data>
+  <data name="NoticeProfileSwapProfileNotFound" xml:space="preserve">
+    <value>Could not find profile $.</value>
+  </data>
 </root>
