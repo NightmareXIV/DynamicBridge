@@ -13,7 +13,7 @@ Or automatically put on a winter coat when you're going to a snowy place? With D
 **Note: DynamicBridge enables advanced automation of the plugins listed below:**
 
  - [Glamourer](https://github.com/Ottermandias/Glamourer)
- - [Customize+](https://github.com/XIV-Tools/CustomizePlus/)
+ - [Customize+](https://github.com/Aether-Tools/CustomizePlus)
  - [Honorific](https://github.com/Caraxi/Honorific/)
  - [Palette+ (Deprecated)](https://github.com/chirpxiv/PalettePlus)
 
