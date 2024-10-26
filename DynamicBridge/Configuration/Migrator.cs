@@ -9,7 +9,6 @@ public class Migrator
     public Migrator()
     {
         Svc.Framework.Update += DoGlamourerMigration;
-        Svc.Framework.Update += DoCustomizeMigration;
         Svc.Framework.Update += DoProfileMigration;
     }
 
@@ -93,50 +92,6 @@ public class Migrator
             }
         }
         catch(Exception e)
-        {
-            e.Log();
-        }
-    }
-
-    void DoCustomizeMigration(object a)
-    {
-        if (C.EnableCustomize)
-        {
-            var entries = P.CustomizePlusManager.GetProfiles();
-            if (entries.Any())
-            {
-                PluginLog.Information($"Begin Customize+ name to guid migration");
-                MigrateProfileCustomize(C.GlobalProfile, entries);
-                foreach (var x in C.Profiles)
-                {
-                    MigrateProfileCustomize(x.Value, entries);
-                }
-                PluginLog.Information($"Finished Customize+ name to guid migration");
-                Svc.Framework.Update -= DoCustomizeMigration;
-            }
-        }
-    }
-
-    void MigrateProfileCustomize(Profile p, IEnumerable<CustomizePlusProfile> entries)
-    {
-        try
-        {
-            foreach (var x in p.GetPresetsUnion())
-            {
-                for (int i = 0; i < x.Customize.Count; i++)
-                {
-                    if (!Guid.TryParse(x.Customize[i], out _))
-                    {
-                        if (entries.TryGetFirst(z => z.Name == x.Customize[i], out var value))
-                        {
-                            PluginLog.Information($">> Profile {p.Name}: customize+ changing {x.Customize[i]} -> {value.ID}");
-                            x.Customize[i] = value.ID.ToString();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
         {
             e.Log();
         }

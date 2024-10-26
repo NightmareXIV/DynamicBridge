@@ -566,7 +566,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             DoNullCustomize = false;
             var randomCusProfile = cfiltered[Random.Next(cfiltered.Length)];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
-            TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.Name));
+            TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.NameWithWorld));
         }
     }
 

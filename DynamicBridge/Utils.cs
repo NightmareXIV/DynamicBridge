@@ -124,10 +124,10 @@ namespace DynamicBridge
         public static IEnumerable<string> CustomizeFiltered(this Preset preset)
         {
             var name = Utils.GetCharaNameFromCID(Player.CID);
-            var clist = P.CustomizePlusManager.GetProfiles([Player.Name]);
+            var clist = P.CustomizePlusManager.GetProfiles([Player.NameWithWorld]);
             foreach (var x in preset.Customize)
             {
-                if (clist.Any(h => h.ID.ToString() == x))
+                if (clist.Any(h => h.UniqueId.ToString() == x))
                 {
                     yield return x;
                 }

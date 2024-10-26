@@ -1,5 +1,6 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Honorific;
+using ECommons;
 using ECommons.Configuration;
 using Newtonsoft.Json;
 using System.Data;
@@ -498,23 +499,23 @@ namespace DynamicBridge.Gui
                                 ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
                                 if (ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 FiltersSelection();
-                                var profiles = P.CustomizePlusManager.GetProfiles(isGlobal ? null : currentProfile.Characters.Select(Utils.GetCharaNameFromCID).Select(z => z.Split("@")[0])).OrderBy(x => P.CustomizePlusManager.TransformName($"{x.ID}"));
+                                var profiles = P.CustomizePlusManager.GetProfiles(isGlobal ? null : currentProfile.Characters.Select(Utils.GetCharaNameFromCID)).OrderBy(x => P.CustomizePlusManager.TransformName($"{x.UniqueId}"));
                                 var index = 0;
                                 List<(string[], Action)> items = [];
                                 foreach (var x in profiles)
                                 {
                                     index++;
                                     ImGui.PushID(index);
-                                    var name = P.CustomizePlusManager.TransformName($"{x.ID}");
+                                    var name = P.CustomizePlusManager.TransformName($"{x.UniqueId}");
                                     if (C.GlamourerFullPath && currentProfile.CustomizePathes.Count > 0 && !name.StartsWithAny(currentProfile.CustomizePathes)) continue;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                    if (OnlySelected[filterCnt] && !preset.Customize.Contains($"{x.ID}")) continue;
-                                    var contains = preset.Customize.Contains($"{x.ID}");
+                                    if (OnlySelected[filterCnt] && !preset.Customize.Contains($"{x.UniqueId}")) continue;
+                                    var contains = preset.Customize.Contains($"{x.UniqueId}");
                                     items.Add((name.SplitDirectories()[0..^1], () =>
                                     {
-                                        if (Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ", $"{x.ID}", preset.Customize))
+                                        if (Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ", $"{x.UniqueId}", preset.Customize))
                                         {
-                                            if (C.AutofillFromGlam && preset.Name == "" && preset.Customize.Contains($"{x.ID}")) preset.Name = name;
+                                            if (C.AutofillFromGlam && preset.Name == "" && preset.Customize.Contains($"{x.UniqueId}")) preset.Name = name;
                                         }
                                     }
 
@@ -523,7 +524,7 @@ namespace DynamicBridge.Gui
                                 }
                                 foreach (var x in preset.Customize)
                                 {
-                                    if (profiles.Any(d => d.ID.ToString() == x)) continue;
+                                    if (profiles.Any(d => d.UniqueId.ToString() == x)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
                                     items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}  ", x, preset.Customize, true)));
                                     ImGui.PopStyleColor();

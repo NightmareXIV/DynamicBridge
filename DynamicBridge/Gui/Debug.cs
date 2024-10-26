@@ -249,9 +249,9 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Text($"wasset: {P.CustomizePlusManager.WasSet}");
                 foreach (var d in P.CustomizePlusManager.GetProfiles())
                 {
-                    if (ImGui.Selectable($"{d.Name} / {d.CharacterName} / {d.ID} / {d.IsEnabled}"))
+                    if (ImGui.Selectable($"{d.Name} / {d.Characters.Print()} / {d.UniqueId} / {d.IsEnabled}"))
                     {
-                        P.CustomizePlusManager.SetProfile(d.Name, Player.Name);
+                        P.CustomizePlusManager.SetProfile(d.UniqueId.ToString(), Player.NameWithWorld);
                     }
                 }
                 if (ImGui.Button("Revert c+")) P.CustomizePlusManager.RestoreState();
