@@ -672,8 +672,12 @@ If you choose to set any values in base preset, they will be used when there is 
   <data name="LogNoticeVersionChange" xml:space="preserve">
     <value>Because plugin version was changed, a backup of your current configuraton has been created.</value>
   </data>
-  <data name="CommangHelp" xml:space="preserve">
-    <value>open the plugin settings\n/db apply - reapply rules immediately\n/db static &lt;name&gt; - mark preset as static\n/db dynamic - cancel static preset and use dynamic rules</value>
+  <data name="CommandHelp" xml:space="preserve">
+    <value>open the plugin settings
+/db apply → reapply rules immediately
+/db static &lt;name&gt; → mark preset as static
+/db dynamic → cancel static preset and use dynamic rules
+/db characterprofile &lt;name&gt; → changes profile of currently active character to provided profile</value>
   </data>
   <data name="ChatNoticeGlamourerWarning" xml:space="preserve">
     <value>[DynamicBridge] Glamourer automation is enabled but DynamicBridge is not configured to work together with it. This will cause issues. Either disable Glamourer automation or configure DynamicBridge accordingly (/db - settings).</value>
