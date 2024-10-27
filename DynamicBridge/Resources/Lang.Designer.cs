@@ -268,11 +268,15 @@ namespace DynamicBridge.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to open the plugin settings\n/db apply - reapply rules immediately\n/db static &lt;name&gt; - mark preset as static\n/db dynamic - cancel static preset and use dynamic rules.
+        ///   Looks up a localized string similar to open the plugin settings
+        ////db apply → reapply rules immediately
+        ////db static &lt;name&gt; → mark preset as static
+        ////db dynamic → cancel static preset and use dynamic rules
+        ////db characterprofile &lt;name&gt; → changes profile of currently active character to provided profile.
         /// </summary>
-        public static string CommangHelp {
+        public static string CommandHelp {
             get {
-                return ResourceManager.GetString("CommangHelp", resourceCulture);
+                return ResourceManager.GetString("CommandHelp", resourceCulture);
             }
         }
         

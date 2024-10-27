@@ -83,7 +83,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
             }
             EzConfigGui.Init(UI.DrawMain);
-            EzCmd.Add("/db", OnCommand, Lang.CommangHelp);
+            EzCmd.Add("/db", OnCommand, Lang.CommandHelp);
             AgentMapInst = AgentMap.Instance();
             WeatherManager = new();
             new EzFrameworkUpdate(OnUpdate);
