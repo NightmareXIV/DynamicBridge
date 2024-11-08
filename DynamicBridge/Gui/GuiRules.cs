@@ -161,7 +161,7 @@ namespace DynamicBridge.Gui
                                 InternalLog.Verbose($"Current drag reset!");
                                 CurrentDrag = null;
                             }
-                        }, delegate { DragDrop.AcceptRuleDragDrop(Profile, moveIndex); }
+                        }, delegate { DragDropUtils.AcceptRuleDragDrop(Profile, moveIndex); }
                         ));
 
                         ImGui.SameLine();
@@ -395,14 +395,7 @@ namespace DynamicBridge.Gui
                                         ImGui.SameLine();
                                     }
                                     ImGui.PushStyleColor(ImGuiCol.Text, EColor.CyanBright);
-<<<<<<< HEAD
-                                    DrawSelector(
-                                        Lang.CurrentEmote
-                                        .Params(cond.RowId, cond.Name.ExtractText().NullWhenEmpty() ?? $"Unnamed")
-                                        + "##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
-=======
                                     DrawSelector($"Current: {id}/{cond.Name.ExtractText()}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
->>>>>>> parent of 9aae3bc (Resx part 2)
                                     ImGui.PopStyleColor();
                                     ImGui.Separator();
                                 }

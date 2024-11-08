@@ -1,4 +1,5 @@
-﻿using DynamicBridge.Configuration;
+﻿using Dalamud.Game.Text.SeStringHandling;
+using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Honorific;
 using ECommons.Configuration;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ namespace DynamicBridge.Gui
     {
         private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         private static bool[] OnlySelected = new bool[15];
-        private static string CurrentDrag = null;
+        private static ImGuiEx.RealtimeDragDrop.Complex DragDrop = new("MovePresetItem");
         private static bool Focus = false;
         private static string Open = null;
         public static void DrawUser()
@@ -118,14 +119,20 @@ namespace DynamicBridge.Gui
                 if(ImGuiEx.TreeNode($"Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
                 {
                     newOpen = "";
-                    DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(Profile, result, Profile.Presets);
+                    }
                     DrawPresets(Profile, Profile.Presets, out var postAction, "", false, drawGlobalSection);
                     ImGui.TreePop();
                     postAction?.Invoke();
                 }
                 else
                 {
-                    DragDrop.AcceptFolderDragDrop(Profile, Profile.Presets);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(Profile, result, Profile.Presets);
+                    }
                 }
             }
 
@@ -141,7 +148,10 @@ namespace DynamicBridge.Gui
                 {
                     newOpen = presetFolder.GUID;
                     CollapsingHeaderClicked();
-                    DragDrop.AcceptFolderDragDrop(Profile, presetFolder.Presets, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(Profile, result, presetFolder.Presets);
+                    }
                     DrawPresets(Profile, presetFolder.Presets, out var postAction, presetFolder.GUID, false, drawGlobalSection);
                     ImGui.TreePop();
                     postAction?.Invoke();
@@ -149,7 +159,10 @@ namespace DynamicBridge.Gui
                 else
                 {
                     CollapsingHeaderClicked();
-                    DragDrop.AcceptFolderDragDrop(Profile, presetFolder.Presets);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(Profile, result, presetFolder.Presets);
+                    }
                 }
                 void CollapsingHeaderClicked()
                 {
@@ -237,7 +250,7 @@ namespace DynamicBridge.Gui
             if(C.EnableGlamourer) cnt++;
             if(C.EnablePenumbra) cnt++;
             if(C.EnableMoodles) cnt++;
-            List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
+            DragDrop.Begin();
             ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
             if(ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
             {
@@ -276,14 +289,8 @@ namespace DynamicBridge.Gui
                         ImGui.PushStyleColor(ImGuiCol.Text, preset.IsStatic ? ImGuiColors.DalamudOrange : ImGuiColors.DalamudGrey);
                     }
                     ImGui.TableNextRow();
-                    if(CurrentDrag == preset.GUID)
-                    {
-                        var col = GradientColor.Get(EColor.Green, EColor.Green with { W = EColor.Green.W / 4 }, 500).ToUint();
-                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, col);
-                        ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg1, col);
-                    }
+                    DragDrop.SetRowColor(preset.GUID);
                     ImGui.TableNextColumn();
-
                     //Sorting
                     if(isFallback)
                     {
@@ -292,7 +299,7 @@ namespace DynamicBridge.Gui
                     }
                     else
                     {
-                        var rowPos = ImGui.GetCursorPos();
+                        DragDrop.BeginRow();
                         if(ImGui.RadioButton("##static", preset.IsStatic))
                         {
                             preset.IsStatic = !preset.IsStatic;
@@ -304,35 +311,12 @@ namespace DynamicBridge.Gui
                         }
                         ImGuiEx.Tooltip("Set this preset as static, applying it unconditionally on this character disregarding any rules.");
                         ImGui.SameLine();
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        var cur = ImGui.GetCursorPos();
-                        var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString());
-                        ImGui.Dummy(size);
-                        ImGui.PopFont();
+                        DragDrop.DrawButtonDummy();
                         var moveIndex = i;
-                        MoveCommands.Add((rowPos, cur, delegate
+                        DragDrop.EndRow(preset.GUID, (payload) =>
                         {
-                            ImGui.PushFont(UiBuilder.IconFont);
-                            ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{preset.GUID}");
-                            ImGui.PopFont();
-                            if(ImGui.IsItemHovered())
-                            {
-                                ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
-                            }
-                            if(ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
-                            {
-                                ImGuiDragDrop.SetDragDropPayload("MovePreset", preset.GUID);
-                                CurrentDrag = preset.GUID;
-                                InternalLog.Verbose($"DragDropSource = {preset.GUID}");
-                                ImGui.EndDragDropSource();
-                            }
-                            else if(CurrentDrag == preset.GUID)
-                            {
-                                InternalLog.Verbose($"Current drag reset!");
-                                CurrentDrag = null;
-                            }
-                        }, delegate { DragDrop.AcceptProfileDragDrop(currentProfile, presetList, moveIndex); }
-                        ));
+                            DragDropUtils.AcceptProfileDragDrop(currentProfile, payload, presetList, moveIndex);
+                        });                        
 
                         ImGui.SameLine();
                         if(ImGuiEx.IconButton(FontAwesomeIcon.CaretDown))
@@ -343,13 +327,13 @@ namespace DynamicBridge.Gui
                         {
                             if(ImGui.Selectable("- Main folder -", currentProfile.Presets.Any(x => x.GUID == preset.GUID)))
                             {
-                                DragDrop.MovePresetToList(currentProfile, preset.GUID, currentProfile.Presets);
+                                DragDropUtils.MovePresetToList(currentProfile, preset.GUID, currentProfile.Presets);
                             }
                             foreach(var x in currentProfile.PresetsFolders)
                             {
                                 if(ImGui.Selectable($"{x.Name}##{x.GUID}", x.Presets.Any(x => x.GUID == preset.GUID)))
                                 {
-                                    DragDrop.MovePresetToList(currentProfile, preset.GUID, x.Presets);
+                                    DragDropUtils.MovePresetToList(currentProfile, preset.GUID, x.Presets);
                                 }
                             }
                             ImGui.EndPopup();
@@ -782,18 +766,7 @@ namespace DynamicBridge.Gui
                     ImGui.PopID();
                 }
                 ImGui.EndTable();
-                postAction = () =>
-                {
-                    foreach(var x in MoveCommands)
-                    {
-                        ImGui.SetCursorPos(x.ButtonPos);
-                        x.BeginDraw();
-                        x.AcceptDraw();
-                        ImGui.SetCursorPos(x.RowPos);
-                        ImGui.Dummy(new Vector2(ImGui.GetContentRegionAvail().X, ImGuiHelpers.GetButtonSize(" ").Y));
-                        x.AcceptDraw();
-                    }
-                };
+                postAction = DragDrop.End;
             }
             ImGui.PopStyleVar();
         }
