@@ -29,6 +29,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="CheapLoc" Version="1.1.8" />
         <PackageReference Include="DalamudPackager" Version="2.1.12" />
     </ItemGroup>
 
@@ -234,20 +235,5 @@
     <ItemGroup>
       <Folder Include="images\" />
       <Folder Include="res\tutorial\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Resources\Lang.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Lang.resx</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="Resources\Lang.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>Lang.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
     </ItemGroup>
 </Project>

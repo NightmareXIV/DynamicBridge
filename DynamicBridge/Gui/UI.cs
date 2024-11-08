@@ -20,19 +20,19 @@ public unsafe static class UI
 
     public static Profile SelectedProfile = null;
     public static Profile Profile => SelectedProfile ?? Utils.GetProfileByCID(Player.CID);
-    public static string RandomNotice = Lang.WillBeRandomlySelectedBetween;
-    public static string AnyNotice = Lang.MeetingAnyOfTheFollowingConditionsWillResultInRuleBeingTriggeredN;
+    public const string RandomNotice = "Will be randomly selected between:\n";
+    public const string AnyNotice = "Meeting any of the following conditions will result in rule being triggered:\n";
     static string PSelFilter = "";
     public static string RequestTab = null;
 
     public static void DrawMain()
     {
         var resolution = "";
-        if (Player.CID == 0) resolution = Lang.NotLoggedIn;
-        else if (C.Blacklist.Contains(Player.CID)) resolution = Lang.CharacterBlacklisted;
-        else if (Utils.GetProfileByCID(Player.CID) == null) resolution = Lang.NoAssociatedProfile;
-        else resolution = Lang.ProfileTitle.Params(Utils.GetProfileByCID(Player.CID).CensoredName);
-        if (!C.Enable && Environment.TickCount64 % 2000 > 1000) resolution = Lang.PLUGINDISABLEDBYSETTINGS;
+        if (Player.CID == 0) resolution = "Not logged in";
+        else if (C.Blacklist.Contains(Player.CID)) resolution = "Character blacklisted";
+        else if (Utils.GetProfileByCID(Player.CID) == null) resolution = "No associated profile";
+        else resolution = $"Profile {Utils.GetProfileByCID(Player.CID).CensoredName}";
+        if (!C.Enable && Environment.TickCount64 % 2000 > 1000) resolution = "PLUGIN DISABLED BY SETTINGS";
         EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} v{P.GetType().Assembly.GetName().Version} [{resolution}]###{DalamudReflector.GetPluginName()}";
         if (ImGui.IsWindowAppearing())
         {
@@ -43,15 +43,15 @@ public unsafe static class UI
         PatreonBanner.DrawRight();
         ImGuiEx.EzTabBar("TabsNR2", PatreonBanner.Text, RequestTab, ImGuiTabBarFlags.Reorderable, [
             //("Settings", Settings, null, true),
-            (C.ShowTutorial?Lang.TabTutorial:null, GuiTutorial.Draw, null, true),
-            (Lang.TabDynamicRules, GuiRules.Draw, Colors.TabGreen, true),
-            (Lang.TabPresets, GuiPresets.DrawUser, Colors.TabGreen, true),
-            (Lang.TabGlobalPresets, GuiPresets.DrawGlobal, Colors.TabYellow, true),
-            (Lang.LayeredDesigns, ComplexGlamourer.Draw, Colors.TabPurple, true),
-            (Lang.TabHouseRegistration, HouseReg.Draw, Colors.TabPurple, true),
-            (Lang.TabProfiles, GuiProfiles.Draw, Colors.TabBlue, true),
-            (Lang.TabCharacters, GuiCharacters.Draw, Colors.TabBlue, true),
-            (Lang.TabSettings, GuiSettings.Draw, null, true),
+            (C.ShowTutorial?"Tutorial":null, GuiTutorial.Draw, null, true),
+            ("Dynamic Rules", GuiRules.Draw, Colors.TabGreen, true),
+            ("Presets", GuiPresets.DrawUser, Colors.TabGreen, true),
+            ("Global Presets", GuiPresets.DrawGlobal, Colors.TabYellow, true),
+            ("Layered Designs", ComplexGlamourer.Draw, Colors.TabPurple, true),
+            ("House Registration", HouseReg.Draw, Colors.TabPurple, true),
+            ("Profiles", GuiProfiles.Draw, Colors.TabBlue, true),
+            ("Characters", GuiCharacters.Draw, Colors.TabBlue, true),
+            ("Settings", GuiSettings.Draw, null, true),
             InternalLog.ImGuiTab(),
             (C.Debug?"Debug":null, Debug.Draw, ImGuiColors.DalamudGrey3, true),
             ]);
@@ -71,19 +71,19 @@ public unsafe static class UI
             {
                 if (C.Blacklist.Contains(Player.CID))
                 {
-                    ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("blisted", Lang.BlacklistedCharacter.Params(Censor.Character(Player.NameWithWorld)), ProfileSelectable), () =>
+                    ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("blisted", $"\"{Censor.Character(Player.NameWithWorld)}\" is blacklisted. Select another profile to edit it.", ProfileSelectable), () =>
                     {
                         after?.Invoke();
                         if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowCircleUp))
                         {
                             C.Blacklist.Remove(Player.CID);
                         }
-                        ImGuiEx.Tooltip(Lang.UnblacklistThisCharacter);
+                        ImGuiEx.Tooltip("Unblacklist this character.");
                     });
                 }
                 else if (Player.CID != 0)
                 {
-                    ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("noprofile", Lang.CharaNoAssociation.Params(Censor.Character(Player.NameWithWorld)), ProfileSelectable), () =>
+                    ImGuiEx.InputWithRightButtonsArea(() => Utils.BannerCombo("noprofile", $"\"{Censor.Character(Player.NameWithWorld)}\" has no associated profile. Select other profile to edit or associate profile in Characters tab.", ProfileSelectable), () =>
                     {
                         after?.Invoke();
                         if (ImGuiEx.IconButton(FontAwesomeIcon.PlusCircle))
