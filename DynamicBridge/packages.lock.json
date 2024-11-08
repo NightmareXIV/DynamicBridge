@@ -2,21 +2,11 @@
   "version": 1,
   "dependencies": {
     "net8.0-windows7.0": {
-      "CheapLoc": {
-        "type": "Direct",
-        "requested": "[1.1.8, )",
-        "resolved": "1.1.8",
-        "contentHash": "b6p8ct7RuSspsNB8kOSCNDv7l7PsDrdaxrbtLcC5PfWK5hquRenFugV/yHhfhd2rH4B28+TaBqVxi8qCfvtQZg==",
-        "dependencies": {
-          "Mono.Cecil": "0.11.3",
-          "Newtonsoft.Json": "12.0.2"
-        }
-      },
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[2.1.12, )",
-        "resolved": "2.1.12",
-        "contentHash": "Sc0PVxvgg4NQjcI8n10/VfUQBAS4O+Fw2pZrAqBdRMbthYGeogzu5+xmIGCGmsEZ/ukMOBuAqiNiB5qA3MRalg=="
+        "requested": "[2.1.13, )",
+        "resolved": "2.1.13",
+        "contentHash": "rMN1omGe8536f4xLMvx9NwfvpAc9YFFfeXJ1t4P4PE6Gu8WCIoFliR1sh07hM+bfODmesk/dvMbji7vNI+B/pQ=="
       },
       "JetBrains.Annotations": {
         "type": "Transitive",
@@ -35,16 +25,6 @@
         "type": "Transitive",
         "resolved": "8.0.0",
         "contentHash": "cjWrLkJXK0rs4zofsK4bSdg+jhDLTaxrkXu4gS6Y7MAlCvRyNNgwY/lJi5RDlQOnSZweHqoyvgvbdvQsRIW+hg=="
-      },
-      "Mono.Cecil": {
-        "type": "Transitive",
-        "resolved": "0.11.3",
-        "contentHash": "DNYE+io5XfEE8+E+5padThTPHJARJHbz1mhbhMPNrrWGKVKKqj/KEeLvbawAmbIcT73NuxLV7itHZaYCZcVWGg=="
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "12.0.2",
-        "contentHash": "rTK0s2EKlfHsQsH6Yx2smvcTCeyoDNgCW7FEYyV01drPlh2T243PR2DiDXqtC5N4GDm4Ma/lkxfW5a/4793vbA=="
       },
       "ecommons": {
         "type": "Project"

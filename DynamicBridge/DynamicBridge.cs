@@ -189,12 +189,12 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     }
                     else
                     {
-                        Notify.Error(Lang.NotifyProfileSwapCharacterNotFoundOrBlacklisted);
+                        Notify.Error("Could not find valid Character based on your current Player ID.");
                     }
                 }
                 else
                 {
-                    Notify.Error(Lang.NoticeProfileSwapProfileNotFound.Params(name));
+                    Notify.Error($"Could not find profile {name}.");
                 }
             });
         }
