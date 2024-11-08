@@ -50,7 +50,7 @@ public static class GuiProfiles
                     }
                     else
                     {
-                        Notify.Error(Lang.CouldNotImportFromClipboard);
+                        Notify.Error($Lang.CouldNotImportFromClipboard);
                     }
                 }
                 catch(Exception e)

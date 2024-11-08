@@ -73,7 +73,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         arch.CreateEntryFromFile(EzConfig.DefaultConfigurationFileName, EzConfig.DefaultSerializationFactory.DefaultConfigFileName);
                     }
                     C.LastVersion = ver;
-                    DuoLog.Information(Lang.LogNoticeVersionChange);
+                    DuoLog.Information($"Because plugin version was changed, a backup of your current configuraton has been created.");
                 }
                 catch(Exception e)
                 {
@@ -81,7 +81,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
             }
             EzConfigGui.Init(UI.DrawMain);
-            EzCmd.Add("/db", OnCommand, Lang.CommandHelp);
+            EzCmd.Add("/db", OnCommand, "open the plugin settings\n/db apply - reapply rules immediately\n/db static <name> - mark preset as static\n/db dynamic - cancel static preset and use dynamic rules");
             AgentMapInst = AgentMap.Instance();
             WeatherManager = new();
             new EzFrameworkUpdate(OnUpdate);
@@ -118,7 +118,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
                 else
                 {
-                    ChatPrinter.Orange(Lang.ChatNoticeGlamourerWarning);
+                    ChatPrinter.Orange("[DynamicBridge] Glamourer automation is enabled but DynamicBridge is not configured to work together with it. This will cause issues. Either disable Glamourer automation or configure DynamicBridge accordingly (/db - settings).");
                 }
             }
         }
@@ -149,12 +149,12 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 {
                     profile.GetPresetsUnion().Each(x => x.IsStatic = false);
                     p.IsStatic = true;
-                    Notify.Success(Lang.NotifyWasMadeStatic.Params(name));
+                    Notify.Success($"{name} was made static.");
                     P.ForceUpdate = true;
                 }
                 else
                 {
-                    Notify.Error(Lang.NoticeNotFound.Params(name));
+                    Notify.Error($"Could not find preset {name}.");
                 }
             });
         }
@@ -165,13 +165,13 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 var profile = Utils.Profile();
                 if (profile != null)
                 {
-                    profile.GetPresetsListUnion().Each(x => x.Each(z => z.IsStatic = false));
-                    Notify.Success(Lang.UsingDynamicRulesNow);
+                    profile.Presets.Each(x => x.IsStatic = false);
+                    Notify.Success($"Using dynamic rules now.");
                     P.ForceUpdate = true;
                 }
                 else
                 {
-                    Notify.Error(Lang.NoticeCharacterBlacklistedOrNotLoggedIn);
+                    Notify.Error($"Character blacklisted or not logged in.");
                 }
             });
         }

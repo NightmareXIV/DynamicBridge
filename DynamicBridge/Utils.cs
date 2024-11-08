@@ -177,7 +177,7 @@ namespace DynamicBridge
         public static string GetCharaNameFromCID(ulong CID)
         {
             if(C.SeenCharacters.TryGetValue(CID, out var name)) return name;
-            return Lang.UnknownCharacter.Params($"{CID:X16}");
+            return $"Unknown character {CID:X16}";
         }
 
         public static void SetCharacter(this Profile profile, ulong player)
@@ -343,10 +343,10 @@ namespace DynamicBridge
             FullList = list.Select(x => x.ToString()).Join("\n");
             if (notList.Length > 0)
             {
-                FullList += $"\n{Lang.MeetingAnyOfTheseConditionWillMakeRuleInvalid}\n";
+                FullList += "\nMeeting any of these condition will make rule invalid:\n";
                 FullList += notList.Select(x => x.ToString()).Join("\n");
             }
-            return Lang.NotListSelected.Params(list.Length, notList.Length);
+            return $"{list.Length} | {notList.Length} selected";
         }
 
         public static List<uint> GetArmor()
@@ -408,7 +408,7 @@ namespace DynamicBridge
                 }
                 else
                 {
-                    yield return Lang.GearsetFallbackName.Params(gearsetIDs[i]);
+                    yield return $"{gearsetIDs[i]} No name found";
                 }
             }
         }

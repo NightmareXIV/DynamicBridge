@@ -12,14 +12,14 @@ namespace DynamicBridge.Gui
     {
         public static void Draw()
         {
-            ImGuiEx.TextWrapped(Lang.HouseRegHelp);
+            ImGuiEx.TextWrapped($"Here you can register a house. After registration, you will be able to select it as a condition in Dynamic Rules tab.");
             var CurrentHouse = HousingManager.Instance()->GetCurrentHouseId();
             if (CurrentHouse > 0)
             {
-                ImGuiEx.Text(Lang.HouseReg_Draw_CurrentHouse.Params(Censor.Hide($"{CurrentHouse:X16}")));
+                ImGuiEx.Text($"Current house: {Censor.Hide($"{CurrentHouse:X16}")}");
                 if (!C.Houses.TryGetFirst(x => x.ID == CurrentHouse, out var record))
                 {
-                    if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Home, Lang.HouseReg_Draw_RegisterThisHouse))
+                    if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Home, "Register this house"))
                     {
                         C.Houses.Add(new() { ID = CurrentHouse, Name = Utils.GetHouseDefaultName() });
                     }
@@ -27,12 +27,12 @@ namespace DynamicBridge.Gui
             }
             else
             {
-                ImGuiEx.Text(Lang.HouseReg_Draw_YouAreNotInHouse);
+                ImGuiEx.Text($"You are not in house");
             }
             if (ImGui.BeginTable("##houses", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
             {
-                ImGui.TableSetupColumn(Lang.NameColumn, ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableSetupColumn(Lang.IDColumn);
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                ImGui.TableSetupColumn("ID");
                 ImGui.TableSetupColumn(" ");
                 ImGui.TableHeadersRow();
                 foreach (var x in C.Houses)
@@ -55,7 +55,7 @@ namespace DynamicBridge.Gui
                     {
                         new TickScheduler(() => C.Houses.RemoveAll(z => z.GUID == x.GUID));
                     }
-                    ImGuiEx.Tooltip(Lang.HoldCTRLClickToDelete);
+                    ImGuiEx.Tooltip($"Hold CTRL+Click to delete");
 
                     if (col) ImGui.PopStyleColor();
                     ImGui.PopID();

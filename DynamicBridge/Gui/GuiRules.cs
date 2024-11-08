@@ -38,9 +38,9 @@ namespace DynamicBridge.Gui
                     {
                         Profile.Rules.Add(new());
                     }
-                    ImGuiEx.Tooltip(Lang.AddNewRule);
+                    ImGuiEx.Tooltip("Add new rule");
                     ImGui.SameLine();
-                    if (ImGuiEx.IconButton(FontAwesomeIcon.Paste, Lang.PasteRuleFromClipboard))
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Paste, "Paste rule from Clipboard"))
                     {
                         try
                         {
@@ -48,12 +48,12 @@ namespace DynamicBridge.Gui
                         }
                         catch (Exception e)
                         {
-                            Notify.Error(Lang.FailedToPasteFromClipboardN + e.Message);
+                            Notify.Error("Failed to paste from clipboard:\n" + e.Message);
                         }
                     }
                     if (Profile.IsStaticExists())
                     {
-                        ImGuiEx.HelpMarker(Lang.PresetIsSelectedAsStaticAutomationDisabled.Params(Profile.GetStaticPreset()?.CensoredName), GradientColor.Get(EColor.RedBright, EColor.YellowBright, 1000), FontAwesomeIcon.ExclamationTriangle.ToIconString());
+                        ImGuiEx.HelpMarker($"Preset {Profile.GetStaticPreset()?.CensoredName} is selected as static. Automation disabled.", GradientColor.Get(EColor.RedBright, EColor.YellowBright, 1000), FontAwesomeIcon.ExclamationTriangle.ToIconString());
                     }
                     ImGui.SameLine();
                 }
@@ -85,18 +85,18 @@ namespace DynamicBridge.Gui
                 if (ImGui.BeginTable("##main", 3 + active.Count(x => x), ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
                 {
                     ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
-                    if(C.Cond_State) ImGui.TableSetupColumn(Lang.RuleState);
-                    if (C.Cond_Biome) ImGui.TableSetupColumn(Lang.RuleBiome);
-                    if (C.Cond_Weather) ImGui.TableSetupColumn(Lang.RuleWeather);
-                    if (C.Cond_Time) ImGui.TableSetupColumn(Lang.RuleTime);
-                    if (C.Cond_ZoneGroup) ImGui.TableSetupColumn(Lang.RuleZoneGroup);
-                    if (C.Cond_Zone) ImGui.TableSetupColumn(Lang.RuleZone);
-                    if (C.Cond_House) ImGui.TableSetupColumn(Lang.RuleHouse);
-                    if (C.Cond_Emote) ImGui.TableSetupColumn(Lang.RuleEmote);
-                    if (C.Cond_Job) ImGui.TableSetupColumn(Lang.RuleJob);
-                    if (C.Cond_World) ImGui.TableSetupColumn(Lang.RuleWorld);
-                    if (C.Cond_Gearset) ImGui.TableSetupColumn(Lang.RuleGearset);
-                    ImGui.TableSetupColumn(Lang.RulePreset);
+                    if(C.Cond_State) ImGui.TableSetupColumn("State");
+                    if (C.Cond_Biome) ImGui.TableSetupColumn("Biome");
+                    if (C.Cond_Weather) ImGui.TableSetupColumn("Weather");
+                    if (C.Cond_Time) ImGui.TableSetupColumn("Time");
+                    if (C.Cond_ZoneGroup) ImGui.TableSetupColumn("Zone Group");
+                    if (C.Cond_Zone) ImGui.TableSetupColumn("Zone");
+                    if (C.Cond_House) ImGui.TableSetupColumn("House");
+                    if (C.Cond_Emote) ImGui.TableSetupColumn("Emote");
+                    if (C.Cond_Job) ImGui.TableSetupColumn("Job");
+                    if (C.Cond_World) ImGui.TableSetupColumn("World");
+                    if (C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
+                    ImGui.TableSetupColumn("Preset");
                     ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                     ImGui.TableHeadersRow();
 
@@ -107,8 +107,8 @@ namespace DynamicBridge.Gui
                         {
                             ImGui.SetWindowFontScale(0.8f);
                             ImGuiEx.SetNextItemFullWidth();
-                            ImGui.InputTextWithHint($"##fltr{filterCnt}", Lang.Filter, ref Filters[filterCnt], 50);
-                            ImGui.Checkbox(Lang.OnlySelected + "##{filterCnt}", ref OnlySelected[filterCnt]);
+                            ImGui.InputTextWithHint($"##fltr{filterCnt}", "Filter...", ref Filters[filterCnt], 50);
+                            ImGui.Checkbox($"Only selected##{filterCnt}", ref OnlySelected[filterCnt]);
                             ImGui.SetWindowFontScale(1f);
                             ImGui.Separator();
                         }
@@ -130,7 +130,7 @@ namespace DynamicBridge.Gui
                         //Sorting
                         var rowPos = ImGui.GetCursorPos();
                         ImGui.Checkbox("##enable", ref rule.Enabled);
-                        ImGuiEx.Tooltip(Lang.EnableThisRule);
+                        ImGuiEx.Tooltip("Enable this rule");
 
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
@@ -167,7 +167,7 @@ namespace DynamicBridge.Gui
                         ImGui.PushFont(UiBuilder.IconFont);
                         ImGuiEx.ButtonCheckbox("\uf103", ref rule.Passthrough);
                         ImGui.PopFont();
-                        ImGuiEx.Tooltip(Lang.PassthroughTooltip);
+                        ImGuiEx.Tooltip("Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially.");
 
 
                         if(C.Cond_State)
@@ -307,7 +307,7 @@ namespace DynamicBridge.Gui
                             {
                                 if (C.AllowNegativeConditions)
                                 {
-                                    if (ImGui.Selectable(Lang.OpenAllowListEditor))
+                                    if (ImGui.Selectable("Open allow list editor"))
                                     {
                                         new TerritorySelector(rule.Territories, (terr, s) =>
                                         {
@@ -316,10 +316,10 @@ namespace DynamicBridge.Gui
                                         })
                                         {
                                             ActionDrawPlaceName = DrawPlaceName,
-                                            WindowName = Lang.SelectAllowListZones
+                                            WindowName = $"Select allow list zones"
                                         };
                                     }
-                                    if (ImGui.Selectable(Lang.OpenDenyListEditor))
+                                    if (ImGui.Selectable("Open deny list editor"))
                                     {
                                         new TerritorySelector(rule.Territories, (terr, s) =>
                                         {
@@ -328,7 +328,7 @@ namespace DynamicBridge.Gui
                                         })
                                         {
                                             ActionDrawPlaceName = DrawPlaceName,
-                                            WindowName = Lang.SelectDenyListZones
+                                            WindowName = $"Select deny list zones"
                                         };
                                     }
                                 }
@@ -394,10 +394,7 @@ namespace DynamicBridge.Gui
                                         ImGui.SameLine();
                                     }
                                     ImGui.PushStyleColor(ImGuiCol.Text, EColor.CyanBright);
-                                    DrawSelector(
-                                        Lang.CurrentEmote
-                                        .Params(cond.RowId, cond.Name.ExtractText().NullWhenEmpty() ?? $"Unnamed")
-                                        +"##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
+                                    DrawSelector($"Current: {id}/{cond.Name.ExtractText()}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
                                     ImGui.PopStyleColor();
                                     ImGui.Separator();
                                 }
@@ -557,7 +554,7 @@ namespace DynamicBridge.Gui
                         {
                             new TickScheduler(() => Profile.Rules.RemoveAll(x => x.GUID == rule.GUID));
                         }
-                        ImGuiEx.Tooltip(Lang.HoldCTRLClickToDelete);
+                        ImGuiEx.Tooltip("Hold CTRL+Click to delete");
 
                         if (col) ImGui.PopStyleColor();
                         if (col2) ImGui.PopStyleColor();
@@ -638,7 +635,7 @@ namespace DynamicBridge.Gui
             }
             if (s == -1)
             {
-                ImGuiEx.Tooltip(Lang.DenyConditionsTooltip);
+                ImGuiEx.Tooltip($"If matching any condition with cross, rule will not be applied.");
             }
         }
     }
