@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DynamicBridge.Core;
-public unsafe static class ETimeChecker
+public static unsafe class ETimeChecker
 {
     internal static long* ET = &CSFramework.Instance()->ClientTime.EorzeaTime;
 
-    public readonly static Dictionary<ETime, string> Names = new()
+    public static readonly Dictionary<ETime, string> Names = new()
     {
         [ETime.Day] = "12pm - 5pm",
         [ETime.Night] = "10pm - 5am",
@@ -25,12 +25,12 @@ public unsafe static class ETimeChecker
     public static ETime GetTimeInterval(long time)
     {
         var date = DateTimeOffset.FromUnixTimeSeconds(time);
-        if (date.Hour < 5) return ETime.Night;
-        if (date.Hour < 7) return ETime.Dawn;
-        if (date.Hour < 12) return ETime.Morning;
-        if (date.Hour < 17) return ETime.Day;
-        if (date.Hour < 19) return ETime.Dusk;
-        if (date.Hour < 22) return ETime.Evening;
+        if(date.Hour < 5) return ETime.Night;
+        if(date.Hour < 7) return ETime.Dawn;
+        if(date.Hour < 12) return ETime.Morning;
+        if(date.Hour < 17) return ETime.Day;
+        if(date.Hour < 19) return ETime.Dusk;
+        if(date.Hour < 22) return ETime.Evening;
         return ETime.Night;
     }
 }

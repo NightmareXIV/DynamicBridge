@@ -15,31 +15,31 @@ public class PathInfo : IEquatable<PathInfo>
 
     public PathInfo(string name)
     {
-        this.Name = name;
-        this.Indentation = 0;
+        Name = name;
+        Indentation = 0;
     }
 
     public PathInfo(string name, int indentation)
     {
-        this.Name = name ?? throw new ArgumentNullException(nameof(name));
-        this.Indentation = indentation;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Indentation = indentation;
     }
 
     public override bool Equals(object obj)
     {
-        return this.Equals(obj as PathInfo);
+        return Equals(obj as PathInfo);
     }
 
     public bool Equals(PathInfo other)
     {
         return other is not null &&
-               this.Name == other.Name &&
-               this.Indentation == other.Indentation;
+               Name == other.Name &&
+               Indentation == other.Indentation;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(this.Name, this.Indentation);
+        return HashCode.Combine(Name, Indentation);
     }
 
     public static bool operator ==(PathInfo left, PathInfo right)

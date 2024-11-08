@@ -15,7 +15,7 @@ namespace DynamicBridge.Configuration
         public List<HousingRecord> Houses = [];
         public List<ComplexGlamourerEntry> ComplexGlamourerEntries = [];
         public Profile GlobalProfile = new() { Name = "Global profile" };
-        [Obsolete]public Dictionary<ulong, Profile> Profiles = [];
+        [Obsolete] public Dictionary<ulong, Profile> Profiles = [];
         public List<Profile> ProfilesL = [];
         public bool Debug = false;
         public bool EnableGlamourer = true;

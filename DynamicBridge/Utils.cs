@@ -12,7 +12,7 @@ using Action = System.Action;
 
 namespace DynamicBridge
 {
-    public unsafe static class Utils
+    public static unsafe class Utils
     {
         public const string IconWarning = "\uf071";
         public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
@@ -24,7 +24,7 @@ namespace DynamicBridge
         public static uint GetAdjustedEmote()
         {
             var em = Player.Character->EmoteController.EmoteId;
-            if (Data.EmoteGroups.TryGetFirst(x => x.Contains(em), out var array))
+            if(Data.EmoteGroups.TryGetFirst(x => x.Contains(em), out var array))
             {
                 return array[0];
             }
@@ -34,7 +34,7 @@ namespace DynamicBridge
         public static string[] SplitDirectories(this string path)
         {
             var ret = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (ret.Length == 0) return [""];
+            if(ret.Length == 0) return [""];
             return ret;
         }
 
@@ -50,23 +50,23 @@ namespace DynamicBridge
 
         public static bool CollectionSelectable<T>(Vector4? color, string label, T value, ICollection<T> collection, bool delayedOperation = false)
         {
-            bool Draw(ref bool x) => ImGuiEx.Selectable(color ?? ImGuiEx.Vector4FromRGB(0xDDDDDD), label, ref x, collection.Contains(value)? ImGuiTreeNodeFlags.Bullet: ImGuiTreeNodeFlags.Leaf);
+            bool Draw(ref bool x) => ImGuiEx.Selectable(color ?? ImGuiEx.Vector4FromRGB(0xDDDDDD), label, ref x, collection.Contains(value) ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf);
             return ImGuiEx.CollectionCore(Draw, value, collection, false, delayedOperation);
         }
 
         public static Job GetUpgradedJobIfNeeded(this Job current)
         {
-            if (C.UnifyJobs) return current.GetUpgradedJob();
+            if(C.UnifyJobs) return current.GetUpgradedJob();
             return current;
         }
 
         public static List<string> TrimPathes(IEnumerable<string> origPathes)
         {
             var pathes = new List<string>();
-            foreach (var path in origPathes)
+            foreach(var path in origPathes)
             {
                 var nameParts = path.Split('/');
-                if (nameParts.Length > 1)
+                if(nameParts.Length > 1)
                 {
                     var pathParts = nameParts[..^1];
                     pathes.Add(pathParts.Join("/"));
@@ -82,19 +82,19 @@ namespace DynamicBridge
             {
                 var pathes = Utils.TrimPathes(rawPathes);
                 pathes.Sort();
-                foreach (var x in pathes)
+                foreach(var x in pathes)
                 {
                     var parts = x.Split('/');
-                    if (parts.Length == 0) continue;
-                    for (int i = 1; i <= parts.Length; i++)
+                    if(parts.Length == 0) continue;
+                    for(var i = 1; i <= parts.Length; i++)
                     {
                         var part = parts[..i].Join("/");
                         var info = new PathInfo(part, i - 1);
-                        if (!ret.Contains(info)) ret.Add(info);
+                        if(!ret.Contains(info)) ret.Add(info);
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.LogInternal();
             }
@@ -111,10 +111,10 @@ namespace DynamicBridge
         public static IEnumerable<string> HonorificFiltered(this Preset preset)
         {
             var name = Utils.GetCharaNameFromCID(Player.CID);
-            var hlist = P.HonorificManager.GetTitleData(C.HonotificUnfiltered?null:[Player.CID]);
-            foreach (var x in preset.Honorific)
+            var hlist = P.HonorificManager.GetTitleData(C.HonotificUnfiltered ? null : [Player.CID]);
+            foreach(var x in preset.Honorific)
             {
-                if (hlist.Any(h => h.Title == x))
+                if(hlist.Any(h => h.Title == x))
                 {
                     yield return x;
                 }
@@ -125,9 +125,9 @@ namespace DynamicBridge
         {
             var name = Utils.GetCharaNameFromCID(Player.CID);
             var clist = P.CustomizePlusManager.GetProfiles([Player.NameWithWorld]);
-            foreach (var x in preset.Customize)
+            foreach(var x in preset.Customize)
             {
-                if (clist.Any(h => h.UniqueId.ToString() == x))
+                if(clist.Any(h => h.UniqueId.ToString() == x))
                 {
                     yield return x;
                 }
@@ -136,14 +136,14 @@ namespace DynamicBridge
 
         public static void Banner(string id, IEnumerable<string> text, Vector4? colBg = null, Vector4? colText = null)
         {
-            if (ImGui.BeginTable($"##TableBanner{id}", 1, ImGuiTableFlags.SizingStretchSame | ImGuiTableFlags.Borders))
+            if(ImGui.BeginTable($"##TableBanner{id}", 1, ImGuiTableFlags.SizingStretchSame | ImGuiTableFlags.Borders))
             {
                 ImGui.TableHeader($"##header");
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, (colBg ?? ImGuiEx.Vector4FromRGBA(0x222222aa)).ToUint());
                 var i = 0;
-                foreach (var t in text)
+                foreach(var t in text)
                 {
                     ImGuiEx.LineCentered($"Banner{id}-{i++}", () => ImGuiEx.Text(colText ?? ImGuiColors.DalamudWhite, t));
                 }
@@ -161,15 +161,15 @@ namespace DynamicBridge
             }
 
             var ret = ImGui.BeginCombo($"##{id}", text, C.ComboSize);
-            if (ret)
+            if(ret)
             {
-                if (colBg != null) ImGui.PopStyleColor(3);
+                if(colBg != null) ImGui.PopStyleColor(3);
                 draw();
                 ImGui.EndCombo();
             }
             else
             {
-                if (colBg != null) ImGui.PopStyleColor(3);
+                if(colBg != null) ImGui.PopStyleColor(3);
             }
             return ret;
         }
@@ -194,22 +194,22 @@ namespace DynamicBridge
             var ret = new List<uint>();
             var im = InventoryManager.Instance();
             var cont = im->GetInventoryContainer(InventoryType.EquippedItems);
-            for (int i = 0; i < cont->Size; i++)
+            for(var i = 0; i < cont->Size; i++)
             {
                 var item = cont->GetInventorySlot(i);
                 ret.Add((uint)(item->ItemId + (item->Flags.HasFlag(InventoryItem.ItemFlags.HighQuality) ? 1000000 : 0)));
             }
             return ret;
         }
-        
+
         public static bool GuidEquals(this List<ApplyRule> rule, List<ApplyRule> other)
         {
             //if (rule == null && other == null) return true;
             //if (rule == null || other == null) return false;
-            if (rule.Count != other.Count) return false;
-            for (int i = 0; i < rule.Count; i++)
+            if(rule.Count != other.Count) return false;
+            for(var i = 0; i < rule.Count; i++)
             {
-                if (rule[i].GUID != other[i].GUID) return false;
+                if(rule[i].GUID != other[i].GUID) return false;
             }
             return true;
         }
@@ -229,7 +229,7 @@ namespace DynamicBridge
 
         public static Profile GetProfileByCID(ulong CID)
         {
-            if (CID == 0 || C.Blacklist.Contains(CID)) return null;
+            if(CID == 0 || C.Blacklist.Contains(CID)) return null;
             if(C.ProfilesL.TryGetFirst(x => x.Characters.Contains(CID), out var profile))
             {
                 return profile;
@@ -242,7 +242,7 @@ namespace DynamicBridge
         public static string GetHouseDefaultName()
         {
             var h = HousingManager.Instance();
-            return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRow(Svc.ClientState.TerritoryType)?.PlaceNameRegion.Value?.Name?.ExtractText()}, Ward {h->GetCurrentWard()+1}, plot {h->GetCurrentPlot()+1}";
+            return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRow(Svc.ClientState.TerritoryType)?.PlaceNameRegion.Value?.Name?.ExtractText()}, Ward {h->GetCurrentWard() + 1}, plot {h->GetCurrentPlot() + 1}";
         }
 
         public static GlamourerDesignInfo? GetDesignByGUID(string GUID)
@@ -250,7 +250,7 @@ namespace DynamicBridge
             var designs = P.GlamourerManager.GetDesigns();
             foreach(var d in designs)
             {
-                if (d.Identifier.ToString() == GUID) return d;
+                if(d.Identifier.ToString() == GUID) return d;
             }
             return null;
         }
@@ -259,14 +259,14 @@ namespace DynamicBridge
         {
             var len = needle.Length;
             var limit = haystack.Length - len;
-            for (var i = 0; i <= limit; i++)
+            for(var i = 0; i <= limit; i++)
             {
                 var k = 0;
-                for (; k < len; k++)
+                for(; k < len; k++)
                 {
-                    if (needle[k] != haystack[i + k]) break;
+                    if(needle[k] != haystack[i + k]) break;
                 }
-                if (k == len)
+                if(k == len)
                 {
                     pos = i;
                     return true;
@@ -276,23 +276,23 @@ namespace DynamicBridge
             return false;
         }
 
-        public static (List<byte> WeatherList, string EnvbFile) ParseLvb(ushort id) 
+        public static (List<byte> WeatherList, string EnvbFile) ParseLvb(ushort id)
         {
             var weathers = new List<byte>();
             var territoryType = Svc.Data.GetExcelSheet<TerritoryType>().GetRow(id);
-            if (territoryType == null) return default;
+            if(territoryType == null) return default;
             try
             {
                 var file = Svc.Data.GetFile<LvbFile>($"bg/{territoryType.Bg}.lvb");
-                if (file?.weatherIds == null || file.weatherIds.Length == 0)
+                if(file?.weatherIds == null || file.weatherIds.Length == 0)
                     return (null, null);
-                foreach (var weather in file.weatherIds)
-                    if (weather > 0 && weather < 255)
+                foreach(var weather in file.weatherIds)
+                    if(weather > 0 && weather < 255)
                         weathers.Add((byte)weather);
                 weathers.Sort();
                 return (weathers, file.envbFile);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 PluginLog.Error($"Failed to load lvb for {territoryType}\n{e}");
             }
@@ -307,8 +307,8 @@ namespace DynamicBridge
         {
             FullList = null;
             var list = s.ToArray();
-            if (list.Length == 0) return noneStr;
-            if (list.Length == 1) return list[0].ToString();
+            if(list.Length == 0) return noneStr;
+            if(list.Length == 1) return list[0].ToString();
             FullList = list.Select(x => x.ToString()).Join("\n");
             return $"{list.Length} selected";
         }
@@ -318,13 +318,13 @@ namespace DynamicBridge
         public static string GetName(this MoodleInfo info, out bool success)
         {
             success = true;
-            foreach (var x in P.MoodlesManager.GetMoodles())
+            foreach(var x in P.MoodlesManager.GetMoodles())
             {
-                if (x.ID == info.Guid) return x.FullPath.Split("/")[^1];
+                if(x.ID == info.Guid) return x.FullPath.Split("/")[^1];
             }
-            foreach (var x in P.MoodlesManager.GetPresets())
+            foreach(var x in P.MoodlesManager.GetPresets())
             {
-                if (x.ID == info.Guid) return x.FullPath.Split("/")[^1];
+                if(x.ID == info.Guid) return x.FullPath.Split("/")[^1];
             }
             success = false;
             return info.Guid.ToString();
@@ -332,16 +332,16 @@ namespace DynamicBridge
 
         public static string PrintRange<T>(this IEnumerable<T> s, IEnumerable<T> notS, out string FullList, string noneStr = "Any")
         {
-            if (!C.AllowNegativeConditions)
+            if(!C.AllowNegativeConditions)
             {
                 return PrintRange(s.Select(x => x.ToString().Replace("_", " ")), out FullList, noneStr);
             }
             FullList = null;
             var list = s.Select(x => x.ToString().Replace("_", " ")).ToArray();
             var notList = notS.Select(x => x.ToString().Replace("_", " ")).ToArray();
-            if (list.Length == 0 && notList.Length == 0) return noneStr;
+            if(list.Length == 0 && notList.Length == 0) return noneStr;
             FullList = list.Select(x => x.ToString()).Join("\n");
-            if (notList.Length > 0)
+            if(notList.Length > 0)
             {
                 FullList += "\nMeeting any of these condition will make rule invalid:\n";
                 FullList += notList.Select(x => x.ToString()).Join("\n");
@@ -354,7 +354,7 @@ namespace DynamicBridge
             var im = InventoryManager.Instance();
             var cont = im->GetInventoryContainer(InventoryType.EquippedItems);
             var ret = new List<uint>();
-            for (int i = 0; i < cont->Size; i++)
+            for(var i = 0; i < cont->Size; i++)
             {
                 ret.Add(cont->GetInventorySlot(i)->ItemId);
             }
@@ -367,14 +367,14 @@ namespace DynamicBridge
         {
             foreach(var x in profile.PresetsFolders)
             {
-                if (x.Presets.Any(z => z == preset)) return x;
+                if(x.Presets.Any(z => z == preset)) return x;
             }
             return null;
         }
 
         public static bool IsDisguise()
         {
-            if (Gui.Debug.ForceDisguise != null) return Gui.Debug.ForceDisguise.Value;
+            if(Gui.Debug.ForceDisguise != null) return Gui.Debug.ForceDisguise.Value;
             return Svc.PluginInterface.SourceRepository.ContainsAny(StringComparison.OrdinalIgnoreCase, "SeaOfStars", "DynamicBridgeStandalone");
         }
 
@@ -385,12 +385,12 @@ namespace DynamicBridge
 
         public static void UpdateGearsetCache()
         {
-            if (Player.Available)
+            if(Player.Available)
             {
                 var list = new List<GearsetEntry>();
-                foreach (var x in RaptureGearsetModule.Instance()->Entries)
+                foreach(var x in RaptureGearsetModule.Instance()->Entries)
                 {
-                    if (x.Name[0] == 0) continue;
+                    if(x.Name[0] == 0) continue;
                     list.Add(new(x.Id, GenericHelpers.Read(x.Name), x.ClassJob));
                 }
                 C.GearsetNameCacheCID[Player.CID] = list;
@@ -399,10 +399,10 @@ namespace DynamicBridge
 
         public static IEnumerable<string> ToGearsetNames(this List<int> gearsetIDs, ulong CID)
         {
-            if (!C.GearsetNameCacheCID.TryGetValue(CID, out var cache)) cache = [];
-            for (int i = 0; i < gearsetIDs.Count; i++)
+            if(!C.GearsetNameCacheCID.TryGetValue(CID, out var cache)) cache = [];
+            for(var i = 0; i < gearsetIDs.Count; i++)
             {
-                if (cache.TryGetFirst(x => x.Id == gearsetIDs[i], out var ret))
+                if(cache.TryGetFirst(x => x.Id == gearsetIDs[i], out var ret))
                 {
                     yield return $"{ret}";
                 }

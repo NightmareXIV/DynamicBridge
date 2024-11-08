@@ -40,7 +40,7 @@ namespace DynamicBridge
 
         public override string ToString()
         {
-            return $"MicroDesign(name={this.Name}, id={this.Identifier})";
+            return $"MicroDesign(name={Name}, id={Identifier})";
         }
     }
 }

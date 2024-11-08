@@ -10,7 +10,7 @@ public static class GuiAbout
 {
     public static void Draw()
     {
-        if (!Utils.IsDisguise())
+        if(!Utils.IsDisguise())
         {
             ImGuiEx.LineCentered("about1", () =>
             {
@@ -18,14 +18,14 @@ public static class GuiAbout
             });
             ImGuiEx.LineCentered("about2", () =>
             {
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Comments, "Join Discord for support and changelogs"))
+                if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Comments, "Join Discord for support and changelogs"))
                 {
                     ShellStart("https://discord.gg/m8NRt4X8Gf");
                 }
             });
             ImGuiEx.LineCentered("about3", () =>
             {
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.QuestionCircle, "Read instructions and FAQ"))
+                if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.QuestionCircle, "Read instructions and FAQ"))
                 {
                     ShellStart("https://github.com/NightmareXIV/DynamicBridge/tree/main/docs");
                 }
@@ -35,11 +35,11 @@ public static class GuiAbout
         {
             ImGuiEx.LineCentered("about4", () =>
             {
-                if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Bug, "Report issue, request feature or ask a question on GitHub"))
+                if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Bug, "Report issue, request feature or ask a question on GitHub"))
                 {
                     ShellStart("https://github.com/Limiana/DynamicBridgeStandalone/issues");
                 }
-            }); 
+            });
         }
     }
 }

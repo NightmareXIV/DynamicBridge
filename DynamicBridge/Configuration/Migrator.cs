@@ -12,11 +12,11 @@ public class Migrator
         Svc.Framework.Update += DoProfileMigration;
     }
 
-    void DoProfileMigration(object framework)
+    private void DoProfileMigration(object framework)
     {
 #pragma warning disable CS0612 // Type or member is obsolete
         PluginLog.Information($"Profile migration begins with {C.Profiles.Count} values");
-        foreach (var x in C.Profiles)
+        foreach(var x in C.Profiles)
         {
             PluginLog.Information($"Migrating profile {x.Key}/{x.Value.Name}");
             C.ProfilesL.Add(x.Value);
@@ -38,12 +38,12 @@ public class Migrator
 #pragma warning restore CS0612 // Type or member is obsolete
     }
 
-    void DoGlamourerMigration(object a)
+    private void DoGlamourerMigration(object a)
     {
         if(C.EnableGlamourer)
         {
             var entries = P.GlamourerManager.GetDesigns();
-            if (entries.Any())
+            if(entries.Any())
             {
                 PluginLog.Information($"Begin Glamourer name to guid migration");
                 MigrateProfile(C.GlobalProfile, entries);
@@ -55,11 +55,11 @@ public class Migrator
 
                 foreach(var x in C.ComplexGlamourerEntries)
                 {
-                    for (int i = 0; i < x.Designs.Count; i++)
+                    for(var i = 0; i < x.Designs.Count; i++)
                     {
-                        if (!Guid.TryParse(x.Designs[i], out _))
+                        if(!Guid.TryParse(x.Designs[i], out _))
                         {
-                            if (entries.TryGetFirst(z => z.Name == x.Designs[i], out var value))
+                            if(entries.TryGetFirst(z => z.Name == x.Designs[i], out var value))
                             {
                                 PluginLog.Information($">> Complex Glamourer Entry: changing {x.Designs[i]} -> {value.Identifier}");
                                 x.Designs[i] = value.Identifier.ToString();
@@ -72,17 +72,17 @@ public class Migrator
         }
     }
 
-    void MigrateProfile(Profile p, GlamourerDesignInfo[] entries)
+    private void MigrateProfile(Profile p, GlamourerDesignInfo[] entries)
     {
         try
         {
-            foreach (var x in p.GetPresetsUnion())
+            foreach(var x in p.GetPresetsUnion())
             {
-                for (int i = 0; i < x.Glamourer.Count; i++)
+                for(var i = 0; i < x.Glamourer.Count; i++)
                 {
-                    if (!Guid.TryParse(x.Glamourer[i], out _))
+                    if(!Guid.TryParse(x.Glamourer[i], out _))
                     {
-                        if (entries.TryGetFirst(z => z.Name == x.Glamourer[i], out var value))
+                        if(entries.TryGetFirst(z => z.Name == x.Glamourer[i], out var value))
                         {
                             PluginLog.Information($">> Profile {p.Name}: glamourer changing {x.Glamourer[i]} -> {value.Identifier}");
                             x.Glamourer[i] = value.Identifier.ToString();

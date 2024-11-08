@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DynamicBridge.IPC;
 public class IpcTester
 {
-    EzIPCDisposalToken[] Tokens;
+    private EzIPCDisposalToken[] Tokens;
 
     public bool Throw = false;
     public bool ThrowIpcError = false;
@@ -41,16 +41,16 @@ public class IpcTester
     }
 
     [EzIPC]
-    bool JustFunction()
+    private bool JustFunction()
     {
         return Random.Shared.Next(2) == 0;
     }
 
     [EzIPC]
-    bool ThrowsException()
+    private bool ThrowsException()
     {
         if(Throw) throw new InvalidOperationException();
-        if (ThrowIpcError) throw new IpcNotReadyError("test");
+        if(ThrowIpcError) throw new IpcNotReadyError("test");
         return Random.Shared.Next(2) == 0;
     }
 }

@@ -23,7 +23,7 @@ namespace DynamicBridge
                     foreach(var w in weathers.WeatherList)
                     {
                         var t = Svc.Data.GetExcelSheet<Weather>().GetRow(w).Name.ExtractText();
-                        if (!Weathers.ContainsKey(w))
+                        if(!Weathers.ContainsKey(w))
                         {
                             Weathers[w] = t;
                         }

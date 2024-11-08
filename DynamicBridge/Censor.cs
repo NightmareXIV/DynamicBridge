@@ -19,9 +19,9 @@ internal static class Censor
         [CensorType.World] = ["Albion", "Asgard", "Avalon", "Averoigne", "Azeroth", "Barsoom", "Darkover", "Deltora", "Dinotopia", "Discworld", "Dreamlands", "Earthsea", "Encantadia", "Equestria", "Eternia", "Etheria", "Filgaia", "Gielinor", "Glorantha", "Gor", "Greyhawk", "Halkeginia", "Hyrule", "Ivalice", "Lankhmar", "Melnibone", "Narnia", "Neverland", "Nirn", "Pellucidar", "Pern", "Prydain", "Spira", "Thedas", "Tyria", "Westeros", "Wonderland", "Xanth", "Devuniake", "Angbotain", "Warkinles", "Prisluake", "Spiunknds", "Dradevows", "Froprirth", "Warlosnse", "Kingollds", "Loskinake", "Losslurse", "Devfronds", "Quewarnds", "Golpoichy", "Warwarion", "Devlocsea", "Elvgolsle", "Prirotles", "Phosortum", "Loslosach", "Pholubnse", "Trowizrse", "Pholubalm", "Redsorest", "Spirotest", "Kinspisea", "Phosorory", "Losillsle", "Redlorlds", "Develdion", "Devunkory", "Witdeaxus", "Eldtrorse", "Locillnds", "Froqueion", "Elvfroane", "Angbotnet", "Trosoroon", "Elvwilows", "Fropoitry", "Troeldchy", "Locdraoon", "Angdevsle", "Elvkinles", "Warelvtum", "Warbrotum", "Phosluows", "Draelvder", "Trodrands", "Eldkinane", "Priangain", "Elvdevnet", "Deawitlds", "Draunkles", "Deaunkoon", "Devredout", "Quekinsea", "Kinfronet", "Spislunds", "Prilosean", "Kinwizean", "Anglocnds", "Spiunktum", "Elduniory", "Troslunds", "Eldredley", "Eldcolary", "Redelvrld", "Devlosest", "Drafroory", "Golangnet", "Witviltry", "Deawizain", "Warsorach", "Witspidom", "Dralossle", "Witphoake", "Angspitry", "Fropoidom", "Anguniest", "Eldcolire", "Phopoinet", "Frowarnce", "Draredrld", "Kinbrolds", "Golfrodom", "Draqueest", "Drabroain", "Locilland", "Devdraean", "Drakinles", "Loslubies", "Spieviest", "Elvbotnet", "Devsorley", "Devkinchy", "Golillain", "Locsorley", "Deavilrld", "Kinwarest", "Golrotnce", "Drawilnet", "Kineldchy", "Quedeatum", "Prideaake", "Eldbroake", "Locfaiest", "Eldspiley", "Angkinsea", "Froeviory", "Frolocder", "Drauninds", "Frovilach", "Angfroest", "Phoqueoon", "Deawilder", "Locwiznds", "Trorotlds", "Quesorchy", "Warredion", "Golfroout", "Elvtronds", "Elddraies", "Redbotrse", "Kinunkane", "Trounichy", "Spikinsle", "Redlocnse", "Quebotrld", "Frocolean", "Phoslusea", "Deafronds", "Draunkoon", "Deakinion", "Locunkand", "Kinfrochy", "Elvwizest", "Trokinrse", "Prigolane", "Witsluion", "Losfailey", "Phoeviean", "Deakinain", "Locwizest", "Witfroane", "Trogiaand", "Kinspiion", "Devdrands", "Redrotdom", "Spirotnce", "Devwarion", "Phoangtum", "Tropriary", "Kinslules", "Devlorchy", "Frocolnds", "Eldpoisle", "Devpoiory", "Spigiasea", "Redredane", "Quelocnet", "Lockintum", "Golgolles", "Losunisle", "Gollocsea", "Kincolles", "Losprilds", "Spiwilain", "Golrotley", "Frogolion", "Warbotach", "Locunkory", "Draquerth", "Draeldchy", "Wardranet", "Golwizrth", "Devfrorth", "Warkinrth", "Deaangnds", "Elvtroxus", "Lospoiean", "Witunkles", "Spipoiary", "Redwaroon", "Eldevider", "Prifrotry", "Witdraain", "Dradraley", "Trodeaion", "Phospiest", "Trorotley", "Elvlossea", "Loswitach", "Frogollds", "Locfaiion", "Locpoiean", "Frolocand", "Elvelvnse", "Quewilire", "Locbroley", "Wartroles", "Devspilds", "Golkinion", "Redwilley", "Kinkintum", "Fropoiake", "Warrotnds", "Spieldrld", "Phodrachy", "Phodeands", "Losspinds", "Eldlorlds", "Reddrales", "Lossorach", "Warwitnse", "Kinlocion", "Redrotles", "Locrottum", "Angpoiand", "Wargolion", "Elddevand", "Prilocnds", "Lossluory", "Phowitnds", "Redspinet", "Warilldom", "Prielvake", "Troelvrth", "Losunkion", "Froelvand", "Elvcolire", "Unieldion", "Drawitles", "Elvelvnet", "Redbotsea", "Trounkane", "Trodeaire", "Warredest", "Querotean", "Warspiies", "Loswizsea", "Spivilion", "Dealorory", "Quelocand", "Pritrosea", "Angbronds", "Phodevnce", "Prigolain", "Drabroxus", "Warwizire", "Deawitnet", "Spifrorse", "Queuniire", "Priprinse", "Kinphooon", "Frowittum", "Deagialds", "Phoelvnce", "Elvspirth", "Witrotean", "Golelvalm", "Prilocrse", "Trowaries", "Angrotder", "Poiwilion", "Angwaralm", "Deadeaows", "Queredean", "Angbotean", "Frogiaory", "Angsluley", "Drabotoon", "Spilocary", "Wardevach", "Angwizest", "Devwilnds", "Deadraain", "Kinbronds", "Loswittry", "Quepoirse", "Anggiaxus", "Elvlubles", "Warpoiest", "Frogianse", "Trodevalm", "Quekinder", "Queunkane", "Spispisle", "Prikinnds", "Spicolion", "Froredach", "Spisortum", "Goltroles", "Warbrosle", "Phoillows", "Draelvary", "Eldbroies", "Quepoiion", "Frounitum", "Redkinles", "Prifroach", "Devredalm", "Loswilire", "Locwitary", "Wittroles", "Kinloralm", "Deadevain", "Locpoiary", "Frowitane", "Devwarnse", "Redgolach", "Loskinows", "Quephochy", "Elvgoltry", "Trolubder", "Witprinds", "Loskinies", "Devuniean", "Prilubchy", "Elvvilane", "Wartroows", "Witvildom", "Devcolrse", "Queillnet", "Locbroalm", "Witdevest", "Pholocalm", "Trounkrse", "Quecolane", "Witfaitum", "Kintroies", "Losfroary", "Pridraxus", "Reddrarth", "Phovilnce", "Witsluout", "Prirotlds", "Dearotalm", "Wituniain", "Troviltum", "Spisorrld", "Redbroean", "Phobotane", "Spipoinds", "Elvlubrse", "Frowilane", "Pribotean", "Reduniain", "Frobotout", "Frophoalm", "Deaangach", "Deawiztum", "Trogiaory", "Elvangdom", "Deaangire", "Angsluest", "Locelvain", "Kindraire", "Drawarrld", "Kintroion", "Quekinory", "Kinunkach", "Spiwarion", "Eldwizand", "Spislunet", "Goldeales", "Witwarrth", "Spifaitry", "Devprialm", "Losspiake", "Redillean", "Priunkean", "Phospiach", "Elvpoiley", "Elvqueake", "Deveviach", "Phowarake", "Loseldoon", "Warlocles", "Deadrasea", "Phokinrld", "Eldslunds", "Redsorrth", "Redloslds", "Eldbotlds", "Wardrader", "Phosories", "Trogiaion", "Golphoies", "Witrotean", "Trodevtry", "Kineldxus", "Trofroder", "Frogolach", "Lospritry", "Frosluire", "Willorion", "Quepoiand", "Locwilles", "Drabrotry", "Witangder", "Anglosion", "Redkinder", "Golspiles", "Warfaiane", "Witphoach", "Frowilire", "Spirotows", "Pridraire", "Elddeaalm", "Frobotach", "Trounktry", "Drakinire", "Golwiztry", "Redwition", "Kindevion", "Golpriane", "Redelvtum", "Froelvane", "Fropoiout", "Anglosand", "Elvwitand", "Redwilnet", "Drawarles", "Deaunkles", "Deaunknet", "Prirotnse", "Quewilrth", "Wargolout", "Kindeance", "Quewitnce", "Eldunkory", "Warwilder", "Golwition", "Draeldion", "Quesornds", "Eldslusea", "Frowarrse", "Lospoiake", "Angpriake", "Redfroxus", "Deafroion", "Eldbroles", "Devillary", "Pholubout", "Phovilnds", "Golbronet", "Frotroach", "Pholubest", "Golillows", "Devfroalm", "Eldlubach", "Kinreddom", "Pridevnet", "Redredion", "Elvpridom", "Trolosdom", "Elvdeaean", "Locwarire", "Phodeales", "Frokinory", "Witdeaory", "Deaquerld", "Kinsluake", "Spievixus", "Elddeaout", "Quefaialm", "Golspince", "Phobotnet", "Devwizrse", "Phofroain", "Devphonds", "Anguniion", "Locbotnet", "Warunkdom", "Spiwitles", "Warfainds", "Eldelvain", "Prirotnds", "Losbotion", "Frolosire", "Fropoiane", "Redredach", "Angtrorse", "Trobotdom", "Spispichy", "Witspiion", "Warfrosle", "Dealubies", "Frotrotry", "Froevixus", "Froeldsea", "Dealubchy", "Eldpriire", "Eldpoirse", "Golwildom", "Loctronet", "Angeldnce", "Deakinder", "Redvilies", "Elvlubrld", "Golangane", "Querottry", "Prifaitry", "Priwarsle", "Losrotles", "Trodevsea", "Warredand", "Warelvain", "Quedrands", "Locunkalm", "Queunkach", "Warslusea", "Angillles", "Prilubean", "Kinfroain", "Locdralds", "Phoillout", "Kinvillds", "Golkinsea", "Redbotnds", "Witangtry", "Kinwarory", "Anggolnds", "Kinbotley", "Redvilxus"]
     };
 
-    static string Seed => C.CensorSeed;
+    private static string Seed => C.CensorSeed;
 
-    static Dictionary<CensorType, Dictionary<char, string[]>> SoftCensorCache = new()
+    private static Dictionary<CensorType, Dictionary<char, string[]>> SoftCensorCache = new()
     {
         [CensorType.Animal] = [],
         [CensorType.Adjective] = [],
@@ -35,17 +35,17 @@ internal static class Censor
             return CensorData[ct];
         }
         var c = forString[0];
-        if (!SoftCensorCache[ct].TryGetValue(c, out var ret))
+        if(!SoftCensorCache[ct].TryGetValue(c, out var ret))
         {
             ret = CensorData[ct].Where(x => x.StartsWith(c.ToString(), StringComparison.OrdinalIgnoreCase)).ToArray();
             SoftCensorCache[ct][c] = ret;
         }
-        return ret.Length == 0? CensorData[ct]:ret;
+        return ret.Length == 0 ? CensorData[ct] : ret;
     }
 
     internal static string Character(string name, string world)
     {
-        if (C.NoNames && !name.IsNullOrEmpty() && !world.IsNullOrEmpty())
+        if(C.NoNames && !name.IsNullOrEmpty() && !world.IsNullOrEmpty())
         {
             var parts = name.Split(" ");
             var adj = GetAdjustedCensorList(CensorType.Adjective, parts.SafeSelect(0));
@@ -64,9 +64,9 @@ internal static class Censor
 
     internal static string Character(string name)
     {
-        if (C.NoNames && !name.IsNullOrEmpty())
+        if(C.NoNames && !name.IsNullOrEmpty())
         {
-            if (name.Contains('@'))
+            if(name.Contains('@'))
             {
                 var x = name.Split("@");
                 return Character(x[0], x[1]);
@@ -86,7 +86,7 @@ internal static class Censor
 
     internal static string World(string world)
     {
-        if (C.NoNames && !world.IsNullOrEmpty())
+        if(C.NoNames && !world.IsNullOrEmpty())
         {
             var wor = GetAdjustedCensorList(CensorType.World, world);
             var w = Crc32.Get(Seed + world) % wor.Length;
@@ -100,7 +100,7 @@ internal static class Censor
 
     public static string Hide(string s)
     {
-        if (C.NoNames)
+        if(C.NoNames)
         {
             return "Hidden";
         }
@@ -110,5 +110,5 @@ internal static class Censor
         }
     }
 
-    public enum CensorType { Animal, Adjective, World}
+    public enum CensorType { Animal, Adjective, World }
 }

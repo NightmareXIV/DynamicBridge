@@ -13,13 +13,13 @@ public record struct GearsetEntry
 
     public GearsetEntry(int id, string name, int classJob) : this()
     {
-        this.Id = id;
-        this.Name = name;
-        this.ClassJob = classJob;
+        Id = id;
+        Name = name;
+        ClassJob = classJob;
     }
 
     public override readonly string ToString()
     {
-        return $"{this.Id+1}: {this.Name}";
+        return $"{Id + 1}: {Name}";
     }
 }

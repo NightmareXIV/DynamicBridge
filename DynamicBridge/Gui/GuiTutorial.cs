@@ -9,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace DynamicBridge.Gui;
 public static class GuiTutorial
 {
-    static readonly string Content = @"
+    private static readonly string Content = @"
 Welcome to DynamicBridge plugin!
 This plugin allows you to dynamically change your Glamourer, Customize+ and Honorific presets based on various rules. You can use this plugin for simple means such as switching your appearance manually or you can create very advanced and precise rule sets.
 ---
@@ -70,19 +70,19 @@ If you choose to set any values in base preset, they will be used when there is 
     {
         ImGuiEx.CheckboxInverted("Hide tutorial", ref C.ShowTutorial);
         var array = Content.ReplaceLineEndings().Split(Environment.NewLine);
-        for (int i = 0; i < array.Length; i++)
+        for(var i = 0; i < array.Length; i++)
         {
             var s = array[i];
-            if (s.StartsWith("+"))
+            if(s.StartsWith("+"))
             {
-                if (ImGui.TreeNode(s[1..]))
+                if(ImGui.TreeNode(s[1..]))
                 {
                     do
                     {
                         DrawLine(array[i + 1]);
                         i++;
                     }
-                    while (i+1 < array.Length && !array[i + 1].StartsWith("+"));
+                    while(i + 1 < array.Length && !array[i + 1].StartsWith("+"));
                     ImGui.TreePop();
                 }
                 else
@@ -91,7 +91,7 @@ If you choose to set any values in base preset, they will be used when there is 
                     {
                         i++;
                     }
-                    while (i+1 < array.Length && !array[i + 1].StartsWith("+"));
+                    while(i + 1 < array.Length && !array[i + 1].StartsWith("+"));
                 }
             }
             else
@@ -101,9 +101,9 @@ If you choose to set any values in base preset, they will be used when there is 
         }
     }
 
-    static void DrawLine(string s)
+    private static void DrawLine(string s)
     {
-        if (s.StartsWith("fai="))
+        if(s.StartsWith("fai="))
         {
             var chr = s[4..];
             var success = false;
@@ -131,7 +131,7 @@ If you choose to set any values in base preset, they will be used when there is 
                 //ImGuiEx.Text($"Parse error: {chr}");
             }
         }
-        else if (s.StartsWith("image="))
+        else if(s.StartsWith("image="))
         {
             if(ThreadLoadImageHandler.TryGetTextureWrap($"{Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "tutorial", $"{s[6..]}.png")}", out var tex))
             {

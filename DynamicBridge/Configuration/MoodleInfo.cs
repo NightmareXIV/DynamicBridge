@@ -12,7 +12,7 @@ public class MoodleInfo
 
     public MoodleInfo(Guid guid, bool cancel)
     {
-        this.Guid = guid;
-        this.Cancel = cancel;
+        Guid = guid;
+        Cancel = cancel;
     }
 }

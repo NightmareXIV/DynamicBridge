@@ -13,9 +13,9 @@ public class CustomizePlusManager
     public Guid LastEnabledProfileID = Guid.Empty;
     public CustomizePlusReflector Reflector;
 
-    [EzIPC("Profile.GetList")] Func<IList<IPCProfileDataTuple>> GetProfileList;
-    [EzIPC("Profile.EnableByUniqueId")] Func<Guid, int> EnableProfileByUniqueId;
-    [EzIPC("Profile.DisableByUniqueId")] Func<Guid, int> DisableProfileByUniqueId;
+    [EzIPC("Profile.GetList")] private Func<IList<IPCProfileDataTuple>> GetProfileList;
+    [EzIPC("Profile.EnableByUniqueId")] private Func<Guid, int> EnableProfileByUniqueId;
+    [EzIPC("Profile.DisableByUniqueId")] private Func<Guid, int> DisableProfileByUniqueId;
 
     public CustomizePlusManager()
     {
@@ -23,7 +23,7 @@ public class CustomizePlusManager
         EzIPC.Init(this, "CustomizePlus", SafeWrapper.AnyException);
     }
 
-    List<PathInfo> PathInfos = null;
+    private List<PathInfo> PathInfos = null;
     public List<PathInfo> GetCombinedPathes()
     {
         PathInfos ??= Utils.BuildPathes(GetRawPathes());
@@ -35,30 +35,30 @@ public class CustomizePlusManager
         var ret = new List<string>();
         try
         {
-            foreach (var x in GetProfiles())
+            foreach(var x in GetProfiles())
             {
                 var path = x.VirtualPath;
-                if (path != null)
+                if(path != null)
                 {
                     ret.Add(path);
                 }
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.LogInternal();
         }
         return ret;
     }
 
-    IList<IPCProfileDataTuple> Cache = null;
+    private IList<IPCProfileDataTuple> Cache = null;
     public IEnumerable<IPCProfileDataTuple> GetProfiles(IEnumerable<string> chara = null)
     {
         Cache ??= GetProfileList();
         var charaSenders = chara?.Select(x => Sender.TryParse(x, out var s) ? s : default);
         foreach(var x in (Cache ?? []))
         {
-            if (charaSenders == null || charaSenders.Any(c => x.Characters.Any(p => p.Name == c.Name && p.WorldId.ToUInt().EqualsAny(c.HomeWorld, ushort.MaxValue)))) yield return x;
+            if(charaSenders == null || charaSenders.Any(c => x.Characters.Any(p => p.Name == c.Name && p.WorldId.ToUInt().EqualsAny(c.HomeWorld, ushort.MaxValue)))) yield return x;
         }
     }
 
@@ -107,7 +107,7 @@ public class CustomizePlusManager
                 }
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -116,7 +116,7 @@ public class CustomizePlusManager
 
     public void RestoreState()
     {
-        if (WasSet)
+        if(WasSet)
         {
             try
             {
@@ -126,7 +126,7 @@ public class CustomizePlusManager
                     EnableProfileByUniqueId(x);
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 e.Log();
             }
@@ -139,11 +139,11 @@ public class CustomizePlusManager
 
     public string TransformName(string originalName)
     {
-        if (Guid.TryParse(originalName, out Guid guid))
+        if(Guid.TryParse(originalName, out var guid))
         {
-            if (GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
+            if(GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
             {
-                if (C.GlamourerFullPath)
+                if(C.GlamourerFullPath)
                 {
                     return entry.VirtualPath;
                 }

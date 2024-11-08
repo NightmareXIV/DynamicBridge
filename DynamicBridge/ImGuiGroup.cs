@@ -29,9 +29,9 @@ public static partial class ImGuiGroup
         ImGui.BeginGroup();
 
         var open = true;
-        if (!string.IsNullOrEmpty(id))
+        if(!string.IsNullOrEmpty(id))
         {
-            if (!options.Collapsible)
+            if(!options.Collapsible)
             {
                 ImGui.TextColored(ImGui.ColorConvertU32ToFloat4(options.HeaderTextColor), id);
             }
@@ -63,14 +63,14 @@ public static partial class ImGuiGroup
         var max = ImGui.GetItemRectMax();
         options.MaxX = max.X;
 
-        if (options.Width > 0)
+        if(options.Width > 0)
             ImGui.PushClipRect(ImGui.GetItemRectMin(), max with { Y = 10000 }, true);
 
         ImGui.Indent(Math.Max(options.BorderPadding.X, 0.01f));
         ImGui.PushItemWidth(MathF.Floor((width - options.BorderPadding.X * 2) * 0.65f));
 
         groupBoxOptionsStack.Push(options);
-        if (open) return true;
+        if(open) return true;
 
         ImGui.TextDisabled(". . .");
         EndGroupBox();
@@ -88,13 +88,13 @@ public static partial class ImGuiGroup
         ImGui.PopItemWidth();
         ImGui.Unindent(Math.Max(options.BorderPadding.X, 0.01f));
 
-        if (!autoAdjust)
+        if(!autoAdjust)
             ImGui.PopClipRect();
 
         ImGui.SetCursorPosY(ImGui.GetCursorPosY() - ImGui.GetStyle().ItemSpacing.Y);
         ImGui.Dummy(options.BorderPadding with { X = 0 });
 
-        if (!autoAdjust)
+        if(!autoAdjust)
         {
             var window = GetCurrentWindow();
             window->CursorMaxPos = window->CursorMaxPos with { X = options.MaxX };

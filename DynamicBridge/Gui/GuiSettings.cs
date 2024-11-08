@@ -29,7 +29,7 @@ public static class GuiSettings
     public static void Draw()
     {
         ImGui.Checkbox($"Enable Plugin", ref C.Enable);
-        if (ImGuiGroup.BeginGroupBox("General"))
+        if(ImGuiGroup.BeginGroupBox("General"))
         {
             ImGuiEx.CheckboxInverted("Hide tutorial", ref C.ShowTutorial);
             ImGui.Checkbox($"Allow applying negative conditions", ref C.AllowNegativeConditions);
@@ -39,7 +39,7 @@ public static class GuiSettings
             ImGuiEx.EnumCombo("Dropdown menu size", ref C.ComboSize, ComboFlagNames.ContainsKey, ComboFlagNames);
             if(ImGui.Checkbox($"Force update appearance on job and gearset changes", ref C.UpdateJobGSChange))
             {
-                if (C.UpdateJobGSChange)
+                if(C.UpdateJobGSChange)
                 {
                     P.Memory.EquipGearsetHook.Enable();
                 }
@@ -57,14 +57,14 @@ public static class GuiSettings
             ImGuiEx.Spacing();
             ImGui.Checkbox($"Use only replacement words with same first letter as original when possible.", ref C.LesserCensor);
             ImGuiEx.Spacing();
-            if (ImGui.Button("Regenerate Censor Seed"))
+            if(ImGui.Button("Regenerate Censor Seed"))
             {
                 C.CensorSeed = Guid.NewGuid().ToString();
             }
             ImGuiEx.HelpMarker($"Censored names will change upon pressing this button.");
 
             ImGuiEx.CheckboxInverted($"Split base classes and jobs", ref C.UnifyJobs);
-            
+
             ImGui.Checkbox("Autofill empty preset name with first selected plugin's option name upon selecting it", ref C.AutofillFromGlam);
             ImGuiGroup.EndGroupBox();
         }
@@ -89,7 +89,7 @@ public static class GuiSettings
             ImGuiGroup.EndGroupBox();
         }
 
-        if (ImGuiGroup.BeginGroupBox("Integrations"))
+        if(ImGuiGroup.BeginGroupBox("Integrations"))
         {
             ImGuiEx.Text($"Here you can individually enable/disable plugin integrations and configure appropriate related settings.");
             //glam
@@ -102,9 +102,9 @@ public static class GuiSettings
             ImGuiEx.Spacing();
             ImGuiEx.SetNextItemWidthScaled(200f);
             ImGuiEx.EnumCombo("##dbglamdef", ref C.GlamNoRuleBehaviour, GlamourerNoRuleBehaviorNames);
-            if (C.ManageGlamourerAutomation)
+            if(C.ManageGlamourerAutomation)
             {
-                if (C.GlamNoRuleBehaviour != GlamourerNoRuleBehavior.RevertToAutomation)
+                if(C.GlamNoRuleBehaviour != GlamourerNoRuleBehavior.RevertToAutomation)
                 {
                     ImGuiEx.HelpMarker("Revert to Automation is recommended if you are using Glamourer automation.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
@@ -112,9 +112,9 @@ public static class GuiSettings
             ImGuiEx.Spacing();
             ImGui.Checkbox("Allow DynamicBridge to manage Glamourer's automation setting", ref C.ManageGlamourerAutomation);
             ImGuiEx.HelpMarker("If this setting is enabled, Glamourer's global automation setting will be automatically disabled upon applying any rule and will be automatically enabled when no rules are found.");
-            if (P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
+            if(P.GlamourerManager.Reflector.GetAutomationGlobalState() && P.GlamourerManager.Reflector.GetAutomationStatusForChara())
             {
-                if (!C.ManageGlamourerAutomation)
+                if(!C.ManageGlamourerAutomation)
                 {
                     ImGuiEx.HelpMarker("You MUST enable this setting or disable Glamourer's automation, otherwise either Glamourer's or DynamicBridge's automation will not work correctly.", ImGuiColors.DalamudRed, FontAwesomeIcon.ExclamationTriangle.ToIconString());
                 }
@@ -150,14 +150,14 @@ public static class GuiSettings
             ImGuiGroup.EndGroupBox();
         }
 
-        if (ImGuiGroup.BeginGroupBox("About"))
+        if(ImGuiGroup.BeginGroupBox("About"))
         {
             GuiAbout.Draw();
             ImGuiGroup.EndGroupBox();
         }
     }
 
-    static void DrawPluginCheck(string name, string minVersion = "0.0.0.0")
+    private static void DrawPluginCheck(string name, string minVersion = "0.0.0.0")
     {
         ImGui.SameLine();
         var plugin = Svc.PluginInterface.InstalledPlugins.FirstOrDefault(x => x.InternalName == name && x.IsLoaded);

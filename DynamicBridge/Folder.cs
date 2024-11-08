@@ -12,10 +12,10 @@ public class Folder
     public List<Folder> Subfolders = [];
     public List<FolderItem> Items = [];
 
-    public Folder(string name, List<Folder> subfolders) 
+    public Folder(string name, List<Folder> subfolders)
     {
-        this.Name = name;
-        this.Subfolders = subfolders;
+        Name = name;
+        Subfolders = subfolders;
     }
 
     public void AddItem(string[] path, FolderItem item, int num = 0)
@@ -23,19 +23,19 @@ public class Folder
         try
         {
             num++;
-            if (num >= 50)
+            if(num >= 50)
             {
                 throw new InvalidOperationException("Nested path was too long");
             }
             PluginLog.Information($"Adding {item} with path {path.Print()}");
-            if (path.Length == 0)
+            if(path.Length == 0)
             {
                 Items.Add(item);
             }
             else
             {
                 string[] newPath;
-                if (path.Length < 1)
+                if(path.Length < 1)
                 {
                     newPath = path;
                 }
@@ -43,7 +43,7 @@ public class Folder
                 {
                     newPath = path[1..];
                 }
-                if (Subfolders.TryGetFirst(x => x.Name == path[0], out var target))
+                if(Subfolders.TryGetFirst(x => x.Name == path[0], out var target))
                 {
                     target.AddItem(newPath, item, num);
                 }
@@ -64,7 +64,7 @@ public class Folder
     public void Draw()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, Vector2.One);
-        for (int i = 0; i < Subfolders.Count; i++)
+        for(var i = 0; i < Subfolders.Count; i++)
         {
             var item = Subfolders[i];
             if(ImGuiEx.TreeNode(Colors.TabBlue, $"{item.Name}##fldr{Identifier}"))
@@ -73,7 +73,7 @@ public class Folder
                 ImGui.TreePop();
             }
         }
-        for (int i = 0; i < Items.Count; i++)
+        for(var i = 0; i < Items.Count; i++)
         {
             var item = Items[i];
             try

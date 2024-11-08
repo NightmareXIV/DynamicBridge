@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 namespace DynamicBridge.IPC.Moodles;
 public class MoodlesManager
 {
-    [EzIPC] readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
-    [EzIPC] readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
-    [EzIPC] readonly Action<Guid, IPlayerCharacter> AddOrUpdateMoodleByGUID;
-    [EzIPC] readonly Action<Guid, IPlayerCharacter> ApplyPresetByGUID;
-    [EzIPC] readonly Action<Guid, IPlayerCharacter> RemoveMoodleByGUID;
-    [EzIPC] readonly Action<Guid, IPlayerCharacter> RemovePresetByGUID;
+    [EzIPC] private readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
+    [EzIPC] private readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
+    [EzIPC] private readonly Action<Guid, IPlayerCharacter> AddOrUpdateMoodleByGUID;
+    [EzIPC] private readonly Action<Guid, IPlayerCharacter> ApplyPresetByGUID;
+    [EzIPC] private readonly Action<Guid, IPlayerCharacter> RemoveMoodleByGUID;
+    [EzIPC] private readonly Action<Guid, IPlayerCharacter> RemovePresetByGUID;
 
     public MoodlesManager()
     {
         EzIPC.Init(this, "Moodles");
     }
 
-    List<PathInfo> PathInfos = null;
+    private List<PathInfo> PathInfos = null;
     public List<PathInfo> GetCombinedPathes()
     {
         PathInfos ??= Utils.BuildPathes(GetRawPathes());
@@ -35,24 +35,24 @@ public class MoodlesManager
         var ret = new List<string>();
         try
         {
-            foreach (var x in GetMoodles())
+            foreach(var x in GetMoodles())
             {
                 var path = x.FullPath;
-                if (path != null)
+                if(path != null)
                 {
                     ret.Add(path);
                 }
             }
-            foreach (var x in GetPresets())
+            foreach(var x in GetPresets())
             {
                 var path = x.FullPath;
-                if (path != null)
+                if(path != null)
                 {
                     ret.Add(path);
                 }
             }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.LogInternal();
         }
@@ -66,7 +66,7 @@ public class MoodlesManager
         PathInfos = null;
     }
 
-    List<MoodlesMoodleInfo> MoodleCache = null;
+    private List<MoodlesMoodleInfo> MoodleCache = null;
     public List<MoodlesMoodleInfo> GetMoodles()
     {
         if(MoodleCache != null) return MoodleCache;
@@ -82,7 +82,7 @@ public class MoodlesManager
         return [];
     }
 
-    List<MoodlesProfileInfo> MoodleProfilesCache = null;
+    private List<MoodlesProfileInfo> MoodleProfilesCache = null;
     public List<MoodlesProfileInfo> GetPresets()
     {
         if(MoodleProfilesCache != null) return MoodleProfilesCache;
@@ -104,7 +104,7 @@ public class MoodlesManager
         {
             AddOrUpdateMoodleByGUID(guid, Player.Object);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -116,7 +116,7 @@ public class MoodlesManager
         {
             RemoveMoodleByGUID(guid, Player.Object);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -128,7 +128,7 @@ public class MoodlesManager
         {
             ApplyPresetByGUID(guid, Player.Object);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }
@@ -140,7 +140,7 @@ public class MoodlesManager
         {
             RemovePresetByGUID(guid, Player.Object);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             e.Log();
         }

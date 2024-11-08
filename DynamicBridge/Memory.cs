@@ -27,7 +27,7 @@ public unsafe class Memory : IDisposable
         }
     }
 
-    nint EquipGearsetDetour(nint a1, uint a2, byte a3)
+    private nint EquipGearsetDetour(nint a1, uint a2, byte a3)
     {
         try
         {

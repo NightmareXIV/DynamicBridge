@@ -8,13 +8,13 @@ public class GlamourerReflector
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
                 var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Configuration"], []);
                 return config.GetFoP<bool>("EnableAutoDesigns");
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             ex.LogWarning();
         }
@@ -25,13 +25,13 @@ public class GlamourerReflector
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
                 var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Configuration"], []);
                 config.SetFoP("EnableAutoDesigns", state);
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             ex.LogWarning();
         }
@@ -41,16 +41,16 @@ public class GlamourerReflector
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
                 var adm = plugin.GetFoP("_services").Call<System.Collections.IEnumerable>(context.Assemblies, "GetService", ["Glamourer.Automation.AutoDesignManager"], []);
-                foreach (var profile in adm)
+                foreach(var profile in adm)
                 {
-                    if (profile.GetFoP<bool>("Enabled"))
+                    if(profile.GetFoP<bool>("Enabled"))
                     {
-                        foreach (var identifier in profile.GetFoP<System.Collections.IEnumerable>("Identifiers"))
+                        foreach(var identifier in profile.GetFoP<System.Collections.IEnumerable>("Identifiers"))
                         {
-                            if (identifier.GetFoP("PlayerName").ToString().EqualsIgnoreCase(Player.Name))
+                            if(identifier.GetFoP("PlayerName").ToString().EqualsIgnoreCase(Player.Name))
                             {
                                 return true;
                             }
@@ -59,7 +59,7 @@ public class GlamourerReflector
                 }
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             InternalLog.Warning(ex.ToString());
         }
@@ -70,17 +70,17 @@ public class GlamourerReflector
     {
         try
         {
-            if (DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
+            if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
                 var manager = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignManager"], []);
                 var designList = manager.GetFoP<System.Collections.IList>("Designs");
-                foreach (var design in designList)
+                foreach(var design in designList)
                 {
-                    if (design.GetFoP<Guid>("Identifier") == guid)
+                    if(design.GetFoP<Guid>("Identifier") == guid)
                     {
                         var dfs = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignFileSystem"], []);
                         object[] findLeafArray = [design, null];
-                        if (dfs.Call<bool>("FindLeaf", findLeafArray, false))
+                        if(dfs.Call<bool>("FindLeaf", findLeafArray, false))
                         {
                             var ret = findLeafArray[1].Call<string>("FullName", []);
                             //PluginLog.Information($"Path for {guid} is {ret}");
@@ -91,7 +91,7 @@ public class GlamourerReflector
                 }
             }
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
             InternalLog.Warning(ex.ToString());
         }

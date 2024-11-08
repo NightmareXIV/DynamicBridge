@@ -11,6 +11,6 @@ public struct FolderItem
 
     public FolderItem(Action action) : this()
     {
-        this.Action = action ?? throw new ArgumentNullException(nameof(action));
+        Action = action ?? throw new ArgumentNullException(nameof(action));
     }
 }

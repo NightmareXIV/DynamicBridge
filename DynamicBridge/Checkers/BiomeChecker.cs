@@ -13,7 +13,7 @@ namespace DynamicBridge.Core
     {
         public static Dictionary<uint, Biome> Cache = [];
 
-        public readonly static Dictionary<Biome, uint[]> Territories = new()
+        public static readonly Dictionary<Biome, uint[]> Territories = new()
         {
             [Biome.Desert] = [
                 OpenAreas.Amh_Araeng,
@@ -73,7 +73,7 @@ namespace DynamicBridge.Core
                 1002, 1003, 1025, 691, 695, 692, 696, 693, 697, 694, 698, 749, 753, 798, 802, 658, 724, 756, 807, 812, 808, 690, 800, 804, 801, 805, 1122,
                 ]
         };
-        public readonly static Dictionary<Biome, TerritoryRegion[]> Regions = new()
+        public static readonly Dictionary<Biome, TerritoryRegion[]> Regions = new()
         {
             [Biome.Desert] = [TerritoryRegion.GyrAbania, TerritoryRegion.Thanalan],
             [Biome.Tropical] = [TerritoryRegion.LaNoscea, TerritoryRegion.Othard, TerritoryRegion.Ilsabard],
@@ -87,7 +87,7 @@ namespace DynamicBridge.Core
 
         public static bool Check(this Biome biome)
         {
-            if (Cache.TryGetValue(Svc.ClientState.TerritoryType, out var b))
+            if(Cache.TryGetValue(Svc.ClientState.TerritoryType, out var b))
             {
                 return biome == b;
             }
@@ -97,14 +97,14 @@ namespace DynamicBridge.Core
 
         public static Biome FindBiome(this TerritoryType t)
         {
-            foreach (var x in Territories)
+            foreach(var x in Territories)
             {
-                if (x.Value.Contains(t.RowId)) return x.Key;
+                if(x.Value.Contains(t.RowId)) return x.Key;
             }
-            if (((TerritoryIntendedUseEnum)t.TerritoryIntendedUse).EqualsAny(TerritoryIntendedUseEnum.Housing_Instances)) return Biome.No_biome;
-            foreach (var x in Regions)
+            if(((TerritoryIntendedUseEnum)t.TerritoryIntendedUse).EqualsAny(TerritoryIntendedUseEnum.Housing_Instances)) return Biome.No_biome;
+            foreach(var x in Regions)
             {
-                if (x.Value.Contains((TerritoryRegion)t.PlaceNameRegion.Row)) return x.Key;
+                if(x.Value.Contains((TerritoryRegion)t.PlaceNameRegion.Row)) return x.Key;
             }
             return Biome.No_biome;
         }

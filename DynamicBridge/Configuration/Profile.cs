@@ -37,11 +37,11 @@ namespace DynamicBridge.Configuration
         public IEnumerable<List<Preset>> GetPresetsListUnion(bool includeGlobal = true)
         {
             yield return Presets;
-            foreach (var x in PresetsFolders) yield return x.Presets;
-            if (!IsGlobal && includeGlobal)
+            foreach(var x in PresetsFolders) yield return x.Presets;
+            if(!IsGlobal && includeGlobal)
             {
                 yield return C.GlobalProfile.Presets;
-                foreach (var x in C.GlobalProfile.PresetsFolders) yield return x.Presets;
+                foreach(var x in C.GlobalProfile.PresetsFolders) yield return x.Presets;
             }
         }
     }

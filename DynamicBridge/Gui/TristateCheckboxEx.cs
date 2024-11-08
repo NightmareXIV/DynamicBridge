@@ -11,7 +11,7 @@ public class TristateCheckboxEx : TristateCheckbox
 {
     protected override void RenderSymbol(sbyte value, Vector2 position, float size)
     {
-        switch (value)
+        switch(value)
         {
             case -1:
                 SymbolHelpers.RenderCross(ImGui.GetWindowDrawList(), position, CrossColor, size);

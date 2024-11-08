@@ -11,14 +11,14 @@ public static class DragDrop
 {
     public static void AcceptProfileDragDrop(Profile currentProfile, List<Preset> presetList, int i)
     {
-        if (ImGui.BeginDragDropTarget())
+        if(ImGui.BeginDragDropTarget())
         {
-            if (ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+            if(ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
             {
-                if (!presetList.Any(x => x.GUID == payload))
+                if(!presetList.Any(x => x.GUID == payload))
                 {
                     var item = currentProfile.GetPresetsUnion().FirstOrDefault(x => x.GUID == payload);
-                    if (item == null)
+                    if(item == null)
                     {
                         DuoLog.Error($"Fatal error: payload ID not found");
                     }
@@ -36,9 +36,9 @@ public static class DragDrop
 
     public static void AcceptFolderDragDrop(Profile currentProfile, List<Preset> presetList, ImGuiDragDropFlags flags = ImGuiDragDropFlags.None)
     {
-        if (ImGui.BeginDragDropTarget())
+        if(ImGui.BeginDragDropTarget())
         {
-            if (ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload, flags))
+            if(ImGuiDragDrop.AcceptDragDropPayload("MovePreset", out var payload, flags))
             {
                 MovePresetToList(currentProfile, payload, presetList);
             }
@@ -48,10 +48,10 @@ public static class DragDrop
 
     public static void MovePresetToList(Profile currentProfile, string payload, List<Preset> presetList)
     {
-        if (!presetList.Any(x => x.GUID == payload))
+        if(!presetList.Any(x => x.GUID == payload))
         {
             var item = currentProfile.GetPresetsUnion().FirstOrDefault(x => x.GUID == payload);
-            if (item == null)
+            if(item == null)
             {
                 DuoLog.Error($"Fatal error: payload ID not found");
             }
@@ -65,9 +65,9 @@ public static class DragDrop
 
     public static void AcceptRuleDragDrop(Profile currentProfile, int i)
     {
-        if (ImGui.BeginDragDropTarget())
+        if(ImGui.BeginDragDropTarget())
         {
-            if (ImGuiDragDrop.AcceptDragDropPayload("MoveRule", out var payload, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+            if(ImGuiDragDrop.AcceptDragDropPayload("MoveRule", out var payload, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
             {
                 MoveItemToPosition(currentProfile.Rules, (x) => x.GUID == payload, i);
             }
