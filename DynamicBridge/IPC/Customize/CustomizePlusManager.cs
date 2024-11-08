@@ -58,7 +58,7 @@ public class CustomizePlusManager
         var charaSenders = chara?.Select(x => Sender.TryParse(x, out var s) ? s : default);
         foreach(var x in (Cache ?? []))
         {
-            if (charaSenders == null || charaSenders.Any(c => x.Characters.Any(p => p.Name == c.Name && p.WorldId == c.HomeWorld))) yield return x;
+            if (charaSenders == null || charaSenders.Any(c => x.Characters.Any(p => p.Name == c.Name && p.WorldId.ToUInt().EqualsAny(c.HomeWorld, ushort.MaxValue)))) yield return x;
         }
     }
 
@@ -72,11 +72,11 @@ public class CustomizePlusManager
     {
         try
         {
-            PluginLog.Information($"Try parse: {charName}");
+            //PluginLog.Information($"Try parse: {charName}");
             if(Sender.TryParse(charName, out var chara))
             {
-                var charaProfiles = GetProfiles().Where(x => x.Characters.Any(c => c.Name == chara.Name && c.WorldId == chara.HomeWorld)).ToArray();
-                PluginLog.Information($"CharaProfiles: {charaProfiles}");
+                var charaProfiles = GetProfiles().Where(x => x.Characters.Any(c => c.Name == chara.Name && c.WorldId.ToUInt().EqualsAny(ushort.MaxValue, chara.HomeWorld))).ToArray();
+                //PluginLog.Information($"CharaProfiles: {charaProfiles}");
                 if(!WasSet)
                 {
                     var enabled = charaProfiles.Where(x => x.IsEnabled);

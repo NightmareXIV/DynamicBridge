@@ -34,7 +34,8 @@ public unsafe class GlamourerManager
     {
         try
         {
-            ApplyDesign.Invoke(guid, 0);
+            //ApplyDesign.Invoke(guid, 0);
+            Commands.ApplyByGuid(guid);
         }
         catch (Exception ex)
         {
@@ -88,8 +89,8 @@ public unsafe class GlamourerManager
     {
         try
         {
-            ApplyByGuid(design.Identifier);
-            //Commands.ApplyByGuid(design.Identifier);
+            //ApplyByGuid(design.Identifier);
+            Commands.ApplyByGuid(design.Identifier);
         }
         catch (Exception e)
         {
@@ -103,8 +104,8 @@ public unsafe class GlamourerManager
     {
         try
         {
-            //Commands.Revert();
-            RevertState.Invoke(0);
+            Commands.Revert();
+            //RevertState.Invoke(0);
         }
         catch (Exception e)
         {
