@@ -17,5 +17,6 @@ namespace DynamicBridge.Core
         Wading_in_water,
         Watching_cutscene,
         In_combat,
+        Dead,
     }
 }

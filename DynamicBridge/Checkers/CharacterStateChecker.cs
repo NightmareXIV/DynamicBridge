@@ -1,4 +1,5 @@
-﻿using ECommons.Throttlers;
+﻿using ECommons.GameHelpers;
+using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace DynamicBridge.Core
             [CharacterState.Watching_cutscene] = () => Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
                 || Svc.Condition[ConditionFlag.WatchingCutscene78],
             [CharacterState.In_combat] = () => Svc.Condition[ConditionFlag.InCombat],
+            [CharacterState.Dead] = () => Player.Available && Player.Object.IsDead
         };
 
         public static bool Check(this CharacterState state)
