@@ -27,7 +27,7 @@ public class Folder
             {
                 throw new InvalidOperationException("Nested path was too long");
             }
-            PluginLog.Information($"Adding {item} with path {path.Print()}");
+            //PluginLog.Information($"Adding {item} with path {path.Print()}");
             if(path.Length == 0)
             {
                 Items.Add(item);

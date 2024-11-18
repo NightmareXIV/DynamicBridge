@@ -19,7 +19,7 @@ public unsafe class Memory : IDisposable
     public Memory()
     {
         EzSignatureHelper.Initialize(this);
-        var addr = Svc.SigScanner.GetStaticAddressFromSig("44 38 35 ?? ?? ?? ?? 74 10");
+        var addr = Svc.SigScanner.GetStaticAddressFromSig("F6 05 ?? ?? ?? ?? ?? 74 19");
         IsLPInWater = (byte*)(addr + 2);
         if(C.UpdateJobGSChange)
         {
