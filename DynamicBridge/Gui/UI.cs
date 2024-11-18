@@ -7,7 +7,7 @@ using ECommons.Funding;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using ECommons.SimpleGui;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Xml.Linq;

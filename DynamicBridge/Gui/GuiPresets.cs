@@ -11,7 +11,7 @@ namespace DynamicBridge.Gui
     {
         private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         private static bool[] OnlySelected = new bool[15];
-        private static ImGuiEx.RealtimeDragDrop.Complex DragDrop = new("MovePresetItem");
+        private static ImGuiEx.RealtimeDragDrop<Preset> DragDrop = new("MovePresetItem", (x) => x.GUID);
         private static bool Focus = false;
         private static string Open = null;
         public static void DrawUser()
@@ -299,7 +299,7 @@ namespace DynamicBridge.Gui
                     }
                     else
                     {
-                        DragDrop.BeginRow();
+                        DragDrop.NextRow();
                         if(ImGui.RadioButton("##static", preset.IsStatic))
                         {
                             preset.IsStatic = !preset.IsStatic;
@@ -311,12 +311,11 @@ namespace DynamicBridge.Gui
                         }
                         ImGuiEx.Tooltip("Set this preset as static, applying it unconditionally on this character disregarding any rules.");
                         ImGui.SameLine();
-                        DragDrop.DrawButtonDummy();
                         var moveIndex = i;
-                        DragDrop.EndRow(preset.GUID, (payload) =>
+                        DragDrop.DrawButtonDummy(preset.GUID, (payload) =>
                         {
                             DragDropUtils.AcceptProfileDragDrop(currentProfile, payload, presetList, moveIndex);
-                        });                        
+                        });         
 
                         ImGui.SameLine();
                         if(ImGuiEx.IconButton(FontAwesomeIcon.CaretDown))
@@ -766,7 +765,7 @@ namespace DynamicBridge.Gui
                     ImGui.PopID();
                 }
                 ImGui.EndTable();
-                postAction = DragDrop.End;
+                postAction = () => DragDrop.End();
             }
             ImGui.PopStyleVar();
         }

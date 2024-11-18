@@ -2,7 +2,7 @@
 using ECommons.ExcelServices;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ public class HonorificManager
                     {
                         var name = parts[0];
                         var world = ExcelWorldHelper.Get(parts[1]);
-                        ret.AddRange(GetCharacterTitleList(name, world.RowId) ?? []);
+                        ret.AddRange(GetCharacterTitleList(name, world?.RowId ?? 0) ?? []);
                     }
                 }
             }

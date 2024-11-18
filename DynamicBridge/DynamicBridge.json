@@ -1,10 +1,10 @@
 {
-    "Author": "NightmareXIV and AsunaTsuki",
+    "Author": "NightmareXIV, AsunaTsuki",
     "Name": "DynamicBridge",
     "InternalName": "DynamicBridge",
     "Description": "Automates character appearance changes through rule-based presets, utilizing integration with other popular customization plugins. This enables seamless and context-sensitive transformations, enriching gameplay and increasing immersion.",
     "ApplicableVersion": "any",
     "Punchline": "Allows you to automatically change your appearance based on various conditions.",
     "AcceptsFeedback": false,
-    "DalamudApiLevel": 10
+    "DalamudApiLevel": 11
 }

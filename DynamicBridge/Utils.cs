@@ -6,7 +6,7 @@ using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Globalization;
 using Action = System.Action;
 
@@ -242,7 +242,7 @@ namespace DynamicBridge
         public static string GetHouseDefaultName()
         {
             var h = HousingManager.Instance();
-            return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRow(Svc.ClientState.TerritoryType)?.PlaceNameRegion.Value?.Name?.ExtractText()}, Ward {h->GetCurrentWard() + 1}, plot {h->GetCurrentPlot() + 1}";
+            return $"{Svc.Data.GetExcelSheet<TerritoryType>().GetRowOrDefault(Svc.ClientState.TerritoryType)?.PlaceNameRegion.ValueNullable?.Name.ExtractText()}, Ward {h->GetCurrentWard() + 1}, plot {h->GetCurrentPlot() + 1}";
         }
 
         public static GlamourerDesignInfo? GetDesignByGUID(string GUID)
@@ -279,11 +279,11 @@ namespace DynamicBridge
         public static (List<byte> WeatherList, string EnvbFile) ParseLvb(ushort id)
         {
             var weathers = new List<byte>();
-            var territoryType = Svc.Data.GetExcelSheet<TerritoryType>().GetRow(id);
+            var territoryType = Svc.Data.GetExcelSheet<TerritoryType>().GetRowOrDefault(id);
             if(territoryType == null) return default;
             try
             {
-                var file = Svc.Data.GetFile<LvbFile>($"bg/{territoryType.Bg}.lvb");
+                var file = Svc.Data.GetFile<LvbFile>($"bg/{territoryType?.Bg}.lvb");
                 if(file?.weatherIds == null || file.weatherIds.Length == 0)
                     return (null, null);
                 foreach(var weather in file.weatherIds)

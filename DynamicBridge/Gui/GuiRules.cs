@@ -8,14 +8,14 @@ using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.Throttlers;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using OtterGui.Widgets;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Action = System.Action;
-using Emote = Lumina.Excel.GeneratedSheets.Emote;
+using Emote = Lumina.Excel.Sheets.Emote;
 
 namespace DynamicBridge.Gui
 {
@@ -400,9 +400,9 @@ namespace DynamicBridge.Gui
                                     ImGui.Separator();
                                 }
 
-                                foreach(var cond in Svc.Data.GetExcelSheet<Emote>().Where(e => e.Name?.ExtractText().IsNullOrEmpty() == false || e.Icon != 0 || rule.Emotes.Contains(e.RowId)))
+                                foreach(var cond in Svc.Data.GetExcelSheet<Emote>().Where(e => e.Name.ExtractText().IsNullOrEmpty() == false || e.Icon != 0 || rule.Emotes.Contains(e.RowId)))
                                 {
-                                    var name = cond.Name?.ExtractText() ?? "";
+                                    var name = cond.Name.ExtractText() ?? "";
                                     if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if(OnlySelected[filterCnt] && !rule.Emotes.Contains(cond.RowId)) continue;
                                     if(ThreadLoadImageHandler.TryGetIconTextureWrap(cond.Icon, false, out var texture))
@@ -458,7 +458,7 @@ namespace DynamicBridge.Gui
                                 FiltersSelection();
                                 foreach(var dc in ExcelWorldHelper.GetDataCenters(Enum.GetValues<ExcelWorldHelper.Region>()))
                                 {
-                                    var worlds = ExcelWorldHelper.GetPublicWorlds().Where(x => x.DataCenter.Row == dc.RowId);
+                                    var worlds = ExcelWorldHelper.GetPublicWorlds().Where(x => x.DataCenter.RowId == dc.RowId);
                                     ImGuiEx.Text($"{dc.Name}");
                                     foreach(var cond in worlds)
                                     {

@@ -1,6 +1,6 @@
 ﻿using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,10 +101,10 @@ namespace DynamicBridge.Core
             {
                 if(x.Value.Contains(t.RowId)) return x.Key;
             }
-            if(((TerritoryIntendedUseEnum)t.TerritoryIntendedUse).EqualsAny(TerritoryIntendedUseEnum.Housing_Instances)) return Biome.No_biome;
+            if(((TerritoryIntendedUseEnum)t.TerritoryIntendedUse.RowId).EqualsAny(TerritoryIntendedUseEnum.Housing_Instances)) return Biome.No_biome;
             foreach(var x in Regions)
             {
-                if(x.Value.Contains((TerritoryRegion)t.PlaceNameRegion.Row)) return x.Key;
+                if(x.Value.Contains((TerritoryRegion)t.PlaceNameRegion.RowId)) return x.Key;
             }
             return Biome.No_biome;
         }

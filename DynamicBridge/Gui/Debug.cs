@@ -2,7 +2,7 @@
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Runtime.Loader;
 
 namespace DynamicBridge.Gui
@@ -275,7 +275,7 @@ namespace DynamicBridge.Gui
                     var success = false;
                     foreach(var z in Svc.Data.GetExcelSheet<TerritoryType>())
                     {
-                        if(z.PlaceName.Value?.Name.ExtractText().EqualsIgnoreCase(x) == true || z.ContentFinderCondition.Value?.Name.ExtractText().EqualsIgnoreCase(x) == true)
+                        if(z.PlaceName.ValueNullable?.Name.ExtractText().EqualsIgnoreCase(x) == true || z.ContentFinderCondition.ValueNullable?.Name.ExtractText().EqualsIgnoreCase(x) == true)
                         {
                             success = true;
                             result.Add(z.RowId);

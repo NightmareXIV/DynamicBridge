@@ -1,6 +1,6 @@
 ﻿using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;

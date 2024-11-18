@@ -123,7 +123,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
 
         Utils.UpdateGearsetCache();
 
-        LastJob = Player.Object.ClassJob.Id;
+        LastJob = (uint)Player.Job;
         //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
     }
 
@@ -223,9 +223,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             if(C.UpdateJobGSChange)
             {
-                if(LastJob != Player.Object.ClassJob.Id)
+                if(LastJob != Player.Object.ClassJob.RowId)
                 {
-                    LastJob = Player.Object.ClassJob.Id;
+                    LastJob = Player.Object.ClassJob.RowId;
                     ForceUpdate = true;
                 }
                 /*if (LastGS != RaptureGearsetModule.Instance()->CurrentGearsetIndex)
@@ -289,8 +289,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
                                 && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))
                                 &&
-                                (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.Id))
-                                && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.Id))))
+                                (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.RowId))
+                                && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.RowId))))
                                 &&
                                 (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
                                 && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
