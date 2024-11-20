@@ -80,7 +80,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
             }
             EzConfigGui.Init(UI.DrawMain);
-            EzCmd.Add("/db", OnCommand, "open the plugin settings\n/db apply - reapply rules immediately\n/db static <name> - mark preset as static\n/db dynamic - cancel static preset and use dynamic rules");
+            EzCmd.Add("/db", OnCommand, "open the plugin settings\n" +
+                "/db apply → reapply rules immediately\n" +
+                "/db static <name> → mark preset as static\n" +
+                "/db dynamic → cancel static preset and use dynamic rules\n" +
+                "/db characterprofile <name> → changes profile of currently active character to provided profile");
             AgentMapInst = AgentMap.Instance();
             WeatherManager = new();
             new EzFrameworkUpdate(OnUpdate);
