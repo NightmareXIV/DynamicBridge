@@ -263,7 +263,7 @@ namespace DynamicBridge.Gui
 
             }
 
-            ImGuiEx.Text($"In water: {*P.Memory.IsLPInWater}");
+            ImGuiEx.Text($"In water: {Utils.IsInWater}");
 
             if(ImGui.CollapsingHeader("Query territory IDs"))
             {
