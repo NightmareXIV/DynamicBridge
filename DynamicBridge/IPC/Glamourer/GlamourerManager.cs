@@ -154,6 +154,29 @@ public unsafe class GlamourerManager
         }
     }
 
+    private Dictionary<string, string> FullPathCache = [];
+    public string GetFullPath(string originalName)
+    {
+        if(FullPathCache.TryGetValue(originalName, out var ret))
+        {
+            return ret; 
+        }
+        if (Guid.TryParse(originalName, out var guid))
+        {
+            if (GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
+            {
+                return CacheAndReturn(Reflector.GetPathForDesignByGuid(guid) ?? entry.Name);
+            }
+        }
+        return CacheAndReturn(originalName);
+
+        string CacheAndReturn(string name)
+        {
+            FullPathCache[originalName] = name;
+            return FullPathCache[originalName];
+        }
+    }
+
     public List<string> GetRawPathes()
     {
         var ret = new List<string>();

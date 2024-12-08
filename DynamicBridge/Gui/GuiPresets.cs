@@ -390,8 +390,9 @@ namespace DynamicBridge.Gui
                                     {
                                         var name = x.Name;
                                         var id = x.Identifier.ToString();
-                                        var transformedName = P.GlamourerManager.TransformName(x.Identifier.ToString());
-                                        if(C.GlamourerFullPath && currentProfile.Pathes.Count > 0 && !transformedName.StartsWithAny(currentProfile.Pathes)) continue;
+                                        var fullPath = P.GlamourerManager.GetFullPath(id);
+                                        var transformedName = P.GlamourerManager.TransformName(id);
+                                        if(currentProfile.Pathes.Count > 0 && !fullPath.StartsWithAny(currentProfile.Pathes)) continue;
                                         if(Filters[filterCnt].Length > 0 && !transformedName.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         var contains = preset.Glamourer.Contains(id);
                                         if(OnlySelected[filterCnt] && !contains) continue;
@@ -489,7 +490,8 @@ namespace DynamicBridge.Gui
                                     index++;
                                     ImGui.PushID(index);
                                     var name = P.CustomizePlusManager.TransformName($"{x.UniqueId}");
-                                    if(C.GlamourerFullPath && currentProfile.CustomizePathes.Count > 0 && !name.StartsWithAny(currentProfile.CustomizePathes)) continue;
+                                    var fullPath = P.CustomizePlusManager.GetFullPath($"{x.UniqueId}");
+                                    if(currentProfile.CustomizePathes.Count > 0 && !fullPath.StartsWithAny(currentProfile.CustomizePathes)) continue;
                                     if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if(OnlySelected[filterCnt] && !preset.Customize.Contains($"{x.UniqueId}")) continue;
                                     var contains = preset.Customize.Contains($"{x.UniqueId}");
