@@ -152,4 +152,16 @@ public class CustomizePlusManager
         }
         return originalName;
     }
+
+    public string GetFullPath(string originalName)
+    {
+        if (Guid.TryParse(originalName, out var guid))
+        {
+            if (GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
+            {
+                return entry.VirtualPath;
+            }
+        }
+        return originalName;
+    }
 }
