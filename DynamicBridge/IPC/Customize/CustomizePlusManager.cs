@@ -136,20 +136,53 @@ public class CustomizePlusManager
     }
 
 
-
+    private Dictionary<string, string> TransformNameCache = [];
     public string TransformName(string originalName)
     {
-        if(Guid.TryParse(originalName, out var guid))
+        if (TransformNameCache.TryGetValue(originalName, out var ret))
+        {
+            return ret;
+        }
+        if (Guid.TryParse(originalName, out var guid))
         {
             if(GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
             {
                 if(C.GlamourerFullPath)
                 {
-                    return entry.VirtualPath;
+                    return CacheAndReturn(entry.VirtualPath);
                 }
-                return entry.Name;
+                return CacheAndReturn(entry.Name);
             }
         }
-        return originalName;
+        return CacheAndReturn(originalName);
+
+        string CacheAndReturn(string name)
+        {
+            TransformNameCache[originalName] = name;
+            return TransformNameCache[originalName];
+        }
+    }
+
+    private Dictionary<string, string> FullPathCache = [];
+    public string GetFullPath(string originalName)
+    {
+        if (FullPathCache.TryGetValue(originalName, out var ret))
+        {
+            return ret;
+        }
+        if (Guid.TryParse(originalName, out var guid))
+        {
+            if (GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
+            {
+                return CacheAndReturn(entry.VirtualPath);
+            }
+        }
+        return CacheAndReturn(originalName);
+
+        string CacheAndReturn(string name)
+        {
+            FullPathCache[originalName] = name;
+            return FullPathCache[originalName];
+        }
     }
 }
