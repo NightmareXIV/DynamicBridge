@@ -36,6 +36,7 @@ public static class GuiSettings
             ImGuiEx.HelpMarker("If you will enable this option, you will be able to mark any condition with cross marker. If any condition marked with cross within the rule is matching, that entire rule is ignored.");
             ImGui.Checkbox("Display full path in profile editor, where available", ref C.GlamourerFullPath);
             ImGuiEx.SetNextItemWidthScaled(150f);
+            ImGui.Checkbox("Reapply rules and presets on change in Glamourer dropdowns", ref C.AutoApplyOnChange);
             ImGuiEx.EnumCombo("Dropdown menu size", ref C.ComboSize, ComboFlagNames.ContainsKey, ComboFlagNames);
             if(ImGui.Checkbox($"Force update appearance on job and gearset changes", ref C.UpdateJobGSChange))
             {

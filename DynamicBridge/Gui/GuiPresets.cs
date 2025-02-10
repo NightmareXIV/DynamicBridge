@@ -396,13 +396,16 @@ namespace DynamicBridge.Gui
                                         if(Filters[filterCnt].Length > 0 && !transformedName.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                         var contains = preset.Glamourer.Contains(id);
                                         if(OnlySelected[filterCnt] && !contains) continue;
-
                                         items.Add((transformedName.SplitDirectories()[0..^1], () =>
                                         {
                                             if(Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ##{x.Identifier}", id, preset.Glamourer))
                                             {
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Glamourer.Contains(id)) preset.Name = name;
-                                            }
+                                                if(C.AutoApplyOnChange)
+                                                {
+                                                    P.ForceUpdate = true;
+                                                }
+                                            }                                           
                                         }
 
                                         ));
@@ -431,6 +434,10 @@ namespace DynamicBridge.Gui
                                             if(Utils.CollectionSelectable(contains ? Colors.TabYellow : null, $"{name}##{x.GUID}", name, preset.ComplexGlamourer))
                                             {
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.ComplexGlamourer.Contains(name)) preset.Name = name;
+                                                if(C.AutoApplyOnChange)
+                                                {
+                                                    P.ForceUpdate = true;
+                                                }
                                             }
                                         }
                                         ));
