@@ -18,5 +18,6 @@ namespace DynamicBridge.Core
         Watching_cutscene,
         In_combat,
         Dead,
+        Crafting,
     }
 }

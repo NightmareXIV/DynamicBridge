@@ -172,6 +172,9 @@
         <None Update="res\state\1.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="res\state\10.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="res\state\2.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -191,6 +194,9 @@
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="res\state\8.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="res\state\9.png">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="res\tutorial\1.png">
