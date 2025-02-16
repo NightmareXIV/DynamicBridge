@@ -177,6 +177,6 @@ public static unsafe class UI
         {
             P.ForceUpdate = true;
         }
-        ImGuiEx.Tooltip("Force update your character, reapplying all rules and resets");
+        ImGuiEx.Tooltip("Force update your character, reapplying all rules and presets");
     }
 }
