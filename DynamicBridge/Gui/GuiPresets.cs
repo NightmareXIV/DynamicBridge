@@ -382,6 +382,7 @@ namespace DynamicBridge.Gui
                                 if(ImGui.IsWindowAppearing()) Utils.ResetCaches();
                                 FiltersSelection();
                                 ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
+                                bool noresults = true;
                                 // normal
                                 {
                                     List<(string[], Action)> items = [];
@@ -406,6 +407,7 @@ namespace DynamicBridge.Gui
                                         }
 
                                         ));
+                                        noresults = false;
                                     }
                                     foreach(var x in preset.Glamourer)
                                     {
@@ -434,6 +436,7 @@ namespace DynamicBridge.Gui
                                             }
                                         }
                                         ));
+                                        noresults = false;
                                     }
                                     ImGui.PopStyleColor();
                                     foreach(var x in preset.ComplexGlamourer)
@@ -456,6 +459,7 @@ namespace DynamicBridge.Gui
                                     }
                                 }
 
+                                if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                 ImGui.PopStyleVar();
 
                                 ImGui.EndCombo();
@@ -470,6 +474,7 @@ namespace DynamicBridge.Gui
                     {
                         if(C.EnableCustomize)
                         {
+                            bool noresults = true;
                             ImGui.TableNextColumn();
                             if(isGlobal)
                             {
@@ -504,6 +509,7 @@ namespace DynamicBridge.Gui
                                     }
 
                                     ));
+                                    noresults = false;
                                     ImGui.PopID();
                                 }
                                 foreach(var x in preset.Customize)
@@ -513,6 +519,7 @@ namespace DynamicBridge.Gui
                                     items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}  ", x, preset.Customize, true)));
                                     ImGui.PopStyleColor();
                                 }
+                                if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                 Utils.DrawFolder(items);
                                 ImGui.PopStyleVar();
                                 ImGui.EndCombo();
@@ -527,6 +534,7 @@ namespace DynamicBridge.Gui
                     {
                         if(C.EnableHonorific)
                         {
+                            bool noresults = true;
                             ImGui.TableNextColumn();
                             if(isGlobal && !C.HonotificUnfiltered)
                             {
@@ -565,7 +573,8 @@ namespace DynamicBridge.Gui
                                         }
 
                                         ));
-                                        if(x.Color != null) ImGui.PopStyleColor();
+                                        noresults = false;
+                                        if (x.Color != null) ImGui.PopStyleColor();
                                         ImGui.PopID();
                                     }
                                 }
@@ -574,6 +583,7 @@ namespace DynamicBridge.Gui
                                     if(allTitles.Any(d => d.Title == x)) continue;
                                     items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}  ", x, preset.Honorific, true)));
                                 }
+                                if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                 Utils.DrawFolder(items);
                                 ImGui.PopStyleVar();
                                 ImGui.EndCombo();
@@ -588,6 +598,7 @@ namespace DynamicBridge.Gui
                     {
                         if(C.EnablePenumbra)
                         {
+                            bool noresults = true;
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
                             string fullList = null;
@@ -620,6 +631,7 @@ namespace DynamicBridge.Gui
                                         }
 
                                         ));
+                                        noresults = false;
                                         ImGui.PopID();
                                     }
                                     foreach(var x in preset.Penumbra)
@@ -632,6 +644,7 @@ namespace DynamicBridge.Gui
 
                                         ));
                                     }
+                                    if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                     Utils.DrawFolder(items);
                                 }
                                 ImGui.PopStyleVar();
@@ -646,6 +659,7 @@ namespace DynamicBridge.Gui
                     {
                         if(C.EnableMoodles)
                         {
+                            bool noresults = true;
                             ImGui.TableNextColumn();
                             ImGuiEx.SetNextItemFullWidth();
                             if(ImGui.BeginCombo("##moodles", preset.Moodles.Select(Utils.GetName).PrintRange(out var fullList, "- None -"), C.ComboSize))
@@ -708,6 +722,7 @@ namespace DynamicBridge.Gui
                                         if(currentProfile.MoodlesPathes.Count > 0 && !name.StartsWithAny(currentProfile.MoodlesPathes)) continue;
                                         var parts = name.SplitDirectories();
                                         items.Add((parts[0..^1], () => ToggleMoodle(Colors.TabGreen, x.ID, parts[^1])));
+                                        noresults = false;
                                         ImGui.PopID();
                                     }
                                     Utils.DrawFolder(items);
@@ -726,6 +741,7 @@ namespace DynamicBridge.Gui
                                         if(currentProfile.MoodlesPathes.Count > 0 && !name.StartsWithAny(currentProfile.MoodlesPathes)) continue;
                                         var parts = name.SplitDirectories();
                                         items.Add((parts[0..^1], () => ToggleMoodle(Colors.TabYellow, x.ID, parts[^1])));
+                                        noresults = false;
                                         ImGui.PopID();
                                     }
                                     Utils.DrawFolder(items);
@@ -737,6 +753,7 @@ namespace DynamicBridge.Gui
                                     if(moodlePresets.Any(z => z.ID == x.Guid)) continue;
                                     Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Moodles, true);
                                 }
+                                if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                 ImGui.PopStyleVar();
                                 ImGui.EndCombo();
                             }
