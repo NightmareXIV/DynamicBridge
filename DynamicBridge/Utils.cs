@@ -50,7 +50,7 @@ namespace DynamicBridge
 
         public static bool CollectionSelectable<T>(Vector4? color, string label, T value, ICollection<T> collection, bool delayedOperation = false)
         {
-            bool Draw(ref bool x) => ImGuiEx.Selectable(color ?? ImGuiEx.Vector4FromRGB(0xDDDDDD), label, ref x, collection.Contains(value) ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf);
+            bool Draw(ref bool x) => ImGuiEx.SelectableNode(color ?? ImGuiEx.Vector4FromRGB(0xDDDDDD), label, ref x, collection.Contains(value) ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf);
             return ImGuiEx.CollectionCore(Draw, value, collection, false, delayedOperation);
         }
 

@@ -686,7 +686,7 @@ namespace DynamicBridge.Gui
                                         ImGui.TableSetupColumn("Button", ImGuiTableColumnFlags.WidthFixed, size.X);
                                         ImGui.TableNextRow();
                                         ImGui.TableNextColumn();
-                                        if(ImGuiEx.Selectable(cont ? selectedCol : null, name + "      ", ref cont, cont ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf))
+                                        if(ImGuiEx.SelectableNode(cont ? selectedCol : null, name + "      ", ref cont, cont ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf))
                                         {
                                             if(cont)
                                             {
