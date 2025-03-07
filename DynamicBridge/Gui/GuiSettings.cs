@@ -49,6 +49,7 @@ public static class GuiSettings
                     P.Memory.EquipGearsetHook.Disable();
                 }
             }
+            ImGui.Checkbox($"Don't force update on territory change if applied rules don't change", ref C.DontChangeOnTerritoryChange); // Concise and clear wording?
             /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
             ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
             ImGui.Separator();
