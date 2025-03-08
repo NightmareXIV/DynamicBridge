@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface.Components;
+using Dalamud.Interface.Components;
 using Dalamud.Interface.Style;
 using DynamicBridge.Configuration;
 using DynamicBridge.Core;
@@ -567,7 +567,6 @@ namespace DynamicBridge.Gui
                                     if (rule.StickyRandom == old) {
                                         rule.StickyRandom = (rule.StickyRandom + 1)%rule.SelectedPresets.Count;
                                     };
-
                                 }
                                 else {rule.StickyRandom = 0;}
                             }

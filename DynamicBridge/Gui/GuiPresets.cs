@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling;
 using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Honorific;
 using ECommons.Configuration;
@@ -503,7 +503,6 @@ namespace DynamicBridge.Gui
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "GlamourerButton"))
                                 {
-                                    PluginLog.Debug("Attempting to randomize!");
                                     if (preset.Glamourer.Count + preset.ComplexGlamourer.Count > 1) {
                                         var old = preset.StickyRandomG;
                                         preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
@@ -597,7 +596,6 @@ namespace DynamicBridge.Gui
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice,"CustomizeButton"))
                                 {
-                                    PluginLog.Debug("Attempting to randomize!");
                                     if (preset.CustomizeFiltered().ToArray().Length > 1) {
                                         var old = preset.StickyRandomC;
                                         preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
@@ -695,7 +693,6 @@ namespace DynamicBridge.Gui
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "HonorificButton"))
                                 {
-                                    PluginLog.Debug("Attempting to randomize!");
                                     if (preset.HonorificFiltered().ToArray().Length > 1) {
                                         var old = preset.StickyRandomH;
                                         preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
@@ -785,7 +782,6 @@ namespace DynamicBridge.Gui
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "PenumbraButton"))
                                 {
-                                    PluginLog.Debug("Attempting to randomize!");
                                     if (preset.Penumbra.Count > 1) {
                                         var old = preset.StickyRandomP;
                                         preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
