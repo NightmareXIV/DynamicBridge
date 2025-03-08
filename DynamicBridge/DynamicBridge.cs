@@ -54,10 +54,13 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public IpcTester IpcTester;
     public HonorificManager HonorificManager;
 
+    private DateTime RandomizerTimer;
+    private bool RandomizedRecently = false;
     public DynamicBridge(IDalamudPluginInterface pi)
     {
         P = this;
         ECommonsMain.Init(pi, this, Module.DalamudReflector);
+        RandomizerTimer = DateTime.UtcNow;
         new TickScheduler(() =>
         {
             C = EzConfig.Init<Config>();
@@ -129,6 +132,27 @@ public unsafe class DynamicBridge : IDalamudPlugin
 
         LastJob = (uint)Player.Job;
         //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
+
+        if(C.RandomChoosenType == RandomTypes.OnLogin && !RandomizedRecently) {
+            RandomizedRecently = true;
+            Randomizer();
+        }
+    }
+    
+    private void Randomizer() {
+        var profile = Utils.GetProfileByCID(Player.CID);
+        if (profile != null) {
+            foreach (var rule in profile.Rules) {
+                rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+            }
+            foreach (var preset in profile.Presets) {
+                preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
+                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
+                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+            }
+        }
+        RandomizedRecently = false;
     }
 
     private void OnCommand(string command, string arguments)
@@ -246,6 +270,14 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     LastItems = items;
                     P.TaskManager.Enqueue(() => ForceUpdate = true);
                 }
+            }
+
+            if (!RandomizedRecently && ((DateTime.UtcNow - RandomizerTimer).TotalMinutes >= C.UserInputRandomizerTime) && (C.RandomChoosenType == RandomTypes.Timer))
+            {
+                RandomizedRecently = true;
+                RandomizerTimer = DateTime.UtcNow;
+                Randomizer();
+                ForceUpdate = true;
             }
 
             var profile = Utils.GetProfileByCID(Player.CID);

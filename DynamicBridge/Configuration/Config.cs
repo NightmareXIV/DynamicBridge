@@ -40,6 +40,8 @@ namespace DynamicBridge.Configuration
         public bool StickyCustomize = false;
         public bool StickyHonorific = false;
         public bool StickyPenumbra = false;
+        public RandomTypes RandomChoosenType = RandomTypes.OnLogin;
+        public double UserInputRandomizerTime = 5;
         public bool UpdateGearChange = false;
         public Dictionary<ulong, string> SeenCharacters = [];
 
@@ -71,5 +73,11 @@ namespace DynamicBridge.Configuration
         RevertToNormal,
         RevertToAutomation,
         StoreRestore
+    }
+    public enum RandomTypes
+    {
+        OnLogin,
+        Never,
+        Timer
     }
 }
