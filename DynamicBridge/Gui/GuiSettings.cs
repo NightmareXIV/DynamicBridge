@@ -1,4 +1,4 @@
-﻿using DynamicBridge.Configuration;
+using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
 using Lumina.Excel.Sheets;
 using System;
@@ -59,13 +59,17 @@ public static class GuiSettings
                 ImGuiEx.EnumCombo($"Randomize on Login", ref C.RandomChoosenType);
                 if (C.RandomChoosenType == RandomTypes.Timer) {
                     ImGui.SameLine();
-                    ImGui.Text("| How often should it randomize everything in minutes:");
+                    ImGui.Text("|");
+                    ImGui.SameLine();
+                    ImGui.Text("How often should it randomize everything in minutes:");
                     ImGui.SameLine();
                     ImGuiEx.SetNextItemWidthScaled(200f);
                     if (ImGui.InputDouble("", ref C.UserInputRandomizerTime))
                     {
                         C.UserInputRandomizerTime = Math.Max(0.15, C.UserInputRandomizerTime);
                     };
+                    ImGuiEx.Spacing();ImGuiEx.Spacing();
+                    ImGui.Checkbox("Force update on randomize", ref C.ForceUpdateOnRandomize);
                 }
                 ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve presets", ref C.StickyPresets);
@@ -74,7 +78,7 @@ public static class GuiSettings
                 ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve customize", ref C.StickyCustomize);
                 ImGuiEx.Spacing();
-                ImGui.Checkbox($"Attempt to preserve honorific", ref C.StickyHonorific);
+                ImGui.Checkbox($"Attempt to preserve honorific   ", ref C.StickyHonorific); //Cheaty spaces to make it all line up
                 ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve penumbra", ref C.StickyPenumbra);
             }

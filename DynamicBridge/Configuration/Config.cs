@@ -1,4 +1,4 @@
-﻿using ECommons.Configuration;
+using ECommons.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +42,7 @@ namespace DynamicBridge.Configuration
         public bool StickyPenumbra = false;
         public RandomTypes RandomChoosenType = RandomTypes.OnLogin;
         public double UserInputRandomizerTime = 5;
+        public bool ForceUpdateOnRandomize = false;
         public bool UpdateGearChange = false;
         public Dictionary<ulong, string> SeenCharacters = [];
 

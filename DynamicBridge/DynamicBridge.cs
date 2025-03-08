@@ -1,4 +1,4 @@
-﻿using DynamicBridge.Configuration;
+using DynamicBridge.Configuration;
 using DynamicBridge.Core;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC;
@@ -277,7 +277,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 RandomizedRecently = true;
                 RandomizerTimer = DateTime.UtcNow;
                 Randomizer();
-                ForceUpdate = true;
+                ForceUpdate = C.ForceUpdateOnRandomize;
             }
 
             var profile = Utils.GetProfileByCID(Player.CID);
