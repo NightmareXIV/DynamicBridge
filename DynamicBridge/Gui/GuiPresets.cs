@@ -241,6 +241,11 @@ namespace DynamicBridge.Gui
             }
         }
 
+        private static void SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon icon)
+        {
+            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X-(ImGui.CalcTextSize(icon.ToIconString()).X + ImGui.GetStyle().ItemSpacing.X * 3));
+        }
+
         private static void DrawPresets(Profile currentProfile, List<Preset> presetList, out Action postAction, string extraID, bool isFallback, bool isGlobal)
         {
             postAction = null;
@@ -376,7 +381,13 @@ namespace DynamicBridge.Gui
                         if(C.EnableGlamourer)
                         {
                             ImGui.TableNextColumn();
-                            ImGuiEx.SetNextItemFullWidth();
+                            if (C.StickyGlamourer)
+                            {
+                                SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
+                            }
+                            else{
+                                ImGuiEx.SetNextItemFullWidth();
+                            }
                             if(ImGui.BeginCombo("##glamour", ((string[])[.. preset.Glamourer.Select(P.GlamourerManager.TransformName), .. preset.ComplexGlamourer]).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 if(ImGui.IsWindowAppearing()) Utils.ResetCaches();
@@ -401,6 +412,7 @@ namespace DynamicBridge.Gui
                                         {
                                             if(Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ##{x.Identifier}", id, preset.Glamourer))
                                             {
+                                                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Glamourer.Contains(id)) preset.Name = name;
                                                 if(C.AutoApplyOnChange)
                                                 {
@@ -415,7 +427,15 @@ namespace DynamicBridge.Gui
                                     foreach(var x in preset.Glamourer)
                                     {
                                         if(designs.Any(d => d.Identifier.ToString() == x)) continue;
-                                        items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Glamourer, true)));
+                                        items.Add(([], () => 
+                                        {
+                                            if(Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Glamourer, true))
+                                            {
+                                                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                                            }
+                                        }
+                                        
+                                        ));
                                     }
                                     Utils.DrawFolder(items);
                                 }
@@ -435,6 +455,7 @@ namespace DynamicBridge.Gui
                                         {
                                             if(Utils.CollectionSelectable(contains ? Colors.TabYellow : null, $"{name}##{x.GUID}", name, preset.ComplexGlamourer))
                                             {
+                                                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.ComplexGlamourer.Contains(name)) preset.Name = name;
                                                 if(C.AutoApplyOnChange)
                                                 {
@@ -449,11 +470,14 @@ namespace DynamicBridge.Gui
                                     foreach(var x in preset.ComplexGlamourer)
                                     {
                                         if(designs.Any(d => d.Name == x)) continue;
-                                        items.Add(([], () =>
+                                        items.Add(([], () => 
                                         {
-                                            Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.ComplexGlamourer, true);
+                                            if(Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.ComplexGlamourer, true))
+                                            {
+                                                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                                            }
                                         }
-
+                                        
                                         ));
                                     }
                                     if(items.Count > 0)
@@ -472,6 +496,26 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+
+                            //Add random Glamourer Button
+                            if (C.StickyGlamourer)
+                            {
+                                ImGui.SameLine();
+                                if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "GlamourerButton"))
+                                {
+                                    PluginLog.Debug("Attempting to randomize!");
+                                    if (preset.Glamourer.Count + preset.ComplexGlamourer.Count > 1) {
+                                        var old = preset.StickyRandomG;
+                                        preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                                        P.ForceUpdate = true;
+                                        if (preset.StickyRandomG == old) {
+                                            preset.StickyRandomG = (preset.StickyRandomG + 1)%(preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                                        };
+                                    }
+                                    else {preset.StickyRandomG = 0;}
+                                }
+                                ImGuiEx.Tooltip($"Randomize Glamourer Used.");
+                            }
                             filterCnt++;
                         }
                     }
@@ -488,7 +532,13 @@ namespace DynamicBridge.Gui
                                 ImGuiEx.HelpMarker("All registered profiles are displayed in global profile, but only ones that are assigned to your current character will be used.", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString(), false);
                                 ImGui.SameLine();
                             }
-                            ImGuiEx.SetNextItemFullWidth();
+                            if (C.StickyCustomize)
+                            {
+                                SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
+                            }
+                            else{
+                                ImGuiEx.SetNextItemFullWidth();
+                            }
                             if(ImGui.BeginCombo("##customize", preset.Customize.Select(P.CustomizePlusManager.TransformName).PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
@@ -511,6 +561,7 @@ namespace DynamicBridge.Gui
                                     {
                                         if(Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ", $"{x.UniqueId}", preset.Customize))
                                         {
+                                            preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
                                             if(C.AutofillFromGlam && preset.Name == "" && preset.Customize.Contains($"{x.UniqueId}")) preset.Name = name;
                                         }
                                     }
@@ -523,7 +574,15 @@ namespace DynamicBridge.Gui
                                 {
                                     if(profiles.Any(d => d.UniqueId.ToString() == x)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                    items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}  ", x, preset.Customize, true)));
+                                    items.Add(([], () => 
+                                    {
+                                        if(Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Customize, true))
+                                        {
+                                            preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
+                                        }
+                                    }
+                                    
+                                    ));
                                     ImGui.PopStyleColor();
                                 }
                                 if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
@@ -532,6 +591,25 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            //Add random Customize+ Button
+                            if (C.StickyCustomize)
+                            {
+                                ImGui.SameLine();
+                                if(ImGuiEx.IconButton(FontAwesomeIcon.Dice,"CustomizeButton"))
+                                {
+                                    PluginLog.Debug("Attempting to randomize!");
+                                    if (preset.CustomizeFiltered().ToArray().Length > 1) {
+                                        var old = preset.StickyRandomC;
+                                        preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
+                                        P.ForceUpdate = true;
+                                        if (preset.StickyRandomC == old) {
+                                            preset.StickyRandomC = (preset.StickyRandomC + 1)%preset.CustomizeFiltered().ToArray().Length;
+                                        };
+                                    }
+                                    else {preset.StickyRandomC = 0;}
+                                }
+                                ImGuiEx.Tooltip($"Randomize Customize Used.");
+                            }
                             filterCnt++;
                         }
                     }
@@ -548,7 +626,13 @@ namespace DynamicBridge.Gui
                                 ImGuiEx.HelpMarker("All registered titles are displayed in global profile, but only ones that are assigned to your current character will be used UNLESS \"Allow selecting titles registered for other characters\" is enabled in settings.", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString(), false);
                                 ImGui.SameLine();
                             }
-                            ImGuiEx.SetNextItemFullWidth();
+                            if (C.StickyHonorific)
+                            {
+                                SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
+                            }
+                            else{
+                                ImGuiEx.SetNextItemFullWidth();
+                            }
                             if(ImGui.BeginCombo("##honorific", preset.Honorific.PrintRange(out var fullList, "- None -"), C.ComboSize))
                             {
                                 ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
@@ -575,6 +659,7 @@ namespace DynamicBridge.Gui
                                         {
                                             if(Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{name}  ", x.Title, preset.Honorific))
                                             {
+                                                preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Honorific.Contains(x.Title)) preset.Name = name;
                                             }
                                         }
@@ -588,7 +673,15 @@ namespace DynamicBridge.Gui
                                 foreach(var x in preset.Honorific)
                                 {
                                     if(allTitles.Any(d => d.Title == x)) continue;
-                                    items.Add(([], () => Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}  ", x, preset.Honorific, true)));
+                                    items.Add(([], () => 
+                                    {
+                                        if(Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Honorific, true))
+                                        {
+                                            preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
+                                        }
+                                    }
+                                    
+                                    ));
                                 }
                                 if (noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
                                 Utils.DrawFolder(items);
@@ -596,6 +689,25 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            //Add random Honorific Button
+                            if (C.StickyHonorific)
+                            {
+                                ImGui.SameLine();
+                                if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "HonorificButton"))
+                                {
+                                    PluginLog.Debug("Attempting to randomize!");
+                                    if (preset.HonorificFiltered().ToArray().Length > 1) {
+                                        var old = preset.StickyRandomH;
+                                        preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
+                                        P.ForceUpdate = true;
+                                        if (preset.StickyRandomH == old) {
+                                            preset.StickyRandomH = (preset.StickyRandomH + 1)%preset.HonorificFiltered().ToArray().Length;
+                                        };
+                                    }
+                                    else {preset.StickyRandomH = 0;}
+                                }
+                                ImGuiEx.Tooltip($"Randomize Honorific Used.");
+                            }
                             filterCnt++;
                         }
 
@@ -607,7 +719,13 @@ namespace DynamicBridge.Gui
                         {
                             bool noresults = true;
                             ImGui.TableNextColumn();
-                            ImGuiEx.SetNextItemFullWidth();
+                            if (C.StickyPenumbra)
+                            {
+                                SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
+                            }
+                            else{
+                                ImGuiEx.SetNextItemFullWidth();
+                            }
                             string fullList = null;
                             if(ImGui.BeginCombo("##penumbra", preset.PenumbraType != SpecialPenumbraAssignment.Use_Named_Collection ? preset.PenumbraType.ToString().Replace("_", " ") : preset.Penumbra.PrintRange(out fullList, "- None -"), C.ComboSize))
                             {
@@ -633,6 +751,7 @@ namespace DynamicBridge.Gui
                                         {
                                             if(Utils.CollectionSelectable(contains ? Colors.TabGreen : null, $"{x}  ", x, preset.Penumbra))
                                             {
+                                                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Penumbra.Contains(x)) preset.Name = name;
                                             }
                                         }
@@ -646,7 +765,10 @@ namespace DynamicBridge.Gui
                                         if(collections.Contains(x)) continue;
                                         items.Add(([], () =>
                                         {
-                                            Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Penumbra, true);
+                                            if(Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.Penumbra, true))
+                                            {
+                                                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                                            };
                                         }
 
                                         ));
@@ -658,6 +780,24 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
+                            if (C.StickyPenumbra)
+                            {
+                                ImGui.SameLine();
+                                if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "PenumbraButton"))
+                                {
+                                    PluginLog.Debug("Attempting to randomize!");
+                                    if (preset.Penumbra.Count > 1) {
+                                        var old = preset.StickyRandomP;
+                                        preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                                        P.ForceUpdate = true;
+                                        if (preset.StickyRandomP == old) {
+                                            preset.StickyRandomP = (preset.StickyRandomP + 1)%preset.Penumbra.Count;
+                                        };
+                                    }
+                                    else {preset.StickyRandomP = 0;}
+                                }
+                                ImGuiEx.Tooltip($"Randomize Penumbra Used.");
+                            }
                             filterCnt++;
                         }
                     }
