@@ -33,6 +33,13 @@ namespace DynamicBridge.Configuration
         public string LastVersion = "0";
         public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
         public bool UpdateJobGSChange = true;
+        public bool DontChangeOnTerritoryChange = false;
+        public bool Sticky = false;
+        public bool StickyPresets = false;
+        public bool StickyGlamourer = false;
+        public bool StickyCustomize = false;
+        public bool StickyHonorific = false;
+        public bool StickyPenumbra = false;
         public bool UpdateGearChange = false;
         public Dictionary<ulong, string> SeenCharacters = [];
 

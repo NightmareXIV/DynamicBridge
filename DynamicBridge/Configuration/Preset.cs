@@ -20,5 +20,9 @@ namespace DynamicBridge.Configuration
         public List<MoodleInfo> Moodles = [];
         public SpecialPenumbraAssignment PenumbraType = SpecialPenumbraAssignment.Use_Named_Collection;
         public bool IsStatic = false;
+        public int StickyRandomG = 0;
+        public int StickyRandomH = 0;
+        public int StickyRandomC = 0;
+        public int StickyRandomP = 0;
     }
 }

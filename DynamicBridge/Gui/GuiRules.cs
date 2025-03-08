@@ -529,13 +529,19 @@ namespace DynamicBridge.Gui
                                     if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if(OnlySelected[filterCnt] && !rule.SelectedPresets.Contains(name)) continue;
                                     if(x.GetFolder(Profile)?.HiddenFromSelection == true) continue;
-                                    ImGuiEx.CollectionCheckbox($"{x.CensoredName}##{x.GUID}", x.Name, rule.SelectedPresets);
+                                    if (ImGuiEx.CollectionCheckbox($"{x.CensoredName}##{x.GUID}", x.Name, rule.SelectedPresets))
+                                    {
+                                        rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+                                    }
                                 }
                                 foreach(var x in rule.SelectedPresets)
                                 {
                                     if(designs.Any(d => d.Name == x && d.GetFolder(Profile)?.HiddenFromSelection != true)) continue;
                                     ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
-                                    ImGuiEx.CollectionCheckbox($"{x}", x, rule.SelectedPresets, false, true);
+                                    if (ImGuiEx.CollectionCheckbox($"{x}", x, rule.SelectedPresets, false, true))
+                                    {
+                                        rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+                                    }
                                     ImGui.PopStyleColor();
                                 }
                                 ImGui.EndCombo();
@@ -549,6 +555,23 @@ namespace DynamicBridge.Gui
                         if(ImGuiEx.IconButton(FontAwesomeIcon.Copy))
                         {
                             Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(rule)));
+                        }
+                        if (C.StickyPresets){
+                            ImGui.SameLine();
+                            if(ImGuiEx.IconButton(FontAwesomeIcon.Dice))
+                            {
+                                if (rule.SelectedPresets.Count > 1) {
+                                    var old = rule.StickyRandom;
+                                    rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+                                    P.ForceUpdate = true;
+                                    if (rule.StickyRandom == old) {
+                                        rule.StickyRandom = (rule.StickyRandom + 1)%rule.SelectedPresets.Count;
+                                    };
+
+                                }
+                                else {rule.StickyRandom = 0;}
+                            }
+                            ImGuiEx.Tooltip($"Randomize Preset Used.");
                         }
                         ImGui.SameLine();
                         if(ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)

@@ -12,6 +12,7 @@ namespace DynamicBridge.Configuration
     public class ApplyRule
     {
         [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
+        public int StickyRandom = 0;
         public bool Enabled = true;
 
         public List<CharacterState> States = [];
