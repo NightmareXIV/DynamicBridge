@@ -66,7 +66,12 @@ public static class GuiSettings
                     ImGuiEx.SetNextItemWidthScaled(200f);
                     if (ImGui.InputDouble("", ref C.UserInputRandomizerTime))
                     {
-                        C.UserInputRandomizerTime = Math.Max(0.15, C.UserInputRandomizerTime);
+                        double ReloadSpeed = 1;
+                        if (!C.ForceUpdateOnRandomize) 
+                        {
+                            ReloadSpeed = 0.1;
+                        }
+                        C.UserInputRandomizerTime = Math.Max(ReloadSpeed, C.UserInputRandomizerTime);
                     };
                     ImGuiEx.Spacing();ImGuiEx.Spacing();
                     ImGui.Checkbox("Force update on randomize", ref C.ForceUpdateOnRandomize);
