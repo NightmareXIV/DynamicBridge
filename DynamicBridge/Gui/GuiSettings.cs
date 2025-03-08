@@ -55,6 +55,19 @@ public static class GuiSettings
             if (C.Sticky)
             {
                 ImGuiEx.Spacing();
+                ImGuiEx.SetNextItemWidthScaled(200f);
+                ImGuiEx.EnumCombo($"Randomize on Login", ref C.RandomChoosenType);
+                if (C.RandomChoosenType == RandomTypes.Timer) {
+                    ImGui.SameLine();
+                    ImGui.Text("| How often should it randomize everything in minutes:");
+                    ImGui.SameLine();
+                    ImGuiEx.SetNextItemWidthScaled(200f);
+                    if (ImGui.InputDouble("", ref C.UserInputRandomizerTime))
+                    {
+                        C.UserInputRandomizerTime = Math.Max(0.15, C.UserInputRandomizerTime);
+                    };
+                }
+                ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve presets", ref C.StickyPresets);
                 ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve glamourer", ref C.StickyGlamourer);
