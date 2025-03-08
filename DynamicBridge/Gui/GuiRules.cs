@@ -556,7 +556,7 @@ namespace DynamicBridge.Gui
                         {
                             Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(rule)));
                         }
-                        if (C.StickyPresets){
+                        if (C.StickyPresets && C.Sticky){
                             ImGui.SameLine();
                             if(ImGuiEx.IconButton(FontAwesomeIcon.Dice))
                             {
