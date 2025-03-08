@@ -142,16 +142,32 @@ public unsafe class DynamicBridge : IDalamudPlugin
     private void Randomizer() {
         var profile = Utils.GetProfileByCID(Player.CID);
         if (profile != null) {
-            foreach (var rule in profile.Rules) {
+            if (C.StickyPresets) {
+                foreach (var rule in profile.Rules) 
+                {
                 rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
             }
+            }
             foreach (var preset in profile.Presets) {
+                if (C.StickyCustomize)
+                {
                 preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
+                }
+                if (C.StickyGlamourer)
+                {
                 preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                }
+                if (C.StickyHonorific)
+                {
                 preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
+                }
+                if (C.StickyPenumbra)
+                {
                 preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
             }
         }
+        }
+        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets||C.StickyCustomize||C.StickyGlamourer||C.StickyHonorific||C.StickyPenumbra);
         RandomizedRecently = false;
     }
 
@@ -277,7 +293,6 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 RandomizedRecently = true;
                 RandomizerTimer = DateTime.UtcNow;
                 Randomizer();
-                ForceUpdate = C.ForceUpdateOnRandomize;
             }
 
             var profile = Utils.GetProfileByCID(Player.CID);
@@ -358,7 +373,10 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         if(rule != null && rule.SelectedPresets.Count > 0)
                         {
                             var index = Random.Next(0, rule.SelectedPresets.Count);
-                            if (C.StickyPresets) {index = rule.StickyRandom;}
+                            if (C.StickyPresets)
+                            {
+                                index = rule.StickyRandom;
+                            }
                             var preset = profile.GetPresetsUnion().FirstOrDefault(s => s.Name == rule.SelectedPresets[index]);
                             if(preset != null)
                             {
