@@ -381,7 +381,7 @@ namespace DynamicBridge.Gui
                         if(C.EnableGlamourer)
                         {
                             ImGui.TableNextColumn();
-                            if (C.StickyGlamourer)
+                            if (C.StickyGlamourer && C.Sticky)
                             {
                                 SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
                             }
@@ -498,7 +498,7 @@ namespace DynamicBridge.Gui
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
 
                             //Add random Glamourer Button
-                            if (C.StickyGlamourer)
+                            if (C.StickyGlamourer && C.Sticky)
                             {
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "GlamourerButton"))
@@ -531,7 +531,7 @@ namespace DynamicBridge.Gui
                                 ImGuiEx.HelpMarker("All registered profiles are displayed in global profile, but only ones that are assigned to your current character will be used.", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString(), false);
                                 ImGui.SameLine();
                             }
-                            if (C.StickyCustomize)
+                            if (C.StickyCustomize && C.Sticky)
                             {
                                 SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
                             }
@@ -591,7 +591,7 @@ namespace DynamicBridge.Gui
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
                             //Add random Customize+ Button
-                            if (C.StickyCustomize)
+                            if (C.StickyCustomize && C.Sticky)
                             {
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice,"CustomizeButton"))
@@ -624,7 +624,7 @@ namespace DynamicBridge.Gui
                                 ImGuiEx.HelpMarker("All registered titles are displayed in global profile, but only ones that are assigned to your current character will be used UNLESS \"Allow selecting titles registered for other characters\" is enabled in settings.", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString(), false);
                                 ImGui.SameLine();
                             }
-                            if (C.StickyHonorific)
+                            if (C.StickyHonorific && C.Sticky)
                             {
                                 SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
                             }
@@ -688,7 +688,7 @@ namespace DynamicBridge.Gui
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
                             //Add random Honorific Button
-                            if (C.StickyHonorific)
+                            if (C.StickyHonorific && C.Sticky)
                             {
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "HonorificButton"))
@@ -716,7 +716,7 @@ namespace DynamicBridge.Gui
                         {
                             bool noresults = true;
                             ImGui.TableNextColumn();
-                            if (C.StickyPenumbra)
+                            if (C.StickyPenumbra && C.Sticky)
                             {
                                 SetWidthNextImGuiWithButtonToRight(FontAwesomeIcon.Dice);
                             }
@@ -777,7 +777,7 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.RandomNotice + fullList);
-                            if (C.StickyPenumbra)
+                            if (C.StickyPenumbra && C.Sticky)
                             {
                                 ImGui.SameLine();
                                 if(ImGuiEx.IconButton(FontAwesomeIcon.Dice, "PenumbraButton"))

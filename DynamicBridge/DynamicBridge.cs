@@ -142,26 +142,26 @@ public unsafe class DynamicBridge : IDalamudPlugin
     private void Randomizer() {
         var profile = Utils.GetProfileByCID(Player.CID);
         if (profile != null) {
-            if (C.StickyPresets) {
+            if (C.StickyPresets && C.Sticky) {
                 foreach (var rule in profile.Rules) 
                 {
                 rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
             }
             }
             foreach (var preset in profile.Presets) {
-                if (C.StickyCustomize)
+                if (C.StickyCustomize && C.Sticky)
                 {
                 preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
                 }
-                if (C.StickyGlamourer)
+                if (C.StickyGlamourer && C.Sticky)
                 {
                 preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
                 }
-                if (C.StickyHonorific)
+                if (C.StickyHonorific && C.Sticky)
                 {
                 preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
                 }
-                if (C.StickyPenumbra)
+                if (C.StickyPenumbra && C.Sticky)
                 {
                 preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
             }
@@ -373,7 +373,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         if(rule != null && rule.SelectedPresets.Count > 0)
                         {
                             var index = Random.Next(0, rule.SelectedPresets.Count);
-                            if (C.StickyPresets)
+                            if (C.StickyPresets && C.Sticky)
                             {
                                 index = rule.StickyRandom;
                             }
@@ -544,7 +544,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         else if(preset.Penumbra.Count > 0)
         {
             int index = Random.Next(preset.Penumbra.Count);
-            if (C.StickyPenumbra) {index = preset.StickyRandomP;}
+            if (C.StickyPenumbra && C.Sticky) {index = preset.StickyRandomP;}
             var randomAssignment = preset.Penumbra[index];
             PenumbraManager.SetAssignment(randomAssignment);
             DoNullPenumbra = false;
@@ -556,7 +556,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         if(preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
         {
             var selectedIndex = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
-            if (C.StickyGlamourer) {selectedIndex = preset.StickyRandomG;}
+            if (C.StickyGlamourer && C.Sticky) {selectedIndex = preset.StickyRandomG;}
             var designs = new List<string>();
             if(selectedIndex < preset.Glamourer.Count)
             {
@@ -607,7 +607,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             DoNullHonorific = false;
             var index = Random.Next(hfiltered.Length);
-            if (C.StickyHonorific) {index = preset.StickyRandomH;};
+            if (C.StickyHonorific && C.Sticky) {index = preset.StickyRandomH;};
             var randomTitle = hfiltered[index];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
             TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
@@ -621,7 +621,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             DoNullCustomize = false;
             var index = Random.Next(cfiltered.Length);
-            if (C.StickyCustomize) {index = preset.StickyRandomC;};
+            if (C.StickyCustomize && C.Sticky) {index = preset.StickyRandomC;};
             var randomCusProfile = cfiltered[index];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
             TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.NameWithWorld));
