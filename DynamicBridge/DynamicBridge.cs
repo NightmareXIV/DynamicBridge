@@ -20,6 +20,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using Glamourer.Api.Enums;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -90,6 +91,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             new EzFrameworkUpdate(OnUpdate);
             new EzLogout(Logout);
             new EzTerritoryChanged(TerritoryChanged);
+            new EzStateChanged(StateChanged);
             TaskManager = new()
             {
                 TimeLimitMS = 2000,
@@ -298,6 +300,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 &&
                                 (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
                                 && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
+                                &&
+                                (!C.Cond_Race || ((x.Races.Count == 0 || x.Races.Any(s => s == (Races)(int)GlamourerManager.GetMyState()["Customize"]["Race"]["Value"]))
+                                && (!C.AllowNegativeConditions || !x.Not.Races.Any(s => s == (Races)(int)GlamourerManager.GetMyState()["Customize"]["Race"]["Value"]))))
                                 )
                             {
                                 newRule.Add(x);
@@ -476,6 +481,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
     private void TerritoryChanged(ushort id)
     {
         SoftForceUpdate = true;
+    }
+
+    private void StateChanged(nint objectId, StateChangeType changeType)
+    {
+        // PluginLog.Debug($"STATE CHANGED!!!!! Type: {changeType}");
     }
 
     private void ApplyPresetPenumbra(Preset preset, ref bool DoNullPenumbra)
