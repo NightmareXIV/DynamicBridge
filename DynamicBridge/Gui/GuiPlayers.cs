@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace DynamicBridge.Gui;
 public class GuiPlayers
 {
-    internal static unsafe IEnumerable<IPlayerCharacter> GetNearbyPlayers()
+    internal static IEnumerable<IPlayerCharacter> GetNearbyPlayers()
     {
         if (Svc.Objects == null)
         {
