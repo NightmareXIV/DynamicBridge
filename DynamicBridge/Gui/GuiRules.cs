@@ -23,7 +23,7 @@ namespace DynamicBridge.Gui
     {
         private static Vector2 iconSize => new(24f);
 
-        private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
+        private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         private static bool[] OnlySelected = new bool[20];
         private static string CurrentDrag = "";
 
@@ -78,6 +78,7 @@ namespace DynamicBridge.Gui
                     C.Cond_World,
                     C.Cond_Zone,
                     C.Cond_ZoneGroup,
+                    C.Cond_Players,
                 ];
 
                 List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
@@ -97,6 +98,7 @@ namespace DynamicBridge.Gui
                     if(C.Cond_Job) ImGui.TableSetupColumn("Job");
                     if(C.Cond_World) ImGui.TableSetupColumn("World");
                     if(C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
+                    if(C.Cond_Players) ImGui.TableSetupColumn("Players");
                     ImGui.TableSetupColumn("Preset");
                     ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                     ImGui.TableHeadersRow();
@@ -511,6 +513,48 @@ namespace DynamicBridge.Gui
                             }
 
                             if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
+                        }
+                        filterCnt++;
+
+                        if (C.Cond_Players)
+                        {
+                            ImGui.TableNextColumn();
+                            
+                            // Player Selection Dropdown
+                            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                            if (ImGui.BeginCombo("##players", rule.Players.Select(x => C.selectedPlayers.FirstOrDefault(p => x == p.Name).Name ?? $"{x:X16}").PrintRange(rule.Not.Players.Select(x => C.selectedPlayers.FirstOrDefault(p => x == p.Name).Name ?? $"{x:X16}"), out var fullList), C.ComboSize))
+                            {
+                                FiltersSelection();
+
+                                foreach (var player in C.selectedPlayers)
+                                {
+                                    var name = player.Name;
+
+                                    // Apply filtering
+                                    if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase))
+                                        continue;
+                                    if (OnlySelected[filterCnt] && !rule.Players.Contains(name))
+                                        continue;
+
+                                    DrawSelector($"{name}##{player.Name}", player.Name, rule.Players, rule.Not.Players);
+                                }
+
+                                // Handle players that no longer exist in `C.selectedPlayers` but are still in `rule.Players`
+                                foreach (var z in rule.Players)
+                                {
+                                    if (!C.selectedPlayers.Any(p => p.Name == z))
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudRed);
+                                        ImGuiEx.CollectionCheckbox($"{z}", z, rule.Players, delayedOperation: true);
+                                        ImGui.PopStyleColor();
+                                    }
+                                }
+
+                                ImGui.EndCombo();
+                            }
+
+                            if (fullList != null) 
+                                ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                         }
                         filterCnt++;
 
