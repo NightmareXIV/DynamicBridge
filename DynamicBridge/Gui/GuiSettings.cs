@@ -85,10 +85,67 @@ public static class GuiSettings
                 () => ImGui.Checkbox($"Job", ref C.Cond_Job),
                 () => ImGui.Checkbox($"World", ref C.Cond_World),
                 () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
+                () => ImGui.Checkbox($"Current Race", ref C.Cond_Race_Bonus),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             ImGuiGroup.EndGroupBox();
         }
+        bool Cond_Race_Bonus_Window = C.Cond_Race_Bonus && !C.Cond_Race;
+        if (Cond_Race_Bonus_Window)
+        {
+            // Measure the longest text line
+            Vector2 textSize1 = ImGui.CalcTextSize("ARE YOU SURE YOU WANT TO ENABLE THE RACE CONDITION FOR RULES?");
+            Vector2 textSize2 = ImGui.CalcTextSize("It is VERY easy to be stuck in infinite loops with this condition");
+            Vector2 textSize3 = ImGui.CalcTextSize("By selecting YES, I yeild my right to ask for help if I can't fix the loop");
+            float width = Math.Max(textSize1.X, Math.Max(textSize2.X, textSize3.X)) + 40;
+            float height = textSize1.Y + textSize2.Y + textSize3.Y + textSize3.Y + 100;
+
+            ImGui.SetNextWindowSize(new Vector2(width, height), ImGuiCond.Always);
+
+            if (ImGui.Begin("ARE YOU SURE", ref Cond_Race_Bonus_Window, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                float windowWidth = ImGui.GetWindowSize().X;
+
+                float time = (float)ImGui.GetTime();
+                bool flash = (int)(time * 2) % 2 == 0;
+                Vector4 textColor = flash ? new Vector4(1f, 0f, 0f, 1f) : new Vector4(1f, 1f, 1f, 1f);
+
+                ImGui.SetCursorPosX((windowWidth - textSize1.X) * 0.5f);
+                ImGui.TextColored(textColor, "ARE YOU SURE YOU WANT TO ENABLE THE RACE CONDITION FOR RULES?");
+
+                ImGui.SetCursorPosX((windowWidth - textSize2.X) * 0.5f);
+                ImGui.Text("It is VERY easy to be stuck in infinite loops with this condition");
+
+                ImGui.SetCursorPosX((windowWidth - textSize3.X) * 0.5f);
+                ImGui.Text("By selecting YES, I yeild my right to ask for help if I can't fix out the loop");
+
+                ImGui.NewLine();
+
+                float buttonWidth = 80f;
+                float buttonSpacing = 10f;
+                float totalButtonWidth = (buttonWidth * 2) + buttonSpacing;
+
+                ImGui.SetCursorPosX((windowWidth - totalButtonWidth) * 0.5f);
+                if (ImGui.Button("NO", new Vector2(buttonWidth, 30)))
+                {
+                    C.Cond_Race_Bonus = false;
+                    C.Cond_Race = false;
+                    Cond_Race_Bonus_Window = false;
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("YES", new Vector2(buttonWidth, 30)))
+                {
+                    C.Cond_Race_Bonus = true;
+                    C.Cond_Race = true;
+                    Cond_Race_Bonus_Window = false;
+                }
+            }
+            ImGui.End();
+        }
+
+        if(!C.Cond_Race_Bonus){C.Cond_Race=false;}
 
         if(ImGuiGroup.BeginGroupBox("Integrations"))
         {
