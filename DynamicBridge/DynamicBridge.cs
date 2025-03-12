@@ -223,11 +223,16 @@ public unsafe class DynamicBridge : IDalamudPlugin
             {
                 var name = arguments[(arguments.IndexOf(" ") + 1)..];
                 var profile = C.ProfilesL.FirstOrDefault(p => p.Name == name);
+                var currentProfile = C.ProfilesL.FirstOrDefault(z => z.Characters.Contains(Player.CID));
 
                 if(profile != null)
                 {
                     if(C.SeenCharacters.ContainsKey(Player.CID) && !C.Blacklist.Contains(Player.CID))
                     {
+                        if (profile.IsStaticExists() && (currentProfile == null || currentProfile.IsStaticExists()))
+                        {
+                            P.ForceUpdate = true;
+                        }
                         profile.SetCharacter(Player.CID);
 
                     }
