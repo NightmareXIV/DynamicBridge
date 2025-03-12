@@ -49,7 +49,6 @@ public static class GuiSettings
                     P.Memory.EquipGearsetHook.Disable();
                 }
             }
-            ImGui.Checkbox($"Don't force update on territory change if applied rules don't change", ref C.DontChangeOnTerritoryChange); // Concise and clear wording?
             ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
             ImGui.Checkbox($"Attempt to preserve rules", ref C.Sticky);
             if (C.Sticky)
