@@ -25,6 +25,7 @@ namespace DynamicBridge.Configuration
         public List<ETime> Times = [];
         public List<uint> Worlds = [];
         public List<int> Gearsets = [];
+        public List<string> Players = [];
 
         public List<string> SelectedPresets = [];
         public bool Passthrough = false;
@@ -44,6 +45,7 @@ namespace DynamicBridge.Configuration
             public List<ETime> Times = [];
             public List<uint> Worlds = [];
             public List<int> Gearsets = [];
+            public List<string> Players = [];
         }
     }
 }

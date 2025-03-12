@@ -85,6 +85,7 @@ public static class GuiSettings
                 () => ImGui.Checkbox($"Job", ref C.Cond_Job),
                 () => ImGui.Checkbox($"World", ref C.Cond_World),
                 () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
+                () => ImGui.Checkbox($"Nearby Players", ref C.Cond_Players),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             ImGuiGroup.EndGroupBox();
