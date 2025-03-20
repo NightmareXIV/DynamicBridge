@@ -49,6 +49,7 @@ public static class GuiSettings
                     P.Memory.EquipGearsetHook.Disable();
                 }
             }
+
             ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
             ImGui.Checkbox($"Attempt to preserve rules", ref C.Sticky);
             if (C.Sticky)
@@ -86,6 +87,10 @@ public static class GuiSettings
                 ImGuiEx.Spacing();
                 ImGui.Checkbox($"Attempt to preserve penumbra", ref C.StickyPenumbra);
             }
+
+            ImGui.Checkbox($"Don't force update on territory change if applied rules don't change", ref C.DontChangeOnTerritoryChange); // Concise and clear wording?
+            ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
+
             /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
             ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
             ImGui.Separator();
@@ -122,6 +127,7 @@ public static class GuiSettings
                 () => ImGui.Checkbox($"Job", ref C.Cond_Job),
                 () => ImGui.Checkbox($"World", ref C.Cond_World),
                 () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
+                () => ImGui.Checkbox($"Nearby Players", ref C.Cond_Players),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             ImGuiGroup.EndGroupBox();
