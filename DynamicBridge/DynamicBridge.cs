@@ -314,7 +314,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         }
                     }
                 }
-                if(ForceUpdate || !Utils.GuidEquals(newRule, LastRule) || (SoftForceUpdate && newRule.Count > 0))
+                bool DontChangeOnTerritoryChange = C.DontChangeOnTerritoryChange; // true: Don't change if rules are same on territory change, false (defualt): Use old method 
+                if(ForceUpdate || !Utils.GuidEquals(newRule, LastRule) || (SoftForceUpdate && newRule.Count > 0 && !DontChangeOnTerritoryChange))
                 {
                     PluginLog.Debug($"Old rule: {LastRule.Print()}, new rule: {newRule.Print()} | {Utils.GuidEquals(newRule, LastRule)} | F:{ForceUpdate}");
                     LastRule = newRule;
