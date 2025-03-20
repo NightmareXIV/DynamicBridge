@@ -1,4 +1,4 @@
-﻿using DynamicBridge.Configuration;
+using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Glamourer;
 using Lumina.Excel.Sheets;
 using System;
@@ -49,8 +49,48 @@ public static class GuiSettings
                     P.Memory.EquipGearsetHook.Disable();
                 }
             }
+
+            ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
+            ImGui.Checkbox($"Attempt to preserve rules", ref C.Sticky);
+            if (C.Sticky)
+            {
+                ImGuiEx.Spacing();
+                ImGuiEx.SetNextItemWidthScaled(200f);
+                ImGuiEx.EnumCombo($"Randomize on Login", ref C.RandomChoosenType);
+                if (C.RandomChoosenType == RandomTypes.Timer) {
+                    ImGui.SameLine();
+                    ImGui.Text("|");
+                    ImGui.SameLine();
+                    ImGui.Text("How often should it randomize everything in minutes:");
+                    ImGui.SameLine();
+                    ImGuiEx.SetNextItemWidthScaled(200f);
+                    if (ImGui.InputDouble("", ref C.UserInputRandomizerTime))
+                    {
+                        double ReloadSpeed = 1;
+                        if (!C.ForceUpdateOnRandomize) 
+                        {
+                            ReloadSpeed = 0.1;
+                        }
+                        C.UserInputRandomizerTime = Math.Max(ReloadSpeed, C.UserInputRandomizerTime);
+                    };
+                    ImGuiEx.Spacing();ImGuiEx.Spacing();
+                    ImGui.Checkbox("Force update on randomize", ref C.ForceUpdateOnRandomize);
+                }
+                ImGuiEx.Spacing();
+                ImGui.Checkbox($"Attempt to preserve presets", ref C.StickyPresets);
+                ImGuiEx.Spacing();
+                ImGui.Checkbox($"Attempt to preserve glamourer", ref C.StickyGlamourer);
+                ImGuiEx.Spacing();
+                ImGui.Checkbox($"Attempt to preserve customize", ref C.StickyCustomize);
+                ImGuiEx.Spacing();
+                ImGui.Checkbox($"Attempt to preserve honorific   ", ref C.StickyHonorific); //Cheaty spaces to make it all line up
+                ImGuiEx.Spacing();
+                ImGui.Checkbox($"Attempt to preserve penumbra", ref C.StickyPenumbra);
+            }
+
             ImGui.Checkbox($"Don't force update on territory change if applied rules don't change", ref C.DontChangeOnTerritoryChange); // Concise and clear wording?
             ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
+
             /*ImGui.Checkbox($"Force update appearance on manual gear changes", ref C.UpdateGearChange);
             ImGuiEx.HelpMarker("This option impacts performance", EColor.OrangeBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());*/
             ImGui.Separator();

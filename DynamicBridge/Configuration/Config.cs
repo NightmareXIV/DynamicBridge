@@ -1,4 +1,4 @@
-﻿using ECommons.Configuration;
+using ECommons.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +33,15 @@ namespace DynamicBridge.Configuration
         public string LastVersion = "0";
         public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
         public bool UpdateJobGSChange = true;
+        public bool Sticky = false;
+        public bool StickyPresets = false;
+        public bool StickyGlamourer = false;
+        public bool StickyCustomize = false;
+        public bool StickyHonorific = false;
+        public bool StickyPenumbra = false;
+        public RandomTypes RandomChoosenType = RandomTypes.OnLogin;
+        public double UserInputRandomizerTime = 5;
+        public bool ForceUpdateOnRandomize = false;
         public bool DontChangeOnTerritoryChange = false;
         public bool UpdateGearChange = false;
         public Dictionary<ulong, string> SeenCharacters = [];
@@ -67,5 +76,11 @@ namespace DynamicBridge.Configuration
         RevertToNormal,
         RevertToAutomation,
         StoreRestore
+    }
+    public enum RandomTypes
+    {
+        OnLogin,
+        Never,
+        Timer
     }
 }
