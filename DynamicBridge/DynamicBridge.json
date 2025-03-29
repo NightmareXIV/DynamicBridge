@@ -6,5 +6,5 @@
     "ApplicableVersion": "any",
     "Punchline": "Allows you to automatically change your appearance based on various conditions.",
     "AcceptsFeedback": false,
-    "DalamudApiLevel": 11
+    "DalamudApiLevel": 12
 }
