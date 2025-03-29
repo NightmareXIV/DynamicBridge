@@ -40,10 +40,7 @@
         }
       },
       "penumbra.api": {
-        "type": "Project",
-        "dependencies": {
-          "DalamudPackager": "[12.0.0, )"
-        }
+        "type": "Project"
       }
     }
   }
