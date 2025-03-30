@@ -13,7 +13,7 @@ namespace DynamicBridge.Gui
         public static void Draw()
         {
             ImGuiEx.TextWrapped($"Here you can register a house. After registration, you will be able to select it as a condition in Dynamic Rules tab.");
-            var CurrentHouse = HousingManager.Instance()->GetCurrentHouseId();
+            var CurrentHouse = HousingManager.Instance()->GetCurrentIndoorHouseId();
             if(CurrentHouse > 0)
             {
                 ImGuiEx.Text($"Current house: {Censor.Hide($"{CurrentHouse:X16}")}");

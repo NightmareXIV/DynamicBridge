@@ -15,7 +15,7 @@ namespace DynamicBridge
     public static unsafe class Utils
     {
         public const string IconWarning = "\uf071";
-        public static bool IsMoving => P.AgentMapInst->IsPlayerMoving == 1;
+        public static bool IsMoving => P.AgentMapInst->IsPlayerMoving;
         public static bool IsInWater => Player.Available && Player.Object.IsInWater();
         public static ImGuiInputTextFlags CensorFlags => C.NoNames ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None;
         public static Vector2 CellPadding => ImGui.GetStyle().CellPadding + new Vector2(0, 2);

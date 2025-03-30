@@ -12,6 +12,7 @@ namespace DynamicBridge.Configuration
     public class ApplyRule
     {
         [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
+        public int StickyRandom = 0;
         public bool Enabled = true;
 
         public List<CharacterState> States = [];
@@ -26,7 +27,7 @@ namespace DynamicBridge.Configuration
         public List<uint> Worlds = [];
         public List<int> Gearsets = [];
         public List<Races> Races = [];
-
+        public List<string> Players = [];
         public List<string> SelectedPresets = [];
         public bool Passthrough = false;
         public NotConditions Not = new();
@@ -46,6 +47,7 @@ namespace DynamicBridge.Configuration
             public List<uint> Worlds = [];
             public List<int> Gearsets = [];
             public List<Races> Races = [];
+            public List<string> Players = [];
         }
     }
 }
