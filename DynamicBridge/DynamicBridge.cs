@@ -342,8 +342,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Job || ((x.Jobs.Count == 0 || x.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))
                                 && (!C.AllowNegativeConditions || !x.Not.Jobs.Contains(Player.Job.GetUpgradedJobIfNeeded()))))
                                 &&
-                                (!C.Cond_Time || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
+                                (!C.Cond_Time && !C.Cond_Time_Precise || ((x.Times.Count == 0 || x.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))
                                 && (!C.AllowNegativeConditions || !x.Not.Times.Contains(ETimeChecker.GetEorzeanTimeInterval()))))
+                                &&
+                                (!C.Cond_Time_Precise || ((x.Precise_Times.Count == 0 || x.Precise_Times.All(segment => segment.State != 1) || x.Precise_Times.Any(segment => ETimeChecker.GetEorzeanTime() >= segment.Start && ETimeChecker.GetEorzeanTime() <= segment.End && segment.State == 1))
+                                && (!C.AllowNegativeConditions || !x.Precise_Times.Any(segment => ETimeChecker.GetEorzeanTime() >= segment.Start && ETimeChecker.GetEorzeanTime() <= segment.End && segment.State == 2))))
                                 &&
                                 (!C.Cond_World || ((x.Worlds.Count == 0 || x.Worlds.Contains(Player.Object.CurrentWorld.RowId))
                                 && (!C.AllowNegativeConditions || !x.Not.Worlds.Contains(Player.Object.CurrentWorld.RowId))))

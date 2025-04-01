@@ -26,7 +26,7 @@ namespace DynamicBridge.Gui
         private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
         private static bool[] OnlySelected = new bool[20];
         private static string CurrentDrag = "";
-
+        private static Dictionary<int, bool> showDayNightCycleDict = new Dictionary<int, bool>();
         public static void Draw()
         {
             if(UI.Profile != null)
@@ -253,7 +253,7 @@ namespace DynamicBridge.Gui
                         }
                         filterCnt++;
 
-                        if(C.Cond_Time)
+                        if(C.Cond_Time && !C.Cond_Time_Precise)
                         {
                             ImGui.TableNextColumn();
                             //Time
@@ -272,6 +272,40 @@ namespace DynamicBridge.Gui
                                 ImGui.EndCombo();
                             }
                             if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
+                        }
+                        else if(C.Cond_Time && C.Cond_Time_Precise)
+                        {
+                            ImGui.TableNextColumn();
+                            if (!showDayNightCycleDict.ContainsKey(i))
+                            {
+                                showDayNightCycleDict[i] = false;
+                            }
+                            //Precise Time
+                            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                            if (!showDayNightCycleDict[i] && ImGui.Button($"Open Time Editor##{i}"))
+                            {
+                                showDayNightCycleDict[i] = true;
+                            }
+                            else if (showDayNightCycleDict[i] && ImGui.Button($"Close Time Editor##{i}"))
+                            {
+                                showDayNightCycleDict[i] = false;
+                            }
+                            Vector2 windowPos = ImGui.GetCursorScreenPos();
+                            if (showDayNightCycleDict[i])
+                            {
+                                ImGui.SetNextWindowPos(windowPos);
+                                // ImGui.SetNextWindowSize(new Vector2(400, 80), ImGuiCond.Always);
+                                bool open = showDayNightCycleDict[i];
+                                ImGui.Begin($"Time Editor##{i}", ref open, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar);
+
+                                rule.Precise_Times = RenderTimeline(rule.Precise_Times);
+                                if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.RootAndChildWindows) && ImGui.IsAnyMouseDown())
+                                {
+                                    showDayNightCycleDict[i] = false;
+                                }
+
+                                ImGui.End();
+                            }
                         }
                         filterCnt++;
 
@@ -705,6 +739,226 @@ namespace DynamicBridge.Gui
             {
                 ImGuiEx.Tooltip($"If matching any condition with cross, rule will not be applied.");
             }
+        }
+        private static List<TimelineSegment> RenderTimeline(List<TimelineSegment> precise_Times)
+        {
+            
+            Vector2 cursorPos = ImGui.GetCursorScreenPos();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            float startX = cursorPos.X + ImGui.CalcTextSize("12:00 AM").X/2;
+            float endX = startX + ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("12:00 AM").X;
+            float timelineWidth = endX-startX;
+            float centerY = cursorPos.Y + 20;
+            float height = 0;
+
+            List<float> timePoints = GetPoints(precise_Times);
+            List<int> segmentStates = GetStates(precise_Times);
+
+            // Hover tooltip
+            Vector2 mousePos = ImGui.GetMousePos();
+            bool hoveringTimeline = mousePos.Y > centerY - 5 && mousePos.Y < centerY + 5 && mousePos.X >= startX && mousePos.X <= endX;
+            float hoverTime = (float)(Math.Round((mousePos.X - startX) / timelineWidth * 24 * 60 / 5.0) * 5) / (24 * 60);
+            timePoints = timePoints.Distinct().OrderBy(x => x).ToList();
+            for (int i = 0; i < timePoints.Count - 1; i++)
+            {
+                float x1 = startX + timePoints[i] * timelineWidth;
+                float x2 = startX + timePoints[i + 1] * timelineWidth;
+
+                int segmentState = precise_Times[i].State;
+                uint color = segmentState switch
+                {
+                    1 => ImGui.GetColorU32(new Vector4(0, 1, 0, 1)),
+                    _ => ImGui.GetColorU32(new Vector4(1, 1, 1, 1))
+                };
+                if (C.AllowNegativeConditions)
+                {
+                    color = segmentState switch
+                    {
+                        1 => ImGui.GetColorU32(new Vector4(0, 1, 0, 1)),
+                        2 => ImGui.GetColorU32(new Vector4(1, 0, 0, 1)),
+                        _ => ImGui.GetColorU32(new Vector4(1, 1, 1, 1))
+                    };
+                }
+
+                drawList.AddLine(new Vector2(x1, centerY), new Vector2(x2, centerY), color, 2f);
+
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && x1 < mousePos.X && mousePos.X <= x2 && Math.Abs(mousePos.Y - centerY) <= 7)
+                {
+                    TimelineSegment segment = precise_Times[i];
+                    int stateLimit = C.AllowNegativeConditions ? 3 : 2;
+                    segment.State = (segment.State + 1) % stateLimit;
+                    precise_Times[i] = segment;
+                }
+
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && x1 < mousePos.X && mousePos.X <= x2 && Math.Abs(mousePos.Y - centerY) <= 7)
+                {
+                    TimelineSegment segment = precise_Times[i];
+                    int stateLimit = C.AllowNegativeConditions ? 3 : 2;
+                    segment.State = (segment.State - 1 + stateLimit) % stateLimit;
+                    precise_Times[i] = segment;
+                }
+            }
+
+            if (hoveringTimeline)
+            {
+                string timeLabel = FormatTime(hoverTime);
+                ImGui.SetTooltip(timeLabel);
+            }
+
+            List<Vector2> labelBoundryBoxes = [];
+            // Draw points + Identify if removeable
+            for (int i = 0; i < timePoints.Count; i++)
+            {
+                float xPos = startX + timePoints[i] * timelineWidth;
+                Vector2 pointPos = new Vector2(xPos, centerY);
+                uint color = ImGui.GetColorU32(new Vector4(0.2f, 0.6f, 1f, 1f));
+                if (hoveringTimeline && Math.Abs(hoverTime - timePoints[i]) < 10f / timelineWidth)
+                {
+                    color = ImGui.GetColorU32(new Vector4(1.0f, 0.5f, 0.0f, 1.0f));
+                }
+                string label = FormatTime(timePoints[i]);
+                
+                Vector2 textSize = ImGui.CalcTextSize(label);
+
+                float labelX = xPos - textSize.X / 2;
+                float labelY = centerY + 5;
+
+                foreach (Vector2 box in labelBoundryBoxes)
+                {
+                    if (labelX < box.X && labelY == box.Y)
+                    {
+                        labelY += textSize.Y + 2;
+                        drawList.AddLine(pointPos, new Vector2(xPos, labelY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), 1.0f);
+                    }
+                }
+
+                drawList.AddText(new Vector2(labelX, labelY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), label);
+                if (labelY + textSize.Y - cursorPos.Y + 20 > height)
+                {
+                    height = labelY + textSize.Y - cursorPos.Y + 20;
+                }
+                labelBoundryBoxes.Add(new Vector2(xPos+textSize.X/2, labelY));
+                drawList.AddCircleFilled(pointPos, 5f, color);
+            }
+
+            timePoints = timePoints.Distinct().OrderBy(x => Vector2.Distance(mousePos, new Vector2(startX + x * timelineWidth, centerY))).ToList();
+            if (hoveringTimeline && ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+            {
+                if(Math.Abs(hoverTime - timePoints[0]) < 10f / timelineWidth)
+                {
+                    if (!(timePoints[0] == 0f || timePoints[0] == 1f))
+                    {
+                        RemoveSegment(precise_Times, hoverTime, timelineWidth);
+                    }
+                }
+                else if(Math.Abs(hoverTime - timePoints[0]) > 10f / timelineWidth)
+                {
+                    AddSegment(precise_Times, hoverTime);
+                }
+            }
+            ImGui.SetWindowSize(new Vector2(400,height), ImGuiCond.Always);
+            return precise_Times;
+        }
+        private static void AddSegment(List<TimelineSegment> precise_Times, float hoverTime)
+        {
+            for (int i = 0; i < precise_Times.Count; i++)
+            {
+                TimelineSegment segment = precise_Times[i];
+                
+                if (hoverTime > segment.Start && hoverTime < segment.End)
+                {
+                    // Remove the original segment
+                    precise_Times.RemoveAt(i);
+                    
+                    // Create two new segments
+                    TimelineSegment firstSegment = new TimelineSegment(segment.Start, hoverTime, segment.State);
+                    TimelineSegment secondSegment = new TimelineSegment(hoverTime, segment.End, segment.State);
+                    
+                    // Insert the new segments in place of the removed one
+                    precise_Times.Insert(i, secondSegment);
+                    precise_Times.Insert(i, firstSegment);
+                    
+                    return; // Exit after modification to prevent further iteration
+                }
+            }
+        }
+        private static void RemoveSegment(List<TimelineSegment> precise_Times, float hoverTime, float timelineWidth)
+        {
+            float pixelTolerance = 10f / timelineWidth;
+            int closestIndex = -1;
+            float closestDistance = float.MaxValue;
+            
+            // Find the closest valid segment split within tolerance
+            for (int i = 0; i < precise_Times.Count - 1; i++)
+            {
+                TimelineSegment first = precise_Times[i];
+                TimelineSegment second = precise_Times[i + 1];
+                
+                float endDistance = Math.Abs(first.End - hoverTime);
+                float startDistance = Math.Abs(second.Start - hoverTime);
+                
+                if (endDistance <= pixelTolerance && startDistance <= pixelTolerance)
+                {
+                    float totalDistance = endDistance + startDistance;
+                    if (totalDistance < closestDistance)
+                    {
+                        closestDistance = totalDistance;
+                        closestIndex = i;
+                    }
+                }
+            }
+            
+            // If a valid closest segment was found, merge it
+            if (closestIndex != -1)
+            {
+                TimelineSegment first = precise_Times[closestIndex];
+                TimelineSegment second = precise_Times[closestIndex + 1];
+                
+                // Create a merged segment
+                TimelineSegment mergedSegment = new TimelineSegment(first.Start, second.End, first.State);
+                
+                // Remove the two segments
+                precise_Times.RemoveAt(closestIndex + 1);
+                precise_Times.RemoveAt(closestIndex);
+                
+                // Insert the merged segment
+                precise_Times.Insert(closestIndex, mergedSegment);
+            }
+        }
+
+        private static List<int> GetStates(List<TimelineSegment> precise_Times)
+        {
+            List<int> segments = new List<int>();
+            foreach (TimelineSegment time in precise_Times)
+            {
+                segments.Add(time.State);
+            }
+            return segments;        
+        }
+
+        private static List<float> GetPoints(List<TimelineSegment> precise_Times)
+        {
+            List<float> floats = new List<float>();
+            foreach (TimelineSegment time in precise_Times)
+            {
+                floats.Add(time.Start);
+            }
+            floats.Add(precise_Times.Last().End);
+            return floats;
+        }
+
+        private static string FormatTime(float time)
+        {
+            int totalMinutes = (int)(time * 24 * 60);
+            int hours = (totalMinutes / 60) % 24;
+
+            totalMinutes = (int)(Math.Round(totalMinutes / 5.0) * 5);
+            int minutes = totalMinutes % 60;
+            string period = hours > 12 ? "PM" : "AM";
+
+            hours = hours % 12;
+            if (hours == 0) hours = 12;
+            return $"{hours}:{minutes:D2} {period}";
         }
     }
 }
