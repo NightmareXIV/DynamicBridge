@@ -17,7 +17,7 @@ public static unsafe class ETimeChecker
         [ETime.Dawn] = "5am - 7am",
         [ETime.Dusk] = "5pm - 7pm",
         [ETime.Morning] = "7am - 12pm",
-        [ETime.Evening] = "7pm - 10am",
+        [ETime.Evening] = "7pm - 10pm",
     };
 
     public static ETime GetEorzeanTimeInterval() => GetTimeInterval(*ET);
@@ -32,5 +32,13 @@ public static unsafe class ETimeChecker
         if(date.Hour < 19) return ETime.Dusk;
         if(date.Hour < 22) return ETime.Evening;
         return ETime.Night;
+    }
+
+    public static float GetEorzeanTime() => GetTime(*ET);
+    public static float GetTime(long time)
+    {
+        var date = DateTimeOffset.FromUnixTimeSeconds(time);
+        // PluginLog.Information(((date.Hour*60+date.Minute)/(float)(24*60)).ToString());
+        return (date.Hour*60+date.Minute)/(float)(24*60);
     }
 }
