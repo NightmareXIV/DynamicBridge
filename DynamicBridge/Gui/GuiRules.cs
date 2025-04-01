@@ -799,14 +799,10 @@ namespace DynamicBridge.Gui
                 }
             }
 
-            if (hoveringTimeline)
-            {
-                string timeLabel = FormatTime(hoverTime);
-                ImGui.SetTooltip(timeLabel);
-            }
-
             List<Vector2> labelBoundryBoxes = [];
             // Draw points + Identify if removeable
+            string hoverLabel = FormatTime(hoverTime);
+            string tooltipText = $"{hoverLabel} | Mouse Middle to add";
             for (int i = 0; i < timePoints.Count; i++)
             {
                 float xPos = startX + timePoints[i] * timelineWidth;
@@ -817,7 +813,13 @@ namespace DynamicBridge.Gui
                     color = ImGui.GetColorU32(new Vector4(1.0f, 0.5f, 0.0f, 1.0f));
                 }
                 string label = FormatTime(timePoints[i]);
-                
+
+                if (hoveringTimeline && Math.Abs(hoverTime - timePoints[i]) < 10f / timelineWidth)
+                {
+                    if (timePoints[i] == 0f || timePoints[i] == 1f) {tooltipText = $"{label} | May not remove";}
+                    else {tooltipText = $"{label} | Mouse Middle to remove.";}
+                }
+
                 Vector2 textSize = ImGui.CalcTextSize(label);
 
                 float labelX = xPos - textSize.X / 2;
@@ -839,6 +841,10 @@ namespace DynamicBridge.Gui
                 }
                 labelBoundryBoxes.Add(new Vector2(xPos+textSize.X/2, labelY));
                 drawList.AddCircleFilled(pointPos, 5f, color);
+            }
+            if (hoveringTimeline)
+            {
+                ImGui.SetTooltip(tooltipText);
             }
 
             timePoints = timePoints.Distinct().OrderBy(x => Vector2.Distance(mousePos, new Vector2(startX + x * timelineWidth, centerY))).ToList();
