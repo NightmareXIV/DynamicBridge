@@ -72,6 +72,20 @@ public unsafe class GlamourerManager
         }
     }
 
+    private GetState GetState = new(Svc.PluginInterface);
+    public Newtonsoft.Json.Linq.JObject GetMyState()
+    {
+        try
+        {
+            return GetState.Invoke(0).Item2;
+        }
+        catch(Exception e)
+        {
+            e.Log();
+            return null;
+        }
+    }    
+
     private ApplyState ApplyState = new(Svc.PluginInterface);
     public void SetMyCustomization(string customization)
     {
