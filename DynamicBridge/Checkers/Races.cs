@@ -14,7 +14,7 @@ namespace DynamicBridge.Core
         Lalafell = 3,
         Miqote = 4,
         Roegadyn = 5,
-        Aura = 6,
+        Au_ra = 6,
         Hrothgar = 7,
         Viera = 8,
     }

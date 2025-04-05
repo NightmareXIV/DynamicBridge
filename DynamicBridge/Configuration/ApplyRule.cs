@@ -30,6 +30,7 @@ namespace DynamicBridge.Configuration
         public List<string> Players = [];
         public List<string> SelectedPresets = [];
         public bool Passthrough = false;
+        public bool valid = true;
         public NotConditions Not = new();
 
         [Serializable]

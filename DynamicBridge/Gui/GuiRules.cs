@@ -135,7 +135,14 @@ namespace DynamicBridge.Gui
                         //Sorting
                         var rowPos = ImGui.GetCursorPos();
                         ImGui.Checkbox("##enable", ref rule.Enabled);
-                        ImGuiEx.Tooltip("Enable this rule");
+                        if (!rule.valid)
+                        {
+                            ImGuiEx.Tooltip("There is a race/preset conflict, to enable this rule, please resolve.");
+                        }
+                        else
+                        {
+                            ImGuiEx.Tooltip("Enable this rule");
+                        }
 
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
@@ -529,14 +536,9 @@ namespace DynamicBridge.Gui
                                 foreach(var cond in Enum.GetValues<Races>())
                                 {
                                     if(cond == Races.No_Race) continue;
-                                    var name = cond.ToString().Replace("_", " ");
+                                    var name = cond.ToString().Replace("_", "'");
                                     if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if(OnlySelected[filterCnt] && !rule.Races.Contains(cond)) continue;
-                                    // if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "race", $"{(int)cond}.png"), out var texture))
-                                    // {
-                                    //     ImGui.Image(texture.ImGuiHandle, iconSize);
-                                    //     ImGui.SameLine();
-                                    // }
                                     DrawSelector(name, cond, rule.Races, rule.Not.Races);
                                 }
                                 ImGui.EndCombo();
