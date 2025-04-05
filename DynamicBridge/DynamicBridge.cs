@@ -733,7 +733,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                             {
                                 valid = false;
                             }
-                            PluginLog.Information($"Valid: {valid} | Design: {design.Name} | Race: {design_race} | Applied: {applied} | racesToCheck: {racesToCheck.FirstOrNull()},{!racesToCheck.Contains(design_race)} | notRacesToCheck: {notRacesToCheck.FirstOrNull()},{notRacesToCheck.Contains(design_race)} | Guid: {guid}");
+                            // PluginLog.Information($"Valid: {valid} | Design: {design.Name} | Race: {design_race} | Applied: {applied} | racesToCheck: {racesToCheck.FirstOrNull()},{!racesToCheck.Contains(design_race)} | notRacesToCheck: {notRacesToCheck.FirstOrNull()},{notRacesToCheck.Contains(design_race)} | Guid: {guid}");
                         }
                         else
                         {
