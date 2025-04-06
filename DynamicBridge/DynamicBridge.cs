@@ -687,6 +687,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
         bool valid = true;
         List<Races> racesToCheck = rule.Races;
         List<Races> notRacesToCheck = rule.Not.Races;
+        if (racesToCheck.Count + notRacesToCheck.Count == 0)
+            return true;
         foreach(string preset_name in rule.SelectedPresets)
         {
             foreach(Preset preset in presets)
@@ -725,7 +727,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 }
                             }
 
-                            if (applied && !racesToCheck.Contains(design_race))
+                            if (applied && !racesToCheck.Contains(design_race) && racesToCheck.Count > 0)
                             {
                                 valid = false;
                             }
