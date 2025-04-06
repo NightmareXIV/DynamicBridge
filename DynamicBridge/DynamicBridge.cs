@@ -94,7 +94,6 @@ public unsafe class DynamicBridge : IDalamudPlugin
             new EzFrameworkUpdate(OnUpdate);
             new EzLogout(Logout);
             new EzTerritoryChanged(TerritoryChanged);
-            new EzStateChanged(StateChanged);
             TaskManager = new()
             {
                 TimeLimitMS = 2000,
@@ -548,11 +547,6 @@ public unsafe class DynamicBridge : IDalamudPlugin
     private void TerritoryChanged(ushort id)
     {
         SoftForceUpdate = true;
-    }
-
-    private void StateChanged(nint objectId, StateChangeType changeType)
-    {
-        // PluginLog.Debug($"STATE CHANGED!!!!! Type: {changeType}");
     }
 
     private void ApplyPresetPenumbra(Preset preset, ref bool DoNullPenumbra)
