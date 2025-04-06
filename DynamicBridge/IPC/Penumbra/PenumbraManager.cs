@@ -52,7 +52,11 @@ public class PenumbraManager
     {
         try
         {
-            var result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, GetGuidForCollection(newAssignment), true, true);
+            (PenumbraApiEc, (Guid Id, string Name)? OldCollection) result;
+            if (newAssignment == "")
+                result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, null, true, true);
+            else 
+                result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, GetGuidForCollection(newAssignment), true, true);
             if(!result.Item1.EqualsAny(PenumbraApiEc.Success, PenumbraApiEc.NothingChanged))
             {
                 var e = $"Error setting Penumbra assignment: {result.Item1}";
