@@ -418,7 +418,15 @@ namespace DynamicBridge.Gui
                                                 {
                                                     P.ForceUpdate = true;
                                                 }
-                                            }                                           
+                                            }
+                                            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+                                            {
+                                                if (contains)
+                                                {
+                                                    preset.StickyRandomG = preset.Glamourer.IndexOf(id);
+                                                    P.ForceUpdate = true;
+                                                }
+                                            }
                                         }
 
                                         ));
@@ -563,6 +571,14 @@ namespace DynamicBridge.Gui
                                             preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
                                             if(C.AutofillFromGlam && preset.Name == "" && preset.Customize.Contains($"{x.UniqueId}")) preset.Name = name;
                                         }
+                                        if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+                                        {
+                                            if (contains)
+                                            {
+                                                preset.StickyRandomC = preset.Customize.IndexOf($"{x.UniqueId}");
+                                                P.ForceUpdate = true;
+                                            }
+                                        }
                                     }
 
                                     ));
@@ -660,6 +676,14 @@ namespace DynamicBridge.Gui
                                                 preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Honorific.Contains(x.Title)) preset.Name = name;
                                             }
+                                            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+                                            {
+                                                if (contains)
+                                                {
+                                                    preset.StickyRandomH = preset.Honorific.IndexOf(x.Title);
+                                                    P.ForceUpdate = true;
+                                                }
+                                            }
                                         }
 
                                         ));
@@ -750,6 +774,14 @@ namespace DynamicBridge.Gui
                                             {
                                                 preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
                                                 if(C.AutofillFromGlam && preset.Name == "" && preset.Penumbra.Contains(x)) preset.Name = name;
+                                            }
+                                            if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Middle))
+                                            {
+                                                if (contains)
+                                                {
+                                                    preset.StickyRandomP = preset.Penumbra.IndexOf(name);
+                                                    P.ForceUpdate = true;
+                                                }
                                             }
                                         }
 
