@@ -265,6 +265,8 @@ namespace DynamicBridge.Gui
 
             ImGuiEx.Text($"In water: {Utils.IsInWater}");
 
+            ImGuiEx.Text($"Territoy Type: {Svc.ClientState.TerritoryType}");
+
             if(ImGui.CollapsingHeader("Query territory IDs"))
             {
                 ImGuiEx.InputTextMultilineExpanding("##1", ref Input, 100000);
