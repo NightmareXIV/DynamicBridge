@@ -1,4 +1,4 @@
-using DynamicBridge.Configuration;
+﻿using DynamicBridge.Configuration;
 using DynamicBridge.Core;
 using DynamicBridge.Gui;
 using DynamicBridge.IPC;
@@ -20,6 +20,7 @@ using ECommons.Throttlers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+using Glamourer.Api.Enums;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -315,6 +316,14 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     {
                         foreach(var x in profile.Rules)
                         {
+                            if (C.Cond_Race)
+                            {
+                                x.valid = CheckValidRace(profile.Presets, x, "Customize,Race");
+                                if (x.Enabled)
+                                {
+                                    x.Enabled = x.valid;
+                                }
+                            }
                             if(
                                 x.Enabled
                                 &&
@@ -354,7 +363,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
                                 && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
                                 &&
-                                (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))) 
+                                (!C.Cond_Race || ((x.Races.Count == 0 || x.Races.Any(s => s == (Races)(int)GlamourerManager.GetMyState()["Customize"]["Race"]["Value"]))
+                                && (!C.AllowNegativeConditions || !x.Not.Races.Any(s => s == (Races)(int)GlamourerManager.GetMyState()["Customize"]["Race"]["Value"]))))
+                                && (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))) 
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
                                 )
                             {
@@ -666,5 +677,72 @@ public unsafe class DynamicBridge : IDalamudPlugin
         ECommonsMain.Dispose();
         P = null;
         C = null;
+    }
+
+    private static bool CheckValidRace(List<Preset> presets, ApplyRule rule, string path)
+    {
+        bool valid = true;
+        List<Races> racesToCheck = rule.Races;
+        List<Races> notRacesToCheck = rule.Not.Races;
+        if (racesToCheck.Count + notRacesToCheck.Count == 0)
+            return true;
+        foreach(string preset_name in rule.SelectedPresets)
+        {
+            foreach(Preset preset in presets)
+            {
+                if(preset_name == preset.Name)
+                {
+                    foreach(string design_name in preset.Glamourer)
+                    {
+                        var design = (GlamourerDesignInfo)Utils.GetDesignByGUID(design_name);
+                        var guid = design.Identifier;
+                        string targetFile = Path.Combine(Svc.PluginInterface.ConfigDirectory.Parent!.FullName,"Glamourer","Designs",$"{guid}.json");
+                        if (File.Exists(targetFile))
+                        {
+                            string jsonContent = File.ReadAllText(targetFile);
+
+                            var designObject = Newtonsoft.Json.Linq.JObject.Parse(jsonContent);
+                            Newtonsoft.Json.Linq.JToken current = designObject;
+                            string[] keys = path.Split(',');
+                            foreach (var key in keys)
+                            {
+                                current = current?[key];
+                            }
+                            Races design_race = (Races)(int)current["Value"];
+
+                            bool applied = false;
+
+                            foreach (var property in ((Newtonsoft.Json.Linq.JObject)designObject[keys[0]]).Properties())
+                            {
+                                if(property.Name != "ModelId" && property.Name != "BodyType")
+                                {
+                                    if ((string)designObject[keys[0]][property.Name]["Apply"] == "True")
+                                    {
+                                        applied = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (applied && !racesToCheck.Contains(design_race) && racesToCheck.Count > 0)
+                            {
+                                valid = false;
+                            }
+                            if (applied && notRacesToCheck.Contains(design_race))
+                            {
+                                valid = false;
+                            }
+                            // PluginLog.Information($"Valid: {valid} | Design: {design.Name} | Race: {design_race} | Applied: {applied} | racesToCheck: {racesToCheck.FirstOrNull()},{!racesToCheck.Contains(design_race)} | notRacesToCheck: {notRacesToCheck.FirstOrNull()},{notRacesToCheck.Contains(design_race)} | Guid: {guid}");
+                        }
+                        else
+                        {
+                            PluginLog.Warning($"Design file '{guid}.json' not found.");
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return valid;
     }
 }
