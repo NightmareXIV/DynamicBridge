@@ -18,5 +18,6 @@ namespace DynamicBridge.Core
         Aquatic_River,
         Aquatic_Frozen,
         Aquatic_Hot_Springs,
+        City,
     }
 }
