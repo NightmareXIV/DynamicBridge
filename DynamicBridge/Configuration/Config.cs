@@ -82,6 +82,7 @@ namespace DynamicBridge.Configuration
     {
         OnLogin,
         Never,
-        Timer
+        Timer,
+        OnJobChange
     }
 }
