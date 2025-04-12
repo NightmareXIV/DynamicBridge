@@ -57,6 +57,8 @@ namespace DynamicBridge.Configuration
         public bool Cond_Job = true;
         public bool Cond_World = false;
         public bool Cond_Gearset = false;
+        public bool Cond_Race = false;
+        public bool Cond_Race_Bonus = false;
         public bool Cond_Players = false;
 
         public bool Cond_Time_Precise = false;

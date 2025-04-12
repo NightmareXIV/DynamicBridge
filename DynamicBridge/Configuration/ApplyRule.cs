@@ -26,6 +26,7 @@ namespace DynamicBridge.Configuration
         public List<ETime> Times = [];
         public List<uint> Worlds = [];
         public List<int> Gearsets = [];
+        public List<Races> Races = [];
         public List<string> Players = [];
         public List<TimelineSegment> Precise_Times = [
             new TimelineSegment((float)0/24,(float)5/24,0),
@@ -38,6 +39,7 @@ namespace DynamicBridge.Configuration
             ];
         public List<string> SelectedPresets = [];
         public bool Passthrough = false;
+        public bool valid = true;
         public NotConditions Not = new();
 
         [Serializable]
@@ -54,6 +56,7 @@ namespace DynamicBridge.Configuration
             public List<ETime> Times = [];
             public List<uint> Worlds = [];
             public List<int> Gearsets = [];
+            public List<Races> Races = [];
             public List<string> Players = [];
         }
     }

@@ -1,4 +1,4 @@
-using Dalamud.Interface.Components;
+﻿using Dalamud.Interface.Components;
 using Dalamud.Interface.Style;
 using DynamicBridge.Configuration;
 using DynamicBridge.Core;
@@ -78,6 +78,7 @@ namespace DynamicBridge.Gui
                     C.Cond_World,
                     C.Cond_Zone,
                     C.Cond_ZoneGroup,
+                    C.Cond_Race,
                     C.Cond_Players,
                 ];
 
@@ -98,6 +99,7 @@ namespace DynamicBridge.Gui
                     if(C.Cond_Job) ImGui.TableSetupColumn("Job");
                     if(C.Cond_World) ImGui.TableSetupColumn("World");
                     if(C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
+                    if(C.Cond_Race) ImGui.TableSetupColumn("Race");
                     if(C.Cond_Players) ImGui.TableSetupColumn("Players");
                     ImGui.TableSetupColumn("Preset");
                     ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
@@ -133,7 +135,14 @@ namespace DynamicBridge.Gui
                         //Sorting
                         var rowPos = ImGui.GetCursorPos();
                         ImGui.Checkbox("##enable", ref rule.Enabled);
-                        ImGuiEx.Tooltip("Enable this rule");
+                        if (!rule.valid)
+                        {
+                            ImGuiEx.Tooltip("There is a race/preset conflict, to enable this rule, please resolve.");
+                        }
+                        else
+                        {
+                            ImGuiEx.Tooltip("Enable this rule");
+                        }
 
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
@@ -550,6 +559,26 @@ namespace DynamicBridge.Gui
                         }
                         filterCnt++;
 
+                        if(C.Cond_Race)
+                        {
+                            ImGui.TableNextColumn();
+                            //Race
+                            ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                            if(ImGui.BeginCombo("##race", rule.Races.PrintRange(rule.Not.Races, out var fullList), C.ComboSize))
+                            {
+                                FiltersSelection();
+                                foreach(var cond in Enum.GetValues<Races>())
+                                {
+                                    if(cond == Races.No_Race) continue;
+                                    var name = cond.ToString().Replace("_", "'");
+                                    if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                    if(OnlySelected[filterCnt] && !rule.Races.Contains(cond)) continue;
+                                    DrawSelector(name, cond, rule.Races, rule.Not.Races);
+                                }
+                                ImGui.EndCombo();
+                            }
+                            if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
+                        }
                         if (C.Cond_Players)
                         {
                             ImGui.TableNextColumn();
