@@ -57,7 +57,7 @@ public static class GuiSettings
             {
                 ImGuiEx.Spacing();
                 ImGuiEx.SetNextItemWidthScaled(200f);
-                ImGuiEx.EnumCombo($"Randomize on Login", ref C.RandomChoosenType);
+                ImGuiEx.EnumCombo($"Randomizer Setting", ref C.RandomChoosenType);
                 if (C.RandomChoosenType == RandomTypes.Timer) {
                     ImGui.SameLine();
                     ImGui.Text("|");
