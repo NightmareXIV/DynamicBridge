@@ -53,9 +53,9 @@ public class PenumbraManager
         try
         {
             (PenumbraApiEc, (Guid Id, string Name)? OldCollection) result;
-            if (newAssignment == "")
+            if(newAssignment == "")
                 result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, null, true, true);
-            else 
+            else
                 result = new SetCollectionForObject(Svc.PluginInterface).Invoke(0, GetGuidForCollection(newAssignment), true, true);
             if(!result.Item1.EqualsAny(PenumbraApiEc.Success, PenumbraApiEc.NothingChanged))
             {

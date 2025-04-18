@@ -133,41 +133,46 @@ public unsafe class DynamicBridge : IDalamudPlugin
         LastJob = (uint)Player.Job;
         //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
 
-        if(C.RandomChoosenType == RandomTypes.OnLogin && !RandomizedRecently) {
+        if(C.RandomChoosenType == RandomTypes.OnLogin && !RandomizedRecently)
+        {
             RandomizedRecently = true;
             Randomizer();
         }
     }
-    
-    private void Randomizer() {
+
+    private void Randomizer()
+    {
         var profile = Utils.GetProfileByCID(Player.CID);
-        if (profile != null) {
-            if (C.StickyPresets && C.Sticky) {
-                foreach (var rule in profile.Rules) 
+        if(profile != null)
+        {
+            if(C.StickyPresets && C.Sticky)
+            {
+                foreach(var rule in profile.Rules)
                 {
-                rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+                    rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
+                }
             }
-            }
-            foreach (var preset in profile.Presets) {
-                if (C.StickyCustomize && C.Sticky)
+            foreach(var preset in profile.Presets)
+            {
+                if(C.StickyCustomize && C.Sticky)
                 {
-                preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
+                    preset.StickyRandomC = Random.Shared.Next(0, preset.CustomizeFiltered().ToArray().Length);
                 }
-                if (C.StickyGlamourer && C.Sticky)
+                if(C.StickyGlamourer && C.Sticky)
                 {
-                preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
+                    preset.StickyRandomG = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
                 }
-                if (C.StickyHonorific && C.Sticky)
+                if(C.StickyHonorific && C.Sticky)
                 {
-                preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
+                    preset.StickyRandomH = Random.Shared.Next(0, preset.HonorificFiltered().ToArray().Length);
                 }
-                if (C.StickyPenumbra && C.Sticky)
+                if(C.StickyPenumbra && C.Sticky)
                 {
-                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                    preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                }
             }
         }
-        }
-        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets||C.StickyCustomize||C.StickyGlamourer||C.StickyHonorific||C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
+        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets || C.StickyCustomize || C.StickyGlamourer || C.StickyHonorific || C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
         RandomizedRecently = false;
     }
 
@@ -229,7 +234,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 {
                     if(C.SeenCharacters.ContainsKey(Player.CID) && !C.Blacklist.Contains(Player.CID))
                     {
-                        if (profile.IsStaticExists() && (currentProfile == null || currentProfile.IsStaticExists()))
+                        if(profile.IsStaticExists() && (currentProfile == null || currentProfile.IsStaticExists()))
                         {
                             P.ForceUpdate = true;
                         }
@@ -293,7 +298,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
             }
 
-            if (!RandomizedRecently && ((DateTime.UtcNow - RandomizerTimer).TotalMinutes >= C.UserInputRandomizerTime) && (C.RandomChoosenType == RandomTypes.Timer))
+            if(!RandomizedRecently && ((DateTime.UtcNow - RandomizerTimer).TotalMinutes >= C.UserInputRandomizerTime) && (C.RandomChoosenType == RandomTypes.Timer))
             {
                 RandomizedRecently = true;
                 RandomizerTimer = DateTime.UtcNow;
@@ -354,7 +359,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
                                 && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
                                 &&
-                                (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))) 
+                                (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
                                 )
                             {
@@ -364,7 +369,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         }
                     }
                 }
-                bool DontChangeOnTerritoryChange = C.DontChangeOnTerritoryChange; // true: Don't change if rules are same on territory change, false (defualt): Use old method 
+                var DontChangeOnTerritoryChange = C.DontChangeOnTerritoryChange; // true: Don't change if rules are same on territory change, false (defualt): Use old method 
                 if(ForceUpdate || !Utils.GuidEquals(newRule, LastRule) || (SoftForceUpdate && newRule.Count > 0 && !DontChangeOnTerritoryChange))
                 {
                     PluginLog.Debug($"Old rule: {LastRule.Print()}, new rule: {newRule.Print()} | {Utils.GuidEquals(newRule, LastRule)} | F:{ForceUpdate}");
@@ -385,7 +390,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         if(rule != null && rule.SelectedPresets.Count > 0)
                         {
                             var index = Random.Next(0, rule.SelectedPresets.Count);
-                            if (C.StickyPresets && C.Sticky)
+                            if(C.StickyPresets && C.Sticky)
                             {
                                 index = rule.StickyRandom;
                             }
@@ -555,8 +560,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
         }
         else if(preset.Penumbra.Count > 0)
         {
-            int index = Random.Next(preset.Penumbra.Count);
-            if (C.StickyPenumbra && C.Sticky) {index = preset.StickyRandomP;}
+            var index = Random.Next(preset.Penumbra.Count);
+            if(C.StickyPenumbra && C.Sticky) { index = preset.StickyRandomP; }
             var randomAssignment = preset.Penumbra[index];
             PenumbraManager.SetAssignment(randomAssignment);
             DoNullPenumbra = false;
@@ -568,7 +573,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         if(preset.Glamourer.Count > 0 || preset.ComplexGlamourer.Count > 0)
         {
             var selectedIndex = Random.Shared.Next(0, preset.Glamourer.Count + preset.ComplexGlamourer.Count);
-            if (C.StickyGlamourer && C.Sticky) {selectedIndex = preset.StickyRandomG;}
+            if(C.StickyGlamourer && C.Sticky) { selectedIndex = preset.StickyRandomG; }
             var designs = new List<string>();
             if(selectedIndex < preset.Glamourer.Count)
             {
@@ -619,7 +624,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             DoNullHonorific = false;
             var index = Random.Next(hfiltered.Length);
-            if (C.StickyHonorific && C.Sticky) {index = preset.StickyRandomH;};
+            if(C.StickyHonorific && C.Sticky) { index = preset.StickyRandomH; }
+            ;
             var randomTitle = hfiltered[index];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
             TaskManager.Enqueue(() => HonorificManager.SetTitle(randomTitle));
@@ -633,7 +639,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             DoNullCustomize = false;
             var index = Random.Next(cfiltered.Length);
-            if (C.StickyCustomize && C.Sticky) {index = preset.StickyRandomC;};
+            if(C.StickyCustomize && C.Sticky) { index = preset.StickyRandomC; }
+            ;
             var randomCusProfile = cfiltered[index];
             TaskManager.Enqueue(Utils.WaitUntilInteractable);
             TaskManager.Enqueue(() => CustomizePlusManager.SetProfile(randomCusProfile, Player.NameWithWorld));

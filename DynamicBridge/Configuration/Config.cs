@@ -69,7 +69,7 @@ namespace DynamicBridge.Configuration
         public bool UnifyJobs = true;
         public bool HonotificUnfiltered = false;
         public bool AutofillFromGlam = false;
-        public List<(string Name, float Distance)> selectedPlayers = new List<(string Name, float Distance)>();
+        public List<(string Name, float Distance)> selectedPlayers = [];
     }
 
     public enum GlamourerNoRuleBehavior

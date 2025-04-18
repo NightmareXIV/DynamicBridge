@@ -39,6 +39,6 @@ public static unsafe class ETimeChecker
     {
         var date = DateTimeOffset.FromUnixTimeSeconds(time);
         // PluginLog.Information(((date.Hour*60+date.Minute)/(float)(24*60)).ToString());
-        return (date.Hour*60+date.Minute)/(float)(24*60);
+        return (date.Hour * 60 + date.Minute) / (float)(24 * 60);
     }
 }
