@@ -168,11 +168,12 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
                 if(C.StickyPenumbra && C.Sticky)
                 {
-                    preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
                 }
             }
         }
-        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets || C.StickyCustomize || C.StickyGlamourer || C.StickyHonorific || C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
+        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets||C.StickyCustomize||C.StickyGlamourer||C.StickyHonorific||C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
+
         RandomizedRecently = false;
     }
 
@@ -275,18 +276,19 @@ public unsafe class DynamicBridge : IDalamudPlugin
     {
         if(Player.Interactable)
         {
-            if(C.UpdateJobGSChange)
+            if(LastJob != Player.Object.ClassJob.RowId)
             {
-                if(LastJob != Player.Object.ClassJob.RowId)
+                PluginLog.Information($"Job info Old: {LastJob} Current: {Player.Object.ClassJob.RowId}");
+                LastJob = Player.Object.ClassJob.RowId;
+                if(C.UpdateJobGSChange)
                 {
-                    LastJob = Player.Object.ClassJob.RowId;
                     ForceUpdate = true;
                 }
-                /*if (LastGS != RaptureGearsetModule.Instance()->CurrentGearsetIndex)
+                if(C.RandomChoosenType == RandomTypes.OnJobChange)
                 {
-                    LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
                     ForceUpdate = true;
-                }*/
+                    Randomizer();
+                }
             }
             if(C.UpdateGearChange)
             {
