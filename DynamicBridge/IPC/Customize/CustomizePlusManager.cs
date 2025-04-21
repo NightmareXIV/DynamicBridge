@@ -139,11 +139,11 @@ public class CustomizePlusManager
     private Dictionary<string, string> TransformNameCache = [];
     public string TransformName(string originalName)
     {
-        if (TransformNameCache.TryGetValue(originalName, out var ret))
+        if(TransformNameCache.TryGetValue(originalName, out var ret))
         {
             return ret;
         }
-        if (Guid.TryParse(originalName, out var guid))
+        if(Guid.TryParse(originalName, out var guid))
         {
             if(GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
             {
@@ -166,13 +166,13 @@ public class CustomizePlusManager
     private Dictionary<string, string> FullPathCache = [];
     public string GetFullPath(string originalName)
     {
-        if (FullPathCache.TryGetValue(originalName, out var ret))
+        if(FullPathCache.TryGetValue(originalName, out var ret))
         {
             return ret;
         }
-        if (Guid.TryParse(originalName, out var guid))
+        if(Guid.TryParse(originalName, out var guid))
         {
-            if (GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
+            if(GetProfiles().TryGetFirst(x => x.UniqueId == guid, out var entry))
             {
                 return CacheAndReturn(entry.VirtualPath);
             }

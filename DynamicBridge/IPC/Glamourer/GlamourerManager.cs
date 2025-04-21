@@ -159,11 +159,11 @@ public unsafe class GlamourerManager
     {
         if(FullPathCache.TryGetValue(originalName, out var ret))
         {
-            return ret; 
+            return ret;
         }
-        if (Guid.TryParse(originalName, out var guid))
+        if(Guid.TryParse(originalName, out var guid))
         {
-            if (GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
+            if(GetDesigns().TryGetFirst(x => x.Identifier == guid, out var entry))
             {
                 return CacheAndReturn(Reflector.GetPathForDesignByGuid(guid) ?? entry.Name);
             }

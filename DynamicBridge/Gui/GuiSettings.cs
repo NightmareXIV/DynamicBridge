@@ -53,7 +53,7 @@ public static class GuiSettings
 
             ImGuiEx.HelpMarker("Please ensure \"Revert Manual Changes on Zone Change\" is unchecked in Glamourer Behavior Settings");
             ImGui.Checkbox($"Attempt to preserve rules", ref C.Sticky);
-            if (C.Sticky)
+            if(C.Sticky)
             {
                 ImGuiEx.Spacing();
                 ImGuiEx.SetNextItemWidthScaled(200f);
@@ -65,16 +65,17 @@ public static class GuiSettings
                     ImGui.Text("How often should it randomize everything in minutes:");
                     ImGui.SameLine();
                     ImGuiEx.SetNextItemWidthScaled(200f);
-                    if (ImGui.InputDouble("", ref C.UserInputRandomizerTime))
+                    if(ImGui.InputDouble("", ref C.UserInputRandomizerTime))
                     {
                         double ReloadSpeed = 1;
-                        if (!C.ForceUpdateOnRandomize) 
+                        if(!C.ForceUpdateOnRandomize)
                         {
                             ReloadSpeed = 0.1;
                         }
                         C.UserInputRandomizerTime = Math.Max(ReloadSpeed, C.UserInputRandomizerTime);
-                    };
-                    ImGuiEx.Spacing();ImGuiEx.Spacing();
+                    }
+                    ;
+                    ImGuiEx.Spacing(); ImGuiEx.Spacing();
                     ImGui.Checkbox("Force update on randomize", ref C.ForceUpdateOnRandomize);
                 }
                 ImGuiEx.Spacing();
@@ -131,11 +132,11 @@ public static class GuiSettings
                 () => ImGui.Checkbox($"Nearby Players", ref C.Cond_Players),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
-            if (C.Cond_Time)
+            if(C.Cond_Time)
             {
                 ImGui.Separator();
                 ImGui.Checkbox("Enable Precise Time", ref C.Cond_Time_Precise);
-                if (C.Cond_Time_Precise)
+                if(C.Cond_Time_Precise)
                 {
                     ImGui.SameLine();
                     if(ImGui.Button("Convert all Simple Times to Precise Times") && ImGui.GetIO().KeyCtrl)
@@ -145,7 +146,7 @@ public static class GuiSettings
                     ImGuiEx.Tooltip("Hold CTRL+Click, deletes all current Precise Times");
                 }
             }
-            else 
+            else
             {
                 C.Cond_Time_Precise = false;
             }
@@ -222,9 +223,9 @@ public static class GuiSettings
 
     private static void ConvertTimeRules()
     {
-        foreach (Profile profile in C.ProfilesL)
+        foreach(var profile in C.ProfilesL)
         {
-            foreach (ApplyRule rule in profile.Rules)
+            foreach(var rule in profile.Rules)
             {
                 rule.Precise_Times = [
                     new TimelineSegment(0f / 24, 5f / 24, rule.Not.Times.Contains(ETime.Night) ? 2 : rule.Times.Contains(ETime.Night) ? 1 : 0),
