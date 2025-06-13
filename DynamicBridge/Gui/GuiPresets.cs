@@ -48,51 +48,53 @@ namespace DynamicBridge.Gui
                     }
                 }
                 ImGuiEx.Tooltip("Add new empty preset into default or focused folder");
-                ImGui.SameLine(0, 1);
+                ImGui.SameLine();
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Paste))
                 {
                     try
                     {
-                        var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
-                        if(str != null)
+                        var folder = EzConfig.DefaultSerializationFactory.Deserialize<PresetFolder>(Paste()) ?? throw new NullReferenceException();
+                        if(folder.Presets.Count == 0) throw new InvalidOperationException();
+                        Profile.PresetsFolders.Add(folder);
+                    }
+                    catch(Exception ex)
+                    {
+                        ex.LogDebug();
+                        try
                         {
-                            if(Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                            var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
+                            if(str != null)
                             {
-                                open.Presets.Add(str);
+                                if(Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                                {
+                                    open.Presets.Add(str);
+                                }
+                                else
+                                {
+                                    Profile.Presets.Add(str);
+                                }
                             }
                             else
                             {
-                                Profile.Presets.Add(str);
+                                Notify.Error("Could not import from clipboard");
                             }
                         }
-                        else
+                        catch(Exception e)
                         {
-                            Notify.Error("Could not import from clipboard");
+                            Notify.Error(e.Message);
                         }
-                    }
-                    catch(Exception e)
-                    {
-                        Notify.Error(e.Message);
                     }
                 }
                 ImGuiEx.Tooltip($"Paste previously copied preset or folder from clipboard");
-                ImGui.SameLine(0, 1);
+                ImGui.SameLine();
 
                 if(ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
                 {
-                    try
-                    {
-                        var folder = EzConfig.DefaultSerializationFactory.Deserialize<>
-                    }
-                    catch(Exception e)
-                    {
-                        e.LogDebug();
-                    }
                     Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
                 }
                 ImGuiEx.Tooltip("Add new preset folder");
 
-                ImGui.SameLine(0, 1);
+                ImGui.SameLine();
 
             }
 
@@ -104,7 +106,7 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Tooltip("Toggle focus mode. While focus mode active, only one selected folder will be visible.");
                 ImGui.SameLine();*/
                 UI.ForceUpdateButton();
-                ImGui.SameLine(0, 1);
+                ImGui.SameLine();
             }
 
             if(drawHeader)

@@ -80,7 +80,7 @@ public class GlamourerReflector
                     {
                         var dfs = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Designs.DesignFileSystem"], []);
                         object[] findLeafArray = [design, null];
-                        if(dfs.Call<bool>("FindLeaf", findLeafArray, false))
+                        if(dfs.Call<bool>("TryGetValue", findLeafArray, false))
                         {
                             var ret = findLeafArray[1].Call<string>("FullName", []);
                             //PluginLog.Information($"Path for {guid} is {ret}");
