@@ -30,21 +30,21 @@ public static class GuiPresets
         DrawProfile(C.GlobalProfile, false, false, true);
     }
 
-    private static void DrawProfile(Profile Profile, bool drawFallback, bool drawHeader, bool drawGlobalSection)
+    private static void DrawProfile(Profile profile, bool drawFallback, bool drawHeader, bool drawGlobalSection)
     {
-        Profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
+        profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
 
         void Buttons()
         {
             if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
             {
-                if(Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                if(Open != null && profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                 {
                     open.Presets.Add(new());
                 }
                 else
                 {
-                    Profile.Presets.Add(new());
+                    profile.Presets.Add(new());
                 }
             }
             ImGuiEx.Tooltip("Add new empty preset into default or focused folder");
@@ -55,7 +55,7 @@ public static class GuiPresets
                 {
                     var folder = EzConfig.DefaultSerializationFactory.Deserialize<PresetFolder>(Paste()) ?? throw new NullReferenceException();
                     if(folder.Presets.Count == 0) throw new InvalidOperationException();
-                    Profile.PresetsFolders.Add(folder);
+                    profile.PresetsFolders.Add(folder);
                 }
                 catch(Exception ex)
                 {
@@ -65,13 +65,13 @@ public static class GuiPresets
                         var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
                         if(str != null)
                         {
-                            if(Open != null && Profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                            if(Open != null && profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                             {
                                 open.Presets.Add(str);
                             }
                             else
                             {
-                                Profile.Presets.Add(str);
+                                profile.Presets.Add(str);
                             }
                         }
                         else
@@ -90,7 +90,7 @@ public static class GuiPresets
 
             if(ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
             {
-                Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
+                profile.PresetsFolders.Add(new() { Name = $"Preset folder {profile.PresetsFolders.Count + 1}" });
             }
             ImGuiEx.Tooltip("Add new preset folder");
 
@@ -127,27 +127,29 @@ public static class GuiPresets
         {
             if(ImGuiEx.TreeNode($"Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
             {
+                CollapsingHeaderClicked(profile, -1, null);
                 newOpen = "";
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(Profile, result, Profile.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(profile, result, profile.Presets);
                 }
-                DrawPresets(Profile, Profile.Presets, out var postAction, "", false, drawGlobalSection);
+                DrawPresets(profile, profile.Presets, out var postAction, "", false, drawGlobalSection);
                 ImGui.TreePop();
                 postAction?.Invoke();
             }
             else
             {
+                CollapsingHeaderClicked(profile, -1, null);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(Profile, result, Profile.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(profile, result, profile.Presets);
                 }
             }
         }
 
-        for(var presetFolderIndex = 0; presetFolderIndex < Profile.PresetsFolders.Count; presetFolderIndex++)
+        for(var presetFolderIndex = 0; presetFolderIndex < profile.PresetsFolders.Count; presetFolderIndex++)
         {
-            var presetFolder = Profile.PresetsFolders[presetFolderIndex];
+            var presetFolder = profile.PresetsFolders[presetFolderIndex];
             if(Focus && Open != presetFolder.GUID && Open != null) continue;
             if(presetFolder.HiddenFromSelection)
             {
@@ -156,21 +158,21 @@ public static class GuiPresets
             if(ImGuiEx.TreeNode($"{presetFolder.Name}###presetfolder{presetFolder.GUID}"))
             {
                 newOpen = presetFolder.GUID;
-                CollapsingHeaderClicked(Profile, presetFolderIndex, presetFolder);
+                CollapsingHeaderClicked(profile, presetFolderIndex, presetFolder);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(Profile, result, presetFolder.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(profile, result, presetFolder.Presets);
                 }
-                DrawPresets(Profile, presetFolder.Presets, out var postAction, presetFolder.GUID, false, drawGlobalSection);
+                DrawPresets(profile, presetFolder.Presets, out var postAction, presetFolder.GUID, false, drawGlobalSection);
                 ImGui.TreePop();
                 postAction?.Invoke();
             }
             else
             {
-                CollapsingHeaderClicked(Profile, presetFolderIndex, presetFolder);
+                CollapsingHeaderClicked(profile, presetFolderIndex, presetFolder);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(Profile, result, presetFolder.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(profile, result, presetFolder.Presets);
                 }
             }
         }
@@ -178,69 +180,79 @@ public static class GuiPresets
         {
             if(ImGuiEx.TreeNode($"Fallback preset"))
             {
-                DrawPresets(Profile, [Profile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true, drawGlobalSection);
+                DrawPresets(profile, [profile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true, drawGlobalSection);
                 Open = newOpen;
                 ImGui.TreePop();
             }
         }
     }
 
-    private static void CollapsingHeaderClicked(Profile Profile, int presetFolderIndex, PresetFolder presetFolder)
+    private static void CollapsingHeaderClicked(Profile profile, int presetFolderIndex, PresetFolder presetFolder)
     {
-        if(ImGui.IsItemHovered() && ImGui.IsItemClicked(ImGuiMouseButton.Right)) ImGui.OpenPopup($"Folder{presetFolder.GUID}");
-        if(ImGui.BeginPopup($"Folder{presetFolder.GUID}"))
+        if(ImGui.IsItemHovered() && ImGui.IsItemClicked(ImGuiMouseButton.Right)) ImGui.OpenPopup($"Folder{presetFolder?.GUID}");
+        if(ImGui.BeginPopup($"Folder{presetFolder?.GUID}"))
         {
-            ImGuiEx.SetNextItemWidthScaled(150f);
-            ImGui.InputTextWithHint("##name", "Folder name", ref presetFolder.Name, 200);
-            if(ImGui.Selectable("Export to clipboard"))
+            if(presetFolder != null)
             {
-                Copy(EzConfig.DefaultSerializationFactory.Serialize(presetFolder, false));
-            }
-            if(presetFolder.HiddenFromSelection)
-            {
-                if(ImGui.Selectable("Show in Rules section")) presetFolder.HiddenFromSelection = false;
+                ImGuiEx.SetNextItemWidthScaled(150f);
+                ImGui.InputTextWithHint("##name", "Folder name", ref presetFolder.Name, 200);
+                if(ImGui.Selectable("Export to clipboard"))
+                {
+                    Copy(EzConfig.DefaultSerializationFactory.Serialize(presetFolder, false));
+                }
+                if(presetFolder.HiddenFromSelection)
+                {
+                    if(ImGui.Selectable("Show in Rules section")) presetFolder.HiddenFromSelection = false;
+                }
+                else
+                {
+                    if(ImGui.Selectable("Hide from Rules section")) presetFolder.HiddenFromSelection = true;
+                }
+                if(ImGui.Selectable("Move up", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex > 0)
+                {
+                    (profile.PresetsFolders[presetFolderIndex], profile.PresetsFolders[presetFolderIndex - 1]) = (profile.PresetsFolders[presetFolderIndex - 1], profile.PresetsFolders[presetFolderIndex]);
+                }
+                if(ImGui.Selectable("Move down", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex < profile.PresetsFolders.Count - 1)
+                {
+                    (profile.PresetsFolders[presetFolderIndex], profile.PresetsFolders[presetFolderIndex + 1]) = (profile.PresetsFolders[presetFolderIndex + 1], profile.PresetsFolders[presetFolderIndex]);
+                }
+                ImGui.Separator();
+
+                if(ImGui.BeginMenu("Delete folder..."))
+                {
+                    if(ImGui.Selectable("...and move profiles to default folder (Hold CTRL)"))
+                    {
+                        if(ImGuiEx.Ctrl)
+                        {
+                            new TickScheduler(() =>
+                            {
+                                foreach(var x in presetFolder.Presets)
+                                {
+                                    profile.Presets.Add(x);
+                                }
+                                profile.PresetsFolders.Remove(presetFolder);
+                            });
+                        }
+                    }
+                    if(ImGui.Selectable("...and delete included profiles (Hold CTRL+SHIFT)"))
+                    {
+                        if(ImGuiEx.Ctrl && ImGuiEx.Shift)
+                        {
+                            new TickScheduler(() => profile.PresetsFolders.Remove(presetFolder));
+                        }
+                    }
+                    ImGui.EndMenu();
+                }
             }
             else
             {
-                if(ImGui.Selectable("Hide from Rules section")) presetFolder.HiddenFromSelection = true;
-            }
-            if(ImGui.Selectable("Move up", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex > 0)
-            {
-                (Profile.PresetsFolders[presetFolderIndex], Profile.PresetsFolders[presetFolderIndex - 1]) = (Profile.PresetsFolders[presetFolderIndex - 1], Profile.PresetsFolders[presetFolderIndex]);
-            }
-            if(ImGui.Selectable("Move down", false, ImGuiSelectableFlags.DontClosePopups) && presetFolderIndex < Profile.PresetsFolders.Count - 1)
-            {
-                (Profile.PresetsFolders[presetFolderIndex], Profile.PresetsFolders[presetFolderIndex + 1]) = (Profile.PresetsFolders[presetFolderIndex + 1], Profile.PresetsFolders[presetFolderIndex]);
-            }
-            ImGui.Separator();
-
-            if(ImGui.BeginMenu("Delete folder..."))
-            {
-                if(ImGui.Selectable("...and move profiles to default folder (Hold CTRL)"))
+                if(ImGui.Selectable("Export to clipboard"))
                 {
-                    if(ImGuiEx.Ctrl)
-                    {
-                        new TickScheduler(() =>
-                        {
-                            foreach(var x in presetFolder.Presets)
-                            {
-                                Profile.Presets.Add(x);
-                            }
-                            Profile.PresetsFolders.Remove(presetFolder);
-                        });
-                    }
+                    Copy(EzConfig.DefaultSerializationFactory.Serialize(new PresetFolder() { Name = "Exported Default Folder", Presets = profile.Presets}, false));
                 }
-                if(ImGui.Selectable("...and delete included profiles (Hold CTRL+SHIFT)"))
-                {
-                    if(ImGuiEx.Ctrl && ImGuiEx.Shift)
-                    {
-                        new TickScheduler(() => Profile.PresetsFolders.Remove(presetFolder));
-                    }
-                }
-                ImGui.EndMenu();
             }
 
-            ImGui.EndPopup();
+                ImGui.EndPopup();
         }
         else
         {
