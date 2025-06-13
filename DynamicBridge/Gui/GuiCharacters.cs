@@ -12,14 +12,60 @@ public static class GuiCharacters
     public static void Draw()
     {
         ImGuiEx.SetNextItemFullWidth();
-        ImGui.InputTextWithHint($"##Filter1", "Search character name...", ref Filters[1], 100, Utils.CensorFlags);
+        ImGuiEx.InputWithRightButtonsArea(() =>
+        {
+            ImGui.InputTextWithHint($"##Filter1", "Search character name...", ref Filters[1], 100, Utils.CensorFlags);
+        }, () =>
+        {
+            if(ImGuiEx.IconButton(FontAwesomeIcon.UserPlus))
+            {
+                ImGui.OpenPopup("NewChara");
+            }
+            ImGuiEx.Tooltip("Register new character manually");
+        });
+
+        if(ImGui.BeginPopup("NewChara"))
+        {
+            ImGui.SetNextItemWidth(150f);
+            ImGui.InputTextWithHint("##name2", "Character Name@World", ref NewChara, 50);
+            ImGui.SetNextItemWidth(150f);
+            ImGui.InputTextWithHint("##cid", "Character/Content ID", ref NewCID, 50);
+            if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.UserPlus, "Add new character"))
+            {
+                if(NewChara.Length > 2 && NewChara.Split(" ").Length == 2 && NewChara.Contains('@') && ulong.TryParse(NewCID, out var cid) && cid > 0)
+                {
+                    if(C.SeenCharacters.ContainsKey(cid))
+                    {
+                        Notify.Error("This character ID is already present");
+                    }
+                    else if(C.SeenCharacters.Values.Select(x => x.ToLower()).Contains(NewChara.ToLower()))
+                    {
+                        Notify.Error("This character name is already present");
+                    }
+                    else
+                    {
+                        C.SeenCharacters[cid] = NewChara;
+                        NewChara = "";
+                        NewCID = "";
+                        ImGui.CloseCurrentPopup();
+                        Notify.Success("Character successfully added");
+                    }
+                }
+                else
+                {
+                    Notify.Error("Invalid name or Character/Contenr ID");
+                }
+            }
+            ImGui.EndPopup();
+        }
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
-        if(ImGui.BeginTable($"##characters", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedSame))
+        if(ImGui.BeginTable($"##characters", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
         {
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Name");
+            ImGui.TableSetupColumn("CID");
             ImGui.TableSetupColumn("Assigned profile", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
+            ImGui.TableSetupColumn(" ");
             ImGui.TableHeadersRow();
 
             foreach(var x in C.SeenCharacters)
@@ -31,6 +77,15 @@ public static class GuiCharacters
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV(Player.CID == x.Key ? ImGuiColors.HealerGreen : null, $"{Censor.Character(x.Value)}");
+                ImGui.TableNextColumn();
+                if(!C.NoNames)
+                {
+                    ImGuiEx.TextCopy($"{x.Key}");
+                }
+                else
+                {
+                    ImGuiEx.Text("Hidden by settings");
+                }
                 ImGui.TableNextColumn();
 
                 var currentProfile = C.ProfilesL.FirstOrDefault(z => z.Characters.Contains(x.Key));
@@ -103,4 +158,7 @@ public static class GuiCharacters
         }
         ImGui.PopStyleVar();
     }
+
+    private static string NewChara = "";
+    private static string NewCID = "";
 }
