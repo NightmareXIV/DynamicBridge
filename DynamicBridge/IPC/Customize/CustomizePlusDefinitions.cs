@@ -1,7 +1,4 @@
-﻿global using CustomizePlusProfile = (System.Guid ID, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
-global using IPCCharacterDataTuple = (string Name, ushort WorldId, byte CharacterType, ushort CharacterSubType);
-
-//Virtual path is full path to the profile in the virtual folders created by user in the profile list UI
+﻿//Virtual path is full path to the profile in the virtual folders created by user in the profile list UI
 
 //Character.WorldId is value of Penumbra.GameData.Structs.WorldId. ushort.MaxValue if AnyWorld or if CharacterType != Player/Owned.
 //Does not bear any meaning for CharacterType = Owned right now.

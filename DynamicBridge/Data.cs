@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DynamicBridge;
+﻿namespace DynamicBridge;
 public static class Data
 {
     public static readonly uint[][] EmoteGroups = [

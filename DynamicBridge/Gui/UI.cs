@@ -1,16 +1,9 @@
-﻿using Dalamud.Interface.Components;
-using DynamicBridge.Configuration;
-using DynamicBridge.IPC.Glamourer;
-using ECommons;
-using ECommons.Configuration;
+﻿using DynamicBridge.Configuration;
 using ECommons.Funding;
 using ECommons.GameHelpers;
 using ECommons.Reflection;
 using ECommons.SimpleGui;
 using Lumina.Excel.Sheets;
-using Newtonsoft.Json.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Xml.Linq;
 using Action = System.Action;
 
 namespace DynamicBridge.Gui;

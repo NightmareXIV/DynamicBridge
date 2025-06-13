@@ -1,11 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DynamicBridge.Core;
+﻿namespace DynamicBridge.Core;
 public static unsafe class ETimeChecker
 {
     internal static long* ET = &CSFramework.Instance()->ClientTime.EorzeaTime;

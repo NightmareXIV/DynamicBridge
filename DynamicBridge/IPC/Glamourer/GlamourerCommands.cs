@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DynamicBridge.IPC.Glamourer;
+﻿namespace DynamicBridge.IPC.Glamourer;
 public class GlamourerCommands
 {
     public void ApplyByGuid(Guid guid)

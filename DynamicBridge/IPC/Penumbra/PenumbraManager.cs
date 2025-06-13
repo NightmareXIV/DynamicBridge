@@ -1,14 +1,6 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using ECommons.EzIpcManager;
-using ECommons.GameHelpers;
+﻿using ECommons.EzIpcManager;
 using Penumbra.Api.Enums;
 using Penumbra.Api.IpcSubscribers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicBridge.IPC.Penumbra;
 public class PenumbraManager

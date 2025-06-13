@@ -1,7 +1,4 @@
-﻿using Dalamud.Plugin.Services;
-using DynamicBridge.IPC.Customize;
-using DynamicBridge.IPC.Glamourer;
-using ECommons.Configuration;
+﻿using ECommons.Configuration;
 
 namespace DynamicBridge.Configuration;
 public class Migrator

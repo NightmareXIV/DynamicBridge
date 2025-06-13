@@ -1,9 +1,6 @@
-﻿using Dalamud.Plugin.Ipc.Exceptions;
-using DynamicBridge.Configuration;
+﻿using DynamicBridge.Configuration;
 using ECommons.ChatMethods;
 using ECommons.EzIpcManager;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using System.Collections.Generic;
 
 namespace DynamicBridge.IPC.Customize;
 public class CustomizePlusManager

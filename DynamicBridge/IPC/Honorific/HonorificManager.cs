@@ -1,14 +1,7 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using ECommons.ExcelServices;
+﻿using ECommons.ExcelServices;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
-using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DynamicBridge.IPC.Honorific;
 public class HonorificManager

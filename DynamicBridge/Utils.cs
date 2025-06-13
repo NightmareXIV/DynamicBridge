@@ -1,5 +1,4 @@
-﻿using Dalamud.Memory;
-using DynamicBridge.Configuration;
+﻿using DynamicBridge.Configuration;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;

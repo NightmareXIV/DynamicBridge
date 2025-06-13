@@ -1,4 +1,3 @@
-using Dalamud.Game.Text.SeStringHandling;
 using DynamicBridge.Configuration;
 using DynamicBridge.IPC.Honorific;
 using ECommons.Configuration;
@@ -49,7 +48,7 @@ namespace DynamicBridge.Gui
                     }
                 }
                 ImGuiEx.Tooltip("Add new empty preset into default or focused folder");
-                ImGui.SameLine();
+                ImGui.SameLine(0, 1);
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Paste))
                 {
                     try
@@ -76,16 +75,24 @@ namespace DynamicBridge.Gui
                         Notify.Error(e.Message);
                     }
                 }
-                ImGuiEx.Tooltip($"Paste previously copied preset from clipboard");
-                ImGui.SameLine();
+                ImGuiEx.Tooltip($"Paste previously copied preset or folder from clipboard");
+                ImGui.SameLine(0, 1);
 
                 if(ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
                 {
+                    try
+                    {
+                        var folder = EzConfig.DefaultSerializationFactory.Deserialize<>
+                    }
+                    catch(Exception e)
+                    {
+                        e.LogDebug();
+                    }
                     Profile.PresetsFolders.Add(new() { Name = $"Preset folder {Profile.PresetsFolders.Count + 1}" });
                 }
                 ImGuiEx.Tooltip("Add new preset folder");
 
-                ImGui.SameLine();
+                ImGui.SameLine(0, 1);
 
             }
 
@@ -97,7 +104,7 @@ namespace DynamicBridge.Gui
                 ImGuiEx.Tooltip("Toggle focus mode. While focus mode active, only one selected folder will be visible.");
                 ImGui.SameLine();*/
                 UI.ForceUpdateButton();
-                ImGui.SameLine();
+                ImGui.SameLine(0, 1);
             }
 
             if(drawHeader)

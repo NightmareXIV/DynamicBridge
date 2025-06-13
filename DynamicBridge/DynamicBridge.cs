@@ -7,12 +7,10 @@ using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
 using DynamicBridge.IPC.Moodles;
 using DynamicBridge.IPC.Penumbra;
-using ECommons.Automation;
 using ECommons.Automation.LegacyTaskManager;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
 using ECommons.Events;
-using ECommons.ExcelServices;
 using ECommons.EzEventManager;
 using ECommons.GameHelpers;
 using ECommons.SimpleGui;
@@ -22,7 +20,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 
 namespace DynamicBridge;
 
@@ -168,11 +165,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 }
                 if(C.StickyPenumbra && C.Sticky)
                 {
-                preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
+                    preset.StickyRandomP = Random.Shared.Next(0, preset.Penumbra.Count);
                 }
             }
         }
-        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets||C.StickyCustomize||C.StickyGlamourer||C.StickyHonorific||C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
+        ForceUpdate = C.ForceUpdateOnRandomize && C.Sticky && (C.StickyPresets || C.StickyCustomize || C.StickyGlamourer || C.StickyHonorific || C.StickyPenumbra) && (C.UserInputRandomizerTime >= 0.75);
 
         RandomizedRecently = false;
     }

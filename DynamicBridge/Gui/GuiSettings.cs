@@ -1,13 +1,5 @@
 using DynamicBridge.Configuration;
 using DynamicBridge.Core;
-using DynamicBridge.IPC.Glamourer;
-using Lumina.Excel.Sheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DynamicBridge.Gui;
 public static class GuiSettings
@@ -58,7 +50,8 @@ public static class GuiSettings
                 ImGuiEx.Spacing();
                 ImGuiEx.SetNextItemWidthScaled(200f);
                 ImGuiEx.EnumCombo($"Randomizer Setting", ref C.RandomChoosenType);
-                if (C.RandomChoosenType == RandomTypes.Timer) {
+                if(C.RandomChoosenType == RandomTypes.Timer)
+                {
                     ImGui.SameLine();
                     ImGui.Text("|");
                     ImGui.SameLine();

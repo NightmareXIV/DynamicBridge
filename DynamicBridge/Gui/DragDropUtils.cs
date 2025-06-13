@@ -1,10 +1,4 @@
-﻿using Dalamud.Game.Text.SeStringHandling;
-using DynamicBridge.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DynamicBridge.Configuration;
 
 namespace DynamicBridge.Gui;
 public static class DragDropUtils
