@@ -30,21 +30,21 @@ public static class GuiPresets
         DrawProfile(C.GlobalProfile, false, false, true);
     }
 
-    private static void DrawProfile(Profile profile, bool drawFallback, bool drawHeader, bool drawGlobalSection)
+    private static void DrawProfile(Profile currentProfile, bool drawFallback, bool drawHeader, bool drawGlobalSection)
     {
-        profile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
+        currentProfile.GetPresetsListUnion().Each(f => f.RemoveAll(x => x == null));
 
         void Buttons()
         {
             if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
             {
-                if(Open != null && profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                if(Open != null && currentProfile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                 {
                     open.Presets.Add(new());
                 }
                 else
                 {
-                    profile.Presets.Add(new());
+                    currentProfile.Presets.Add(new());
                 }
             }
             ImGuiEx.Tooltip("Add new empty preset into default or focused folder");
@@ -55,7 +55,7 @@ public static class GuiPresets
                 {
                     var folder = EzConfig.DefaultSerializationFactory.Deserialize<PresetFolder>(Paste()) ?? throw new NullReferenceException();
                     if(folder.Presets.Count == 0) throw new InvalidOperationException();
-                    profile.PresetsFolders.Add(folder);
+                    currentProfile.PresetsFolders.Add(folder);
                 }
                 catch(Exception ex)
                 {
@@ -65,13 +65,13 @@ public static class GuiPresets
                         var str = (EzConfig.DefaultSerializationFactory.Deserialize<Preset>(Paste()));
                         if(str != null)
                         {
-                            if(Open != null && profile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                            if(Open != null && currentProfile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open))
                             {
                                 open.Presets.Add(str);
                             }
                             else
                             {
-                                profile.Presets.Add(str);
+                                currentProfile.Presets.Add(str);
                             }
                         }
                         else
@@ -90,7 +90,7 @@ public static class GuiPresets
 
             if(ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
             {
-                profile.PresetsFolders.Add(new() { Name = $"Preset folder {profile.PresetsFolders.Count + 1}" });
+                currentProfile.PresetsFolders.Add(new() { Name = $"Preset folder {currentProfile.PresetsFolders.Count + 1}" });
             }
             ImGuiEx.Tooltip("Add new preset folder");
 
@@ -127,29 +127,29 @@ public static class GuiPresets
         {
             if(ImGuiEx.TreeNode($"Main presets##global", ImGuiTreeNodeFlags.DefaultOpen))
             {
-                CollapsingHeaderClicked(profile, -1, null);
+                CollapsingHeaderClicked(currentProfile, -1, null);
                 newOpen = "";
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(profile, result, profile.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(currentProfile, result, currentProfile.Presets);
                 }
-                DrawPresets(profile, profile.Presets, out var postAction, "", false, drawGlobalSection);
+                DrawPresets(currentProfile, currentProfile.Presets, out var postAction, "", false, drawGlobalSection);
                 ImGui.TreePop();
                 postAction?.Invoke();
             }
             else
             {
-                CollapsingHeaderClicked(profile, -1, null);
+                CollapsingHeaderClicked(currentProfile, -1, null);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(profile, result, profile.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(currentProfile, result, currentProfile.Presets);
                 }
             }
         }
 
-        for(var presetFolderIndex = 0; presetFolderIndex < profile.PresetsFolders.Count; presetFolderIndex++)
+        for(var presetFolderIndex = 0; presetFolderIndex < currentProfile.PresetsFolders.Count; presetFolderIndex++)
         {
-            var presetFolder = profile.PresetsFolders[presetFolderIndex];
+            var presetFolder = currentProfile.PresetsFolders[presetFolderIndex];
             if(Focus && Open != presetFolder.GUID && Open != null) continue;
             if(presetFolder.HiddenFromSelection)
             {
@@ -158,21 +158,21 @@ public static class GuiPresets
             if(ImGuiEx.TreeNode($"{presetFolder.Name}###presetfolder{presetFolder.GUID}"))
             {
                 newOpen = presetFolder.GUID;
-                CollapsingHeaderClicked(profile, presetFolderIndex, presetFolder);
+                CollapsingHeaderClicked(currentProfile, presetFolderIndex, presetFolder);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(profile, result, presetFolder.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(currentProfile, result, presetFolder.Presets);
                 }
-                DrawPresets(profile, presetFolder.Presets, out var postAction, presetFolder.GUID, false, drawGlobalSection);
+                DrawPresets(currentProfile, presetFolder.Presets, out var postAction, presetFolder.GUID, false, drawGlobalSection);
                 ImGui.TreePop();
                 postAction?.Invoke();
             }
             else
             {
-                CollapsingHeaderClicked(profile, presetFolderIndex, presetFolder);
+                CollapsingHeaderClicked(currentProfile, presetFolderIndex, presetFolder);
                 if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
                 {
-                    DragDropUtils.AcceptFolderDragDrop(profile, result, presetFolder.Presets);
+                    DragDropUtils.AcceptFolderDragDrop(currentProfile, result, presetFolder.Presets);
                 }
             }
         }
@@ -180,7 +180,7 @@ public static class GuiPresets
         {
             if(ImGuiEx.TreeNode($"Fallback preset"))
             {
-                DrawPresets(profile, [profile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true, drawGlobalSection);
+                DrawPresets(currentProfile, [currentProfile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true, drawGlobalSection);
                 Open = newOpen;
                 ImGui.TreePop();
             }

@@ -5,7 +5,7 @@ public class Profile
     [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
     public string Name = "";
     public List<ApplyRule> Rules = [];
-    public List<ApplyRule> RulesFolders = [];
+    public List<ApplyRuleFolder> RulesFolders = [];
     public List<Preset> Presets = [];
     public List<PresetFolder> PresetsFolders = [];
     public string ForcedPreset = null;
@@ -24,7 +24,11 @@ public class Profile
     {
         foreach(var x in GetPresetsListUnion(includeGlobal))
         {
-            foreach(var z in x) yield return z;
+            for(var i = 0; i < x.Count; i++)
+            {
+                var z = x[i];
+                yield return z;
+            }
         }
     }
 
@@ -35,7 +39,29 @@ public class Profile
         if(!IsGlobal && includeGlobal)
         {
             yield return C.GlobalProfile.Presets;
-            foreach(var x in C.GlobalProfile.PresetsFolders) yield return x.Presets;
+            for(var i = 0; i < C.GlobalProfile.PresetsFolders.Count; i++)
+            {
+                var x = C.GlobalProfile.PresetsFolders[i];
+                yield return x.Presets;
+            }
         }
+    }
+
+    public IEnumerable<ApplyRule> GetRulesUnion()
+    {
+        foreach(var x in GetRulesListUnion())
+        {
+            for(var i = 0; i < x.Count; i++)
+            {
+                var z = x[i];
+                yield return z;
+            }
+        }
+    }
+
+    public IEnumerable<List<ApplyRule>> GetRulesListUnion()
+    {
+        yield return Rules;
+        foreach(var x in RulesFolders) yield return x.Rules;
     }
 }

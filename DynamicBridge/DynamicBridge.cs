@@ -53,6 +53,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
 
     private DateTime RandomizerTimer;
     private bool RandomizedRecently = false;
+
+    public ulong CacheVersion = 1;
+
     public DynamicBridge(IDalamudPluginInterface pi)
     {
         P = this;
@@ -530,6 +533,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 if(EzThrottler.Throttle("LogoutUpdateGS", 30000)) Utils.UpdateGearsetCache();
                 if(C.EnablePenumbra) PenumbraManager.UnsetAssignmentIfNeeded();
             }
+
+            /*if(!GenericHelpers.IsScreenReady() || EzConfigGui.Window.IsOpen)
+            {
+                CacheVersion++;
+            }*/
         }
         else
         {
@@ -537,6 +545,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             {
                 ForceUpdate = true;
             }
+            //CacheVersion++;
         }
     }
 
