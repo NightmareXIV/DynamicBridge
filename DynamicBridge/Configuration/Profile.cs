@@ -47,9 +47,9 @@ public class Profile
         }
     }
 
-    public IEnumerable<ApplyRule> GetRulesUnion()
+    public IEnumerable<ApplyRule> GetRulesUnion(bool onlyEnabled = false)
     {
-        foreach(var x in GetRulesListUnion())
+        foreach(var x in GetRulesListUnion(onlyEnabled))
         {
             for(var i = 0; i < x.Count; i++)
             {
@@ -59,9 +59,16 @@ public class Profile
         }
     }
 
-    public IEnumerable<List<ApplyRule>> GetRulesListUnion()
+    public IEnumerable<List<ApplyRule>> GetRulesListUnion(bool onlyEnabled = false)
     {
         yield return Rules;
-        foreach(var x in RulesFolders) yield return x.Rules;
+        for(var i = 0; i < RulesFolders.Count; i++)
+        {
+            var x = RulesFolders[i];
+            if(!onlyEnabled || x.Enabled)
+            {
+                yield return x.Rules;
+            }
+        }
     }
 }

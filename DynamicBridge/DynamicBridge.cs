@@ -147,7 +147,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         {
             if(C.StickyPresets && C.Sticky)
             {
-                foreach(var rule in profile.Rules)
+                foreach(var rule in profile.GetRulesUnion(true))
                 {
                     rule.StickyRandom = Random.Shared.Next(0, rule.SelectedPresets.Count);
                 }
@@ -320,7 +320,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     }
                     else
                     {
-                        foreach(var x in profile.Rules)
+                        foreach(var x in profile.GetRulesUnion(true))
                         {
                             if(
                                 x.Enabled

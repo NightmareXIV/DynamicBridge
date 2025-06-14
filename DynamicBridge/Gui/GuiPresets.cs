@@ -181,10 +181,10 @@ public static class GuiPresets
             if(ImGuiEx.TreeNode($"Fallback preset"))
             {
                 DrawPresets(currentProfile, [currentProfile.FallbackPreset], out _, $"FallbackPreset-8c680b09-acd0-43ab-9413-26a4e38841fc", true, drawGlobalSection);
-                Open = newOpen;
                 ImGui.TreePop();
             }
         }
+        Open = newOpen;
     }
 
     private static void CollapsingHeaderClicked(Profile profile, int presetFolderIndex, PresetFolder presetFolder)

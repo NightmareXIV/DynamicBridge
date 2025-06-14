@@ -1,5 +1,6 @@
 using DynamicBridge.Configuration;
 using DynamicBridge.Core;
+using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.ImGuiMethods.TerritorySelection;
@@ -22,7 +23,9 @@ public static unsafe class GuiRules
     private static bool[] OnlySelected = new bool[20];
     private static string CurrentDrag = "";
     private static Dictionary<int, bool> showDayNightCycleDict = [];
-    private static ImGuiEx.RealtimeDragDrop<Preset> DragDrop = new("MoveRuleItem", (x) => x.GUID);
+    private static ImGuiEx.RealtimeDragDrop<ApplyRule> DragDrop = new("MoveRuleItem", (x) => x.GUID);
+    private static string Open = null;
+    private static bool Focus = false;
     public static void Draw()
     {
         if(UI.Profile != null)
@@ -33,21 +36,63 @@ public static unsafe class GuiRules
             {
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                 {
-                    currentProfile.Rules.Add(new());
+                    if(Open != null && currentProfile.RulesFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                    {
+                        open.Rules.Add(new());
+                    }
+                    else
+                    {
+                        currentProfile.Rules.Add(new());
+                    }
                 }
                 ImGuiEx.Tooltip("Add new rule");
+
                 ImGui.SameLine();
-                if(ImGuiEx.IconButton(FontAwesomeIcon.Paste, "Paste rule from Clipboard"))
+                if(ImGuiEx.IconButton(FontAwesomeIcon.Paste))
                 {
                     try
                     {
-                        currentProfile.Rules.Add(JsonConvert.DeserializeObject<ApplyRule>(Clipboard.GetText()) ?? throw new NullReferenceException());
+                        var folder = EzConfig.DefaultSerializationFactory.Deserialize<ApplyRuleFolder>(Paste()) ?? throw new NullReferenceException();
+                        if(folder.Rules.Count == 0) throw new InvalidOperationException();
+                        currentProfile.RulesFolders.Add(folder);
                     }
-                    catch(Exception e)
+                    catch(Exception ex)
                     {
-                        Notify.Error("Failed to paste from clipboard:\n" + e.Message);
+                        ex.LogDebug();
+                        try
+                        {
+                            var str = (EzConfig.DefaultSerializationFactory.Deserialize<ApplyRule>(Paste()));
+                            if(str != null)
+                            {
+                                if(Open != null && currentProfile.RulesFolders.TryGetFirst(x => x.GUID == Open, out var open))
+                                {
+                                    open.Rules.Add(str);
+                                }
+                                else
+                                {
+                                    currentProfile.Rules.Add(str);
+                                }
+                            }
+                            else
+                            {
+                                Notify.Error("Could not import from clipboard");
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Notify.Error(e.Message);
+                        }
                     }
                 }
+                ImGuiEx.Tooltip($"Paste previously copied rule or folder from clipboard");
+                ImGui.SameLine();
+
+                if(ImGuiEx.IconButton(FontAwesomeIcon.FolderPlus))
+                {
+                    currentProfile.RulesFolders.Add(new() { Name = $"Rule folder {currentProfile.RulesFolders.Count + 1}" });
+                }
+                ImGuiEx.Tooltip("Add new rule folder");
+
                 if(currentProfile.IsStaticExists())
                 {
                     ImGuiEx.HelpMarker($"Preset {currentProfile.GetStaticPreset()?.CensoredName} is selected as static. Automation disabled.", GradientColor.Get(EColor.RedBright, EColor.YellowBright, 1000), FontAwesomeIcon.ExclamationTriangle.ToIconString());
@@ -62,13 +107,143 @@ public static unsafe class GuiRules
 
             UI.ProfileSelectorCommon(ButtonsLeft, ButtonsRight);
 
-            DrawRuleFolder(currentProfile, currentProfile.Rules, out var postAction, "");
-            postAction?.Invoke();
+            string newOpen = null;
+
+            if(!Focus || Open == "" || Open == null)
+            {
+                if(ImGuiEx.TreeNode($"Main rules##globalrules", ImGuiTreeNodeFlags.DefaultOpen))
+                {
+                    CollapsingHeaderClicked(currentProfile, -1, null);
+                    newOpen = "";
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(currentProfile, result, currentProfile.Rules);
+                    }
+                    DrawRuleFolder(currentProfile, currentProfile.Rules, out var postAction, "");
+                    ImGui.TreePop();
+                    postAction?.Invoke();
+                }
+                else
+                {
+                    CollapsingHeaderClicked(currentProfile, -1, null);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(currentProfile, result, currentProfile.Rules);
+                    }
+                }
+            }
+
+            for(var ruleFolderIndex = 0; ruleFolderIndex < currentProfile.RulesFolders.Count; ruleFolderIndex++)
+            {
+                var rulesFolder = currentProfile.RulesFolders[ruleFolderIndex];
+                if(Focus && Open != rulesFolder.GUID && Open != null) continue;
+                if(!rulesFolder.Enabled)
+                {
+                    ImGuiEx.RightFloat($"Disabled{rulesFolder.GUID}", () => ImGuiEx.Text(ImGuiColors.DalamudRed, "Disabled"));
+                }
+                if(ImGuiEx.TreeNode($"{rulesFolder.Name}###rulefolder{rulesFolder.GUID}"))
+                {
+                    newOpen = rulesFolder.GUID;
+                    CollapsingHeaderClicked(currentProfile, ruleFolderIndex, rulesFolder);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(currentProfile, result, rulesFolder.Rules);
+                    }
+                    DrawRuleFolder(currentProfile, rulesFolder.Rules, out var postAction, rulesFolder.GUID);
+                    ImGui.TreePop();
+                    postAction?.Invoke();
+                }
+                else
+                {
+                    CollapsingHeaderClicked(currentProfile, ruleFolderIndex, rulesFolder);
+                    if(DragDrop.AcceptPayload(out var result, ImGuiDragDropFlags.AcceptBeforeDelivery | ImGuiDragDropFlags.AcceptNoDrawDefaultRect))
+                    {
+                        DragDropUtils.AcceptFolderDragDrop(currentProfile, result, rulesFolder.Rules);
+                    }
+                }
+            }
+            Open = newOpen;
 
         }
         else
         {
             UI.ProfileSelectorCommon();
+        }
+    }
+
+    private static void CollapsingHeaderClicked(Profile profile, int ruleFolderIndex, ApplyRuleFolder ruleFolder)
+    {
+        if(ImGui.IsItemHovered() && ImGui.IsItemClicked(ImGuiMouseButton.Right)) ImGui.OpenPopup($"Folder{ruleFolder?.GUID}");
+        if(ImGui.BeginPopup($"Folder{ruleFolder?.GUID}"))
+        {
+            if(ruleFolder != null)
+            {
+                ImGuiEx.SetNextItemWidthScaled(150f);
+                ImGui.InputTextWithHint("##name", "Folder name", ref ruleFolder.Name, 200);
+                if(ImGui.Selectable("Export to clipboard"))
+                {
+                    Copy(EzConfig.DefaultSerializationFactory.Serialize(ruleFolder, false));
+                }
+                if(ruleFolder.Enabled)
+                {
+                    if(ImGui.Selectable("Disable")) ruleFolder.Enabled = false;
+                }
+                else
+                {
+                    if(ImGui.Selectable("Enable")) ruleFolder.Enabled = true;
+                }
+                if(ImGui.Selectable("Move up", false, ImGuiSelectableFlags.DontClosePopups) && ruleFolderIndex > 0)
+                {
+                    (profile.RulesFolders[ruleFolderIndex], profile.RulesFolders[ruleFolderIndex - 1]) = (profile.RulesFolders[ruleFolderIndex - 1], profile.RulesFolders[ruleFolderIndex]);
+                }
+                if(ImGui.Selectable("Move down", false, ImGuiSelectableFlags.DontClosePopups) && ruleFolderIndex < profile.RulesFolders.Count - 1)
+                {
+                    (profile.RulesFolders[ruleFolderIndex], profile.RulesFolders[ruleFolderIndex + 1]) = (profile.RulesFolders[ruleFolderIndex + 1], profile.RulesFolders[ruleFolderIndex]);
+                }
+                ImGui.Separator();
+
+                if(ImGui.BeginMenu("Delete folder..."))
+                {
+                    if(ImGui.Selectable("...and move rules to default folder (Hold CTRL)"))
+                    {
+                        if(ImGuiEx.Ctrl)
+                        {
+                            new TickScheduler(() =>
+                            {
+                                foreach(var x in ruleFolder.Rules)
+                                {
+                                    profile.Rules.Add(x);
+                                }
+                                profile.RulesFolders.Remove(ruleFolder);
+                            });
+                        }
+                    }
+                    if(ImGui.Selectable("...and delete included rules (Hold CTRL+SHIFT)"))
+                    {
+                        if(ImGuiEx.Ctrl && ImGuiEx.Shift)
+                        {
+                            new TickScheduler(() => profile.RulesFolders.Remove(ruleFolder));
+                        }
+                    }
+                    ImGui.EndMenu();
+                }
+            }
+            else
+            {
+                if(ImGui.Selectable("Export to clipboard"))
+                {
+                    Copy(EzConfig.DefaultSerializationFactory.Serialize(new ApplyRuleFolder() { Name = "Exported Default Folder", Rules = profile.Rules }, false));
+                }
+            }
+
+            ImGui.EndPopup();
+        }
+        else
+        {
+            if(!ImGui.IsMouseDragging(ImGuiMouseButton.Left))
+            {
+                ImGuiEx.Tooltip("Right-click to open context menu");
+            }
         }
     }
 
@@ -111,7 +286,7 @@ public static unsafe class GuiRules
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
 
-            for(var i = 0; i < currentProfile.Rules.Count; i++)
+            for(var i = 0; i < rulesList.Count; i++)
             {
                 var filterCnt = 0;
                 void FiltersSelection()
@@ -123,7 +298,7 @@ public static unsafe class GuiRules
                     ImGui.SetWindowFontScale(1f);
                     ImGui.Separator();
                 }
-                var rule = currentProfile.Rules[i];
+                var rule = rulesList[i];
                 var col = !rule.Enabled;
                 var col2 = P.LastRule.Any(x => x.GUID == rule.GUID);
                 if(col2) ImGui.PushStyleColor(ImGuiCol.Text, EColor.Green);
@@ -644,7 +819,7 @@ public static unsafe class GuiRules
                 ImGui.SameLine();
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)
                 {
-                    new TickScheduler(() => currentProfile.Rules.RemoveAll(x => x.GUID == rule.GUID));
+                    new TickScheduler(() => rulesList.Remove(rule));
                 }
                 ImGuiEx.Tooltip("Hold CTRL+Click to delete");
 
