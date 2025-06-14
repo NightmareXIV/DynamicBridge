@@ -213,7 +213,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 var profile = Utils.Profile();
                 if(profile != null)
                 {
-                    profile.Presets.Each(x => x.IsStatic = false);
+                    profile.GetPresetsUnion().Each(x => x.IsStatic = false);
                     Notify.Success($"Using dynamic rules now.");
                     P.ForceUpdate = true;
                 }
@@ -274,7 +274,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
 
     private void OnUpdate()
     {
-        if(Player.Interactable)
+        if(Player.Interactable && !Svc.Condition[ConditionFlag.Fishing])
         {
             if(LastJob != Player.Object.ClassJob.RowId)
             {
