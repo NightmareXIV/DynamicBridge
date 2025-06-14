@@ -21,6 +21,7 @@ public static unsafe class GuiRules
     private static bool[] OnlySelected = new bool[20];
     private static string CurrentDrag = "";
     private static Dictionary<int, bool> showDayNightCycleDict = [];
+    private static ImGuiEx.RealtimeDragDrop<Preset> DragDrop = new("MoveRuleItem", (x) => x.GUID);
     public static void Draw()
     {
         if(UI.Profile != null)

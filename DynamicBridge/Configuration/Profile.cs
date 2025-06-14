@@ -5,6 +5,7 @@ public class Profile
     [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
     public string Name = "";
     public List<ApplyRule> Rules = [];
+    public List<ApplyRule> RulesFolders = [];
     public List<Preset> Presets = [];
     public List<PresetFolder> PresetsFolders = [];
     public string ForcedPreset = null;
