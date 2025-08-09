@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>1.0.8.0</Version>
+        <Version>1.0.8.1</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -29,7 +29,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DalamudPackager" Version="12.0.0" />
+        <PackageReference Include="DalamudPackager" Version="13.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -48,8 +48,20 @@
             <HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="ImGui.NET">
-            <HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
+        <Reference Include="Dalamud.Bindings.ImGui">
+            <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Dalamud.Bindings.ImPlot">
+            <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImPlot.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Dalamud.Bindings.ImGuizmo">
+            <HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGuizmo.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="TerraFX.Interop.Windows">
+            <HintPath>$(DalamudLibPath)TerraFX.Interop.Windows.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Lumina">
