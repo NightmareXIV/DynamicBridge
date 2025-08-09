@@ -340,8 +340,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Zone || ((x.Territories.Count == 0 || x.Territories.Contains(Svc.ClientState.TerritoryType))
                                 && (!C.AllowNegativeConditions || !x.Not.Territories.Contains(Svc.ClientState.TerritoryType))))
                                 &&
-                                (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains(HousingManager.Instance()->GetCurrentIndoorHouseId()))
-                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains(HousingManager.Instance()->GetCurrentIndoorHouseId()))))
+                                (!C.Cond_House || ((x.Houses.Count == 0 || x.Houses.Contains((long)HousingManager.Instance()->GetCurrentIndoorHouseId().Id))
+                                && (!C.AllowNegativeConditions || !x.Not.Houses.Contains((long)HousingManager.Instance()->GetCurrentIndoorHouseId().Id))))
                                 &&
                                 (!C.Cond_Emote || ((x.Emotes.Count == 0 || x.Emotes.Contains(Utils.GetAdjustedEmote()))
                                 && (!C.AllowNegativeConditions || !x.Not.Emotes.Contains(Utils.GetAdjustedEmote()))))

@@ -56,12 +56,12 @@ public static unsafe class ComplexGlamourer
                 {
                     var design = gEntry.Designs[i];
                     ImGui.PushID(design);
-                    if(ImGui.ArrowButton("up", ImGuiDir.Up) && i > 0)
+                    if(ImGuiEx.ArrowButton("up", ImGuiDir.Up) && i > 0)
                     {
                         (gEntry.Designs[i - 1], gEntry.Designs[i]) = (gEntry.Designs[i], gEntry.Designs[i - 1]);
                     }
                     ImGui.SameLine();
-                    if(ImGui.ArrowButton("down", ImGuiDir.Down) && i < gEntry.Designs.Count - 1)
+                    if(ImGuiEx.ArrowButton("down", ImGuiDir.Down) && i < gEntry.Designs.Count - 1)
                     {
                         (gEntry.Designs[i + 1], gEntry.Designs[i]) = (gEntry.Designs[i], gEntry.Designs[i + 1]);
                     }

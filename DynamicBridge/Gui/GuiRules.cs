@@ -350,7 +350,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.States.Contains(cond)) continue;
                             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "state", $"{(int)cond}.png"), out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector(name, cond, rule.States, rule.Not.States);
@@ -377,7 +377,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.Biomes.Contains(cond)) continue;
                             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "biome", $"{(int)cond}.png"), out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector(name, cond, rule.Biomes, rule.Not.Biomes);
@@ -404,7 +404,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.Weathers.ContainsAny(cond.Value)) continue;
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap((uint)Svc.Data.GetExcelSheet<Weather>().GetRow(cond.Value.First()).Icon, false, out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector($"{cond.Key}##{cond.Value.First()}", P.WeatherManager.WeatherNames[cond.Key], rule.Weathers, rule.Not.Weathers);
@@ -486,7 +486,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.SpecialTerritories.Contains(cond)) continue;
                             if(ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "zgrp", $"{(int)cond}.png"), out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector(name, cond, rule.SpecialTerritories, rule.Not.SpecialTerritories);
@@ -589,7 +589,7 @@ public static unsafe class GuiRules
                             var cond = Svc.Data.GetExcelSheet<Emote>().GetRow(id);
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap(cond.Icon, false, out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             ImGui.PushStyleColor(ImGuiCol.Text, EColor.CyanBright);
@@ -605,7 +605,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.Emotes.Contains(cond.RowId)) continue;
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap(cond.Icon, false, out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector($"{name.NullWhenEmpty() ?? $"Unnamed/{cond.RowId}"}##{cond.RowId}", cond.RowId, rule.Emotes, rule.Not.Emotes);
@@ -633,7 +633,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.Jobs.Contains(cond)) continue;
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap((uint)cond.GetIcon(), false, out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             if(cond.IsUpgradeable()) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
@@ -691,7 +691,7 @@ public static unsafe class GuiRules
                             if(OnlySelected[filterCnt] && !rule.Gearsets.Contains(cond.Id)) continue;
                             if(ThreadLoadImageHandler.TryGetIconTextureWrap((uint)((Job)cond.ClassJob).GetIcon(), false, out var texture))
                             {
-                                ImGui.Image(texture.ImGuiHandle, iconSize);
+                                ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
                             }
                             DrawSelector(name, cond.Id, rule.Gearsets, rule.Not.Gearsets);
@@ -839,7 +839,7 @@ public static unsafe class GuiRules
         var cond = t.FindBiome();
         if(cond != Biome.No_biome && ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "biome", $"{(int)cond}.png"), out var texture))
         {
-            ImGui.Image(texture.ImGuiHandle, iconSize);
+            ImGui.Image(texture.Handle, iconSize);
             ImGui.SameLine();
         }
         ImGuiEx.Text(nullable, arg2);

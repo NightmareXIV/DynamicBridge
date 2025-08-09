@@ -129,7 +129,7 @@ If you choose to set any values in base preset, they will be used when there is 
         {
             if(ThreadLoadImageHandler.TryGetTextureWrap($"{Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "tutorial", $"{s[6..]}.png")}", out var tex))
             {
-                ImGui.Image(tex.ImGuiHandle, new(tex.Width, tex.Height));
+                ImGui.Image(tex.Handle, new(tex.Width, tex.Height));
             }
         }
         else if(s == "---")

@@ -12,11 +12,11 @@ public static unsafe class HouseReg
         if(CurrentHouse > 0)
         {
             ImGuiEx.Text($"Current house: {Censor.Hide($"{CurrentHouse:X16}")}");
-            if(!C.Houses.TryGetFirst(x => x.ID == CurrentHouse, out var record))
+            if(!C.Houses.TryGetFirst(x => x.ID == (long)CurrentHouse.Id, out var record))
             {
                 if(ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Home, "Register this house"))
                 {
-                    C.Houses.Add(new() { ID = CurrentHouse, Name = Utils.GetHouseDefaultName() });
+                    C.Houses.Add(new() { ID = (long)CurrentHouse.Id, Name = Utils.GetHouseDefaultName() });
                 }
             }
         }
@@ -33,7 +33,7 @@ public static unsafe class HouseReg
             foreach(var x in C.Houses)
             {
                 ImGui.PushID(x.GUID);
-                var col = x.ID == CurrentHouse;
+                var col = x.ID == (long)CurrentHouse.Id;
                 if(col) ImGui.PushStyleColor(ImGuiCol.Text, EColor.GreenBright);
 
                 ImGui.TableNextRow();
