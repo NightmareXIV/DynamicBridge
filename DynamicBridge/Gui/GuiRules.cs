@@ -8,7 +8,6 @@ using ECommons.Throttlers;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using System.IO;
-using System.Windows.Forms;
 using Action = System.Action;
 using Emote = Lumina.Excel.Sheets.Emote;
 using Weather = Lumina.Excel.Sheets.Weather;
@@ -794,7 +793,7 @@ public static unsafe class GuiRules
                 //Delete
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Copy))
                 {
-                    Safe(() => Clipboard.SetText(JsonConvert.SerializeObject(rule)));
+                    Safe(() => Copy(JsonConvert.SerializeObject(rule)));
                 }
                 if(C.StickyPresets && C.Sticky)
                 {
