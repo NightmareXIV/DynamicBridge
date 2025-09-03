@@ -6,12 +6,12 @@ using ECommons.GameHelpers;
 namespace DynamicBridge.IPC.Moodles;
 public class MoodlesManager
 {
-    [EzIPC] private readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
-    [EzIPC] private readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
-    [EzIPC] private readonly Action<Guid, IPlayerCharacter> AddOrUpdateMoodleByGUID;
-    [EzIPC] private readonly Action<Guid, IPlayerCharacter> ApplyPresetByGUID;
-    [EzIPC] private readonly Action<Guid, IPlayerCharacter> RemoveMoodleByGUID;
-    [EzIPC] private readonly Action<Guid, IPlayerCharacter> RemovePresetByGUID;
+    [EzIPC("GetRegisteredMoodlesV2")] private readonly Func<List<MoodlesMoodleInfo>> GetRegisteredMoodles;
+    [EzIPC("GetRegisteredProfilesV2")] private readonly Func<List<MoodlesProfileInfo>> GetRegisteredProfiles;
+    [EzIPC("AddOrUpdateMoodleByPlayerV2")] private readonly Action<Guid, IPlayerCharacter> AddOrUpdateMoodleByGUID;
+    [EzIPC("ApplyPresetByPlayerV2")] private readonly Action<Guid, IPlayerCharacter> ApplyPresetByGUID;
+    [EzIPC("RemoveMoodleByPlayerV2")] private readonly Action<Guid, IPlayerCharacter> RemoveMoodleByGUID;
+    [EzIPC("RemovePresetByPlayerV2")] private readonly Action<Guid, IPlayerCharacter> RemovePresetByGUID;
 
     public MoodlesManager()
     {
