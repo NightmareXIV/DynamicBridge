@@ -262,6 +262,7 @@ public static unsafe class GuiRules
                 C.Cond_Zone,
                 C.Cond_ZoneGroup,
                 C.Cond_Players,
+                C.Cond_OnlineStatus,
             ];
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
@@ -281,6 +282,7 @@ public static unsafe class GuiRules
             if(C.Cond_World) ImGui.TableSetupColumn("World");
             if(C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
             if(C.Cond_Players) ImGui.TableSetupColumn("Players");
+            if(C.Cond_OnlineStatus) ImGui.TableSetupColumn("Online Status");
             ImGui.TableSetupColumn("Preset");
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
@@ -750,6 +752,35 @@ public static unsafe class GuiRules
 
                     if(fullList != null)
                         ImGuiEx.Tooltip(UI.AnyNotice + fullList);
+                }
+                filterCnt++;
+
+                if(C.Cond_OnlineStatus)
+                {
+                    ImGui.TableNextColumn();
+                    //Online Status
+                    ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                    if(ImGui.BeginCombo("##onlinestatus", rule.OnlineStatuses.Select(x => P.OnlineStatusManager.OnlineStatuses.TryGetValue(x, out var n) ? n : $"{x}").ToHashSet().PrintRange(rule.Not.OnlineStatuses.Select(x => P.OnlineStatusManager.OnlineStatuses.TryGetValue(x, out var n) ? n : $"{x}").ToHashSet(), out var fullList), C.ComboSize))
+                    {
+                        FiltersSelection();
+                        foreach(var cond in P.OnlineStatusManager.OnlineStatuses)
+                        {
+                            var name = cond.Value;
+                            if(name.IsNullOrEmpty()) continue;
+                            if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                            if(OnlySelected[filterCnt] && !rule.OnlineStatuses.Contains(cond.Key)) continue;
+                            var iconSourceId = P.OnlineStatusManager.IconOverrides.TryGetValue(cond.Key, out var overrideId) ? overrideId : cond.Key;
+                            var statusRow = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.OnlineStatus>().GetRowOrDefault(iconSourceId);
+                            if(statusRow != null && ThreadLoadImageHandler.TryGetIconTextureWrap((uint)statusRow.Value.Icon, false, out var texture))
+                            {
+                                ImGui.Image(texture.Handle, iconSize);
+                                ImGui.SameLine();
+                            }
+                            DrawSelector($"{cond.Value}##{cond.Key}", cond.Key, rule.OnlineStatuses, rule.Not.OnlineStatuses);
+                        }
+                        ImGui.EndCombo();
+                    }
+                    if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                 }
                 filterCnt++;
 

@@ -32,6 +32,7 @@ public static unsafe class UI
             Utils.ResetCaches();
             foreach(var x in Svc.Data.GetExcelSheet<Weather>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
             foreach(var x in Svc.Data.GetExcelSheet<Emote>()) ThreadLoadImageHandler.TryGetIconTextureWrap(x.Icon, false, out _);
+            foreach(var x in Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.OnlineStatus>()) ThreadLoadImageHandler.TryGetIconTextureWrap((uint)x.Icon, false, out _);
         }
         PatreonBanner.DrawRight();
         ImGuiEx.EzTabBar("TabsNR2", PatreonBanner.Text, RequestTab, ImGuiTabBarFlags.Reorderable, [

@@ -123,6 +123,7 @@ public static class GuiSettings
                 () => ImGui.Checkbox($"World", ref C.Cond_World),
                 () => ImGui.Checkbox($"Gearset", ref C.Cond_Gearset),
                 () => ImGui.Checkbox($"Nearby Players", ref C.Cond_Players),
+                () => ImGui.Checkbox($"Online Status", ref C.Cond_OnlineStatus),
             ],
                 (int)(ImGui.GetContentRegionAvail().X / 180f), ImGuiTableFlags.BordersInner);
             if(C.Cond_Time)

@@ -29,6 +29,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public static Config C;
     public AgentMap* AgentMapInst;
     public WeatherManager WeatherManager;
+    public OnlineStatusManager OnlineStatusManager;
     public List<ApplyRule> LastRule = [];
     public HashSet<Guid> MoodleCleanupQueue = [];
     public bool ForceUpdate = false;
@@ -40,6 +41,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public static ApplyRule StaticRule = new();
     public static Migrator Migrator;
     public uint LastJob = 0;
+    public uint LastOnlineStatus = 0;
     //public int LastGS = -1;
     public Memory Memory;
     public List<uint> LastItems = [];
@@ -91,6 +93,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 "/db characterprofile <name> → changes profile of currently active character to provided profile");
             AgentMapInst = AgentMap.Instance();
             WeatherManager = new();
+            OnlineStatusManager = new();
             new EzFrameworkUpdate(OnUpdate);
             new EzLogout(Logout);
             new EzTerritoryChanged(TerritoryChanged);
@@ -132,6 +135,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         Utils.UpdateGearsetCache();
 
         LastJob = (uint)Player.Job;
+        LastOnlineStatus = Player.OnlineStatus;
         //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
 
         if(C.RandomChoosenType == RandomTypes.OnLogin && !RandomizedRecently)
@@ -265,6 +269,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         MyOldDesign = null;
         if(C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
         LastJob = 0;
+        LastOnlineStatus = 0;
         LastItems = [];
         if(C.EnablePenumbra)
         {
@@ -290,6 +295,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     ForceUpdate = true;
                     Randomizer();
                 }
+            }
+            if(LastOnlineStatus != Player.OnlineStatus)
+            {
+                LastOnlineStatus = Player.OnlineStatus;
+                PluginLog.Verbose($"Online Status: {LastOnlineStatus}");
             }
             if(C.UpdateGearChange)
             {
@@ -364,6 +374,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 &&
                                 (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
+                                &&
+                                (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
+                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
                                 )
                             {
                                 newRule.Add(x);
