@@ -41,6 +41,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public static ApplyRule StaticRule = new();
     public static Migrator Migrator;
     public uint LastJob = 0;
+    public uint LastOnlineStatus = 0;
     //public int LastGS = -1;
     public Memory Memory;
     public List<uint> LastItems = [];
@@ -133,6 +134,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         Utils.UpdateGearsetCache();
 
         LastJob = (uint)Player.Job;
+        LastOnlineStatus = Player.OnlineStatus;
         //LastGS = RaptureGearsetModule.Instance()->CurrentGearsetIndex;
 
         if(C.RandomChoosenType == RandomTypes.OnLogin && !RandomizedRecently)
@@ -266,6 +268,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         MyOldDesign = null;
         if(C.EnableCustomize) TaskManager.Enqueue(() => CustomizePlusManager.RestoreState());
         LastJob = 0;
+        LastOnlineStatus = 0;
         LastItems = [];
         if(C.EnablePenumbra)
         {
@@ -291,6 +294,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     ForceUpdate = true;
                     Randomizer();
                 }
+            }
+            if(LastOnlineStatus != Player.OnlineStatus)
+            {
+                LastOnlineStatus = Player.OnlineStatus;
+                PluginLog.Verbose($"Online Status: {LastOnlineStatus}");
             }
             if(C.UpdateGearChange)
             {

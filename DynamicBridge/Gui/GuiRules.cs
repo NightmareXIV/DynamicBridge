@@ -769,7 +769,9 @@ public static unsafe class GuiRules
                             if(name.IsNullOrEmpty()) continue;
                             if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                             if(OnlySelected[filterCnt] && !rule.OnlineStatuses.Contains(cond.Key)) continue;
-                            if(ThreadLoadImageHandler.TryGetIconTextureWrap((uint)Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.OnlineStatus>().GetRow(cond.Key).Icon, false, out var texture))
+                            var iconSourceId = P.OnlineStatusManager.IconOverrides.TryGetValue(cond.Key, out var overrideId) ? overrideId : cond.Key;
+                            var statusRow = Svc.Data.GetExcelSheet<Lumina.Excel.Sheets.OnlineStatus>().GetRowOrDefault(iconSourceId);
+                            if(statusRow != null && ThreadLoadImageHandler.TryGetIconTextureWrap((uint)statusRow.Value.Icon, false, out var texture))
                             {
                                 ImGui.Image(texture.Handle, iconSize);
                                 ImGui.SameLine();
