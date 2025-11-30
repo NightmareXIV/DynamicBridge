@@ -29,6 +29,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public static Config C;
     public AgentMap* AgentMapInst;
     public WeatherManager WeatherManager;
+    public OnlineStatusManager OnlineStatusManager;
     public List<ApplyRule> LastRule = [];
     public HashSet<Guid> MoodleCleanupQueue = [];
     public bool ForceUpdate = false;
@@ -90,6 +91,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 "/db characterprofile <name> → changes profile of currently active character to provided profile");
             AgentMapInst = AgentMap.Instance();
             WeatherManager = new();
+            OnlineStatusManager = new();
             new EzFrameworkUpdate(OnUpdate);
             new EzLogout(Logout);
             new EzTerritoryChanged(TerritoryChanged);
@@ -363,6 +365,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 &&
                                 (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
+                                &&
+                                (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
+                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
                                 )
                             {
                                 newRule.Add(x);

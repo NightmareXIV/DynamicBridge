@@ -53,6 +53,7 @@ public class Config : IEzConfig
     public bool Cond_World = false;
     public bool Cond_Gearset = false;
     public bool Cond_Players = false;
+    public bool Cond_OnlineStatus = false;
 
     public bool Cond_Time_Precise = false;
     public Dictionary<ulong, List<GearsetEntry>> GearsetNameCacheCID = [];
