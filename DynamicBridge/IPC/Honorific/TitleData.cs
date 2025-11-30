@@ -6,4 +6,7 @@ public class TitleData
     public bool IsOriginal;
     public Vector3? Color;
     public Vector3? Glow;
+    public int RainbowMode;
+    public int? GradientColourSet;
+    public GradientAnimationStyle? GradientAnimationStyle;
 }
