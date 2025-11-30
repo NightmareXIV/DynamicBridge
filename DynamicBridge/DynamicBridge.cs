@@ -64,6 +64,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
         RandomizerTimer = DateTime.UtcNow;
         new TickScheduler(() =>
         {
+            ThreadLoadImageHandler.ErrorAction = (ex, str) => PluginLog.Verbose($"{str}:\n{ex?.ToStringFull()}");
             C = EzConfig.Init<Config>();
             var ver = GetType().Assembly.GetName().Version.ToString();
             if(C.LastVersion != ver)
