@@ -250,6 +250,7 @@ public static unsafe class GuiRules
     {
         postAction = null;
         var active = (bool[])[
+                C.Cond_Delay,
                 C.Cond_State,
                 C.Cond_Biome,
                 C.Cond_Emote,
@@ -283,6 +284,7 @@ public static unsafe class GuiRules
             if(C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
             if(C.Cond_Players) ImGui.TableSetupColumn("Players");
             if(C.Cond_OnlineStatus) ImGui.TableSetupColumn("Online Status");
+            if(C.Cond_Delay) ImGui.TableSetupColumn("Delays");
             ImGui.TableSetupColumn("Preset");
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
@@ -783,6 +785,29 @@ public static unsafe class GuiRules
                     if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                 }
                 filterCnt++;
+                
+                if(C.Cond_Delay)
+                {
+                    ImGui.TableNextColumn();
+                    //Delays
+                    ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                    var delayText = rule.ActivationDelay > 0 || rule.DeactivationDelay > 0 ?
+                        $"Act:{rule.ActivationDelay}s / Dct:{rule.DeactivationDelay}s" : "- No delays -";
+                    if(ImGui.BeginCombo("##delays", delayText, C.ComboSize))
+                    {
+                        ImGui.SetWindowFontScale(0.9f);
+                        ImGui.Text("Activation Delay (seconds):");
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                        ImGui.SliderInt("##actdelay", ref rule.ActivationDelay, 0, 60);
+                        ImGui.Spacing();
+                        ImGui.Text("Deactivation Delay (seconds):");
+                        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                        ImGui.SliderInt("##dctdelay", ref rule.DeactivationDelay, 0, 60);
+                        ImGui.SetWindowFontScale(1f);
+                        ImGui.EndCombo();
+                    }
+                    ImGuiEx.Tooltip("Set delays before rule activates or deactivates");
+                }
 
                 ImGui.TableNextColumn();
 

@@ -45,6 +45,9 @@ public unsafe class DynamicBridge : IDalamudPlugin
     //public int LastGS = -1;
     public Memory Memory;
     public List<uint> LastItems = [];
+    private Dictionary<string, DateTime> RuleActivationTimers = new();
+    private Dictionary<string, DateTime> RuleDeactivationTimers = new();
+    private HashSet<string> ActiveRules = new();
 
     public GlamourerManager GlamourerManager;
     public CustomizePlusManager CustomizePlusManager;
@@ -322,6 +325,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             if(!TaskManager.IsBusy && profile != null)
             {
                 List<ApplyRule> newRule = [];
+                List<ApplyRule> rulesMatchingConditions = [];
                 if(C.Enable)
                 {
                     if(profile.IsStaticExists())
@@ -333,7 +337,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     {
                         foreach(var x in profile.GetRulesUnion(true))
                         {
-                            if(
+                            var conditionsMet =
                                 x.Enabled
                                 &&
                                 (!C.Cond_State || ((x.States.Count == 0 || x.States.Any(s => s.Check()))
@@ -376,14 +380,116 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
                                 &&
                                 (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
-                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
-                                )
+                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))));
+
+                            if(conditionsMet)
                             {
-                                newRule.Add(x);
+                                rulesMatchingConditions.Add(x);
+
+                                // Handle activation delay
+                                var ruleId = x.GUID;
+                                var isActive = ActiveRules.Contains(ruleId);
+
+                                if(!isActive && x.ActivationDelay > 0)
+                                {
+                                    // Start activation timer if not already started
+                                    if(!RuleActivationTimers.ContainsKey(ruleId))
+                                    {
+                                        RuleActivationTimers[ruleId] = DateTime.UtcNow;
+                                        PluginLog.Verbose($"Rule {ruleId} activation timer started: {x.ActivationDelay}s delay");
+                                    }
+
+                                    // Check if activation delay has elapsed
+                                    if((DateTime.UtcNow - RuleActivationTimers[ruleId]).TotalSeconds >= x.ActivationDelay)
+                                    {
+                                        ActiveRules.Add(ruleId);
+                                        RuleActivationTimers.Remove(ruleId);
+                                        RuleDeactivationTimers.Remove(ruleId);
+                                        newRule.Add(x);
+                                        PluginLog.Verbose($"Rule {ruleId} activated after delay");
+                                    }
+                                }
+                                else
+                                {
+                                    // No activation delay or already active
+                                    if(!isActive && x.ActivationDelay == 0)
+                                    {
+                                        ActiveRules.Add(ruleId);
+                                    }
+                                    RuleActivationTimers.Remove(ruleId);
+                                    RuleDeactivationTimers.Remove(ruleId);
+                                    newRule.Add(x);
+                                }
+
                                 if(!x.Passthrough) break;
                             }
                         }
                     }
+                }
+
+                // Handle deactivation delays for rules that are no longer matching conditions
+                var rulesToRemove = new List<string>();
+                foreach(var activeRuleId in ActiveRules.ToList())
+                {
+                    var matchingRule = profile.GetRulesUnion(true).FirstOrDefault(r => r.GUID == activeRuleId);
+                    if(matchingRule == null || !rulesMatchingConditions.Contains(matchingRule))
+                    {
+                        if(matchingRule != null && matchingRule.DeactivationDelay > 0)
+                        {
+                            // Start deactivation timer if not already started
+                            if(!RuleDeactivationTimers.ContainsKey(activeRuleId))
+                            {
+                                RuleDeactivationTimers[activeRuleId] = DateTime.UtcNow;
+                                PluginLog.Verbose($"Rule {activeRuleId} deactivation timer started: {matchingRule.DeactivationDelay}s delay");
+                            }
+
+                            // Check if deactivation delay has elapsed
+                            if((DateTime.UtcNow - RuleDeactivationTimers[activeRuleId]).TotalSeconds >= matchingRule.DeactivationDelay)
+                            {
+                                rulesToRemove.Add(activeRuleId);
+                                RuleDeactivationTimers.Remove(activeRuleId);
+                                RuleActivationTimers.Remove(activeRuleId);
+                                PluginLog.Verbose($"Rule {activeRuleId} deactivated after delay");
+                            }
+                            else
+                            {
+                                // Keep the rule active during deactivation delay
+                                if(!newRule.Contains(matchingRule))
+                                {
+                                    newRule.Add(matchingRule);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // No deactivation delay
+                            rulesToRemove.Add(activeRuleId);
+                            RuleDeactivationTimers.Remove(activeRuleId);
+                            RuleActivationTimers.Remove(activeRuleId);
+                        }
+                    }
+                }
+
+                foreach(var ruleId in rulesToRemove)
+                {
+                    ActiveRules.Remove(ruleId);
+                }
+
+                // Cancel activation timers for rules that are no longer matching conditions
+                var activationTimersToCancel = new List<string>();
+                foreach(var timerEntry in RuleActivationTimers.Keys.ToList())
+                {
+                    var matchingRule = profile.GetRulesUnion(true).FirstOrDefault(r => r.GUID == timerEntry);
+                    if(matchingRule == null || !rulesMatchingConditions.Contains(matchingRule))
+                    {
+                        activationTimersToCancel.Add(timerEntry);
+                        PluginLog.Verbose($"Rule {timerEntry} activation timer cancelled (conditions no longer met)");
+                    }
+                }
+
+                foreach(var ruleId in activationTimersToCancel)
+                {
+                    RuleActivationTimers.Remove(ruleId);
                 }
                 var DontChangeOnTerritoryChange = C.DontChangeOnTerritoryChange; // true: Don't change if rules are same on territory change, false (defualt): Use old method 
                 if(ForceUpdate || !Utils.GuidEquals(newRule, LastRule) || (SoftForceUpdate && newRule.Count > 0 && !DontChangeOnTerritoryChange))
