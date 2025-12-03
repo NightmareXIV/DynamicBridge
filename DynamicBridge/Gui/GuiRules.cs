@@ -331,7 +331,9 @@ public static unsafe class GuiRules
 
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
+                if(col2) ImGui.PushStyleColor(ImGuiCol.Text, EColor.GreenBright);
                 ImGuiEx.ButtonCheckbox("\uf103", ref rule.Passthrough);
+                if(col2) ImGui.PopStyleColor();
                 ImGui.PopFont();
                 ImGuiEx.Tooltip("Enable passthrough for this rule. DynamicBridge will continue searching after encountering this rule. All valid found rules will be applied one after another sequentially.");
 
