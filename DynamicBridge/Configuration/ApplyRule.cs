@@ -9,6 +9,8 @@ public class ApplyRule
     [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
     public int StickyRandom = 0;
     public bool Enabled = true;
+    public int ActivationDelay = 0;
+    public int DeactivationDelay = 0;
 
     public List<CharacterState> States = [];
     public List<SpecialTerritory> SpecialTerritories = [];
