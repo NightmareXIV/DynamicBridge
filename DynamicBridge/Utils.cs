@@ -30,6 +30,12 @@ public static unsafe class Utils
         return em;
     }
 
+    public static uint GetCurrentMountId()
+    {
+        if (!Player.Available) return 0;
+        return Player.Character->Mount.MountId;
+    }
+
     public static string[] SplitDirectories(this string path)
     {
         var ret = path.Split('/', StringSplitOptions.RemoveEmptyEntries);

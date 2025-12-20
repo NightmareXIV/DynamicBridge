@@ -25,6 +25,7 @@ public class ApplyRule
     public List<int> Gearsets = [];
     public List<string> Players = [];
     public List<uint> OnlineStatuses = [];
+    public List<uint> Mounts = [];
     public List<TimelineSegment> Precise_Times = [
         new TimelineSegment((float)0/24,(float)5/24,0),
         new TimelineSegment((float)5/24,(float)7/24,0),
@@ -54,5 +55,6 @@ public class ApplyRule
         public List<int> Gearsets = [];
         public List<string> Players = [];
         public List<uint> OnlineStatuses = [];
+        public List<uint> Mounts = [];
     }
 }
