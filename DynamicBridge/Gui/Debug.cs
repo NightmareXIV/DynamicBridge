@@ -163,7 +163,7 @@ public static unsafe class Debug
             ImGuiEx.Text($"{P.LociCleanupQueue.Print("\n")}");
             ImGui.Spacing();
             ImGuiEx.TextUnderlined($"Statuses");
-            foreach (var x in P.LociManager.GetStatuses())
+            foreach(var x in P.LociManager.GetStatuses())
             {
                 ImGuiEx.Text($"{x.FSPath}");
                 ImGui.SameLine();
@@ -183,7 +183,7 @@ public static unsafe class Debug
             }
             ImGui.Spacing();
             ImGuiEx.TextUnderlined($"Events");
-            foreach (var x in P.LociManager.GetEvents())
+            foreach(var x in P.LociManager.GetEvents())
             {
                 ImGuiEx.Text($"{x.FSPath}");
                 ImGui.SameLine();

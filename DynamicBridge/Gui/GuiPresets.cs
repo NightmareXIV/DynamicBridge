@@ -277,7 +277,7 @@ public static class GuiPresets
         if(C.EnableGlamourer) cnt++;
         if(C.EnablePenumbra) cnt++;
         if(C.EnableMoodles) cnt++;
-        if (C.EnableLoci) cnt++;
+        if(C.EnableLoci) cnt++;
         DragDrop.Begin();
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
         if(ImGui.BeginTable($"##presets{extraID}", cnt, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
@@ -289,7 +289,7 @@ public static class GuiPresets
             if(C.EnableHonorific) ImGui.TableSetupColumn("Honorific");
             if(C.EnablePenumbra) ImGui.TableSetupColumn("Penumbra");
             if(C.EnableMoodles) ImGui.TableSetupColumn("Moodles");
-            if (C.EnableLoci) ImGui.TableSetupColumn("Loci");
+            if(C.EnableLoci) ImGui.TableSetupColumn("Loci");
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
 

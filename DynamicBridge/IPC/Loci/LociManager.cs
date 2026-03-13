@@ -40,10 +40,10 @@ public class LociManager
                     ret.Add(path);
                 }
             }
-            foreach (var x in GetEvents())
+            foreach(var x in GetEvents())
             {
                 var path = x.FSPath;
-                if (path != null)
+                if(path != null)
                 {
                     ret.Add(path);
                 }
