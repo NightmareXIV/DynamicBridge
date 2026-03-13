@@ -2,6 +2,7 @@
 using DynamicBridge.Configuration;
 using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
+using LociApi.Enums;
 using LociApi.Ipc;
 
 namespace DynamicBridge.IPC.Loci;
@@ -170,15 +171,17 @@ public class LociManager
     }
 
     private SetEventState SetEventState = new(Svc.PluginInterface);
-    public void SetEvent(Guid guid, bool state)
+    public bool SetEvent(Guid guid, bool state)
     {
         try
         {
-            SetEventState.Invoke(guid, state);
+            var ret = SetEventState.Invoke(guid, state);
+            return ret is (LociApiEc.Success or LociApiEc.NoChange);
         }
         catch(Exception e)
         {
             e.Log();
+            return false;
         }
     }
 }
