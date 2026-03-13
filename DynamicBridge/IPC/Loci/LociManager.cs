@@ -175,8 +175,7 @@ public class LociManager
     {
         try
         {
-            var ret = SetEventState.Invoke(guid, state);
-            return ret is (LociApiEc.Success or LociApiEc.NoChange);
+            return SetEventState.Invoke(guid, state) is (LociApiEc.Success or LociApiEc.NoChange);
         }
         catch(Exception e)
         {

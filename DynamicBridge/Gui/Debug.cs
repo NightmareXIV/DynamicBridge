@@ -188,10 +188,9 @@ public static unsafe class Debug
                 ImGuiEx.Text($"{x.FSPath}");
                 ImGui.SameLine();
                 var buttonText = x.Enabled ? "Disable Event" : "Enable Event";
-                if (ImGui.SmallButton($"{buttonText}##{x.ID}"))
+                if(ImGui.SmallButton($"{buttonText}##{x.ID}"))
                 {
-                    if (P.LociManager.SetEvent(x.ID, !x.Enabled))
-                        P.LociManager.ResetCache();
+                    if(P.LociManager.SetEvent(x.ID, !x.Enabled)) P.LociManager.ResetCache();
                 }
             }
         }
