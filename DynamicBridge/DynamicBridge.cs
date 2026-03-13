@@ -5,6 +5,7 @@ using DynamicBridge.IPC;
 using DynamicBridge.IPC.Customize;
 using DynamicBridge.IPC.Glamourer;
 using DynamicBridge.IPC.Honorific;
+using DynamicBridge.IPC.Loci;
 using DynamicBridge.IPC.Moodles;
 using DynamicBridge.IPC.Penumbra;
 using ECommons.Automation.LegacyTaskManager;

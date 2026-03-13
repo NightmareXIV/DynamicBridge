@@ -4,7 +4,7 @@ using ECommons.EzIpcManager;
 using ECommons.GameHelpers;
 using LociApi.Ipc;
 
-namespace DynamicBridge.IPC.Moodles;
+namespace DynamicBridge.IPC.Loci;
 public class LociManager
 {
     public LociManager()
