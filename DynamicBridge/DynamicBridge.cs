@@ -549,6 +549,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 {
                                     ApplyPresetLoci(preset, lociCleanup);
                                 }
+                            }
                         }
                     }
 
