@@ -206,6 +206,10 @@ public static class GuiSettings
             ImGui.Checkbox("Moodles", ref C.EnableMoodles);
             DrawPluginCheck("Moodles", "1.0.0.15");
 
+            //loci
+            ImGui.Checkbox("Loci", ref C.EnableLoci);
+            DrawPluginCheck("Loci", "0.0.2.0");
+
             ImGuiGroup.EndGroupBox();
         }
 

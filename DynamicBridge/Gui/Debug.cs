@@ -161,8 +161,9 @@ public static unsafe class Debug
         {
             ImGuiEx.Text($"LCQ");
             ImGuiEx.Text($"{P.LociCleanupQueue.Print("\n")}");
-            ImGuiEx.Text($"Statuses");
-            foreach(var x in P.LociManager.GetStatuses())
+            ImGui.Spacing();
+            ImGuiEx.TextUnderlined($"Statuses");
+            foreach (var x in P.LociManager.GetStatuses())
             {
                 ImGuiEx.Text($"{x.FSPath}");
                 ImGui.SameLine();
@@ -170,7 +171,8 @@ public static unsafe class Debug
                 ImGui.SameLine();
                 if(ImGui.SmallButton($"Remove##{x.ID}")) P.LociManager.RemoveStatus(x.ID);
             }
-            ImGuiEx.Text($"Presets");
+            ImGui.Spacing();
+            ImGuiEx.TextUnderlined($"Presets");
             foreach(var x in P.LociManager.GetPresets())
             {
                 ImGuiEx.Text($"{x.FSPath}");
@@ -179,8 +181,9 @@ public static unsafe class Debug
                 ImGui.SameLine();
                 if(ImGui.SmallButton($"Remove##{x.ID}")) P.LociManager.RemovePreset(x.ID);
             }
-            ImGuiEx.Text($"Events");
-            foreach(var x in P.LociManager.GetEvents())
+            ImGui.Spacing();
+            ImGuiEx.TextUnderlined($"Events");
+            foreach (var x in P.LociManager.GetEvents())
             {
                 ImGuiEx.Text($"{x.FSPath}");
                 ImGui.SameLine();
