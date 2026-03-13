@@ -14,6 +14,7 @@ public class Profile
     public List<string> Pathes = [];
     public List<string> CustomizePathes = [];
     public List<string> MoodlesPathes = [];
+    public List<string> LociPathes = [];
     public Preset FallbackPreset = new();
 
     internal bool IsGlobal => C.GlobalProfile == this;

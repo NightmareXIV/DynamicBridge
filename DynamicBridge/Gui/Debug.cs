@@ -157,6 +157,37 @@ public static unsafe class Debug
                 if(ImGui.SmallButton($"Remove##{x.ID}")) P.MoodlesManager.RemovePreset(x.ID);
             }
         }
+        if(ImGui.CollapsingHeader("Loci"))
+        {
+            ImGuiEx.Text($"LCQ");
+            ImGuiEx.Text($"{P.LociCleanupQueue.Print("\n")}");
+            ImGuiEx.Text($"Statuses");
+            foreach(var x in P.LociManager.GetStatuses())
+            {
+                ImGuiEx.Text($"{x.FSPath}");
+                ImGui.SameLine();
+                if(ImGui.SmallButton($"Apply##{x.ID}")) P.LociManager.ApplyStatus(x.ID);
+                ImGui.SameLine();
+                if(ImGui.SmallButton($"Remove##{x.ID}")) P.LociManager.RemoveStatus(x.ID);
+            }
+            ImGuiEx.Text($"Presets");
+            foreach(var x in P.LociManager.GetPresets())
+            {
+                ImGuiEx.Text($"{x.FSPath}");
+                ImGui.SameLine();
+                if(ImGui.SmallButton($"Apply##{x.ID}")) P.LociManager.ApplyPreset(x.ID);
+                ImGui.SameLine();
+                if(ImGui.SmallButton($"Remove##{x.ID}")) P.LociManager.RemovePreset(x.ID);
+            }
+            ImGuiEx.Text($"Events");
+            foreach(var x in P.LociManager.GetEvents())
+            {
+                ImGuiEx.Text($"{x.FSPath}");
+                ImGui.SameLine();
+                var buttonText = x.Enabled ? "Disable Event" : "Enable Event";
+                if(ImGui.SmallButton($"{buttonText}##{x.ID}")) P.LociManager.SetEvent(x.ID, !x.Enabled);
+            }
+        }
         /*if (ImGui.CollapsingHeader("Penumbra"))
         {
         ImGuiEx.Text(EColor.Green, $"Current: {P.PenumbraManager.GetCollectionForType(PenumbraManager.ApiCollectionType.Yourself) ?? "(null)"}");
@@ -180,7 +211,7 @@ public static unsafe class Debug
                 ImGuiEx.TextV($"{x.Name}");
             }
         }*/
-        if(ImGui.CollapsingHeader("Items"))
+        if (ImGui.CollapsingHeader("Items"))
         {
             ImGuiEx.Text($"Current: {Utils.GetCurrentGear().Print()}");
             ImGuiEx.Text($"Last: {P.LastItems.Print()}");

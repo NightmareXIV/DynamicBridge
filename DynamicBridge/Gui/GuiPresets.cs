@@ -976,6 +976,116 @@ public static class GuiPresets
                     }
                 }
 
+                //Loci
+                {
+                    if(C.EnableLoci)
+                    {
+                        var noresults = true;
+                        ImGui.TableNextColumn();
+                        ImGuiEx.SetNextItemFullWidth();
+                        if(ImGui.BeginCombo("##loci", preset.LociData.Select(Utils.GetLociName).PrintRange(out var fullList, "- None -"), C.ComboSize))
+                        {
+                            ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, Utils.IndentSpacing);
+                            if(ImGui.IsWindowAppearing()) Utils.ResetCaches();
+                            void ToggleLociData(Vector4 selectedCol, Guid id, string name)
+                            {
+                                var cont = preset.LociData.Any(x => x.Guid == id);
+                                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Vector2.Zero);
+                                if(ImGui.BeginTable($"{id}LociData", 2, ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.SizingFixedFit))
+                                {
+                                    ImGui.PushFont(UiBuilder.IconFont);
+                                    var size = ImGuiHelpers.GetButtonSize(FontAwesomeIcon.Link.ToIconString());
+                                    ImGui.PopFont();
+                                    ImGui.TableSetupColumn("LociData", ImGuiTableColumnFlags.WidthStretch);
+                                    ImGui.TableSetupColumn("Button", ImGuiTableColumnFlags.WidthFixed, size.X);
+                                    ImGui.TableNextRow();
+                                    ImGui.TableNextColumn();
+                                    if(ImGuiEx.SelectableNode(cont ? selectedCol : null, name + "      ", ref cont, cont ? ImGuiTreeNodeFlags.Bullet : ImGuiTreeNodeFlags.Leaf))
+                                    {
+                                        if(cont)
+                                        {
+                                            preset.LociData.Add(new(id, false));
+                                            if(C.AutofillFromGlam && preset.Name == "") preset.Name = name;
+                                        }
+                                        else
+                                        {
+                                            new TickScheduler(() => preset.LociData.RemoveAll(z => z.Guid == id));
+                                        }
+                                    }
+                                    ImGui.TableNextColumn();
+                                    if(cont)
+                                    {
+                                        var e = preset.LociData.First(x => x.Guid == id);
+                                        ImGui.PushFont(UiBuilder.IconFont);
+                                        ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Link.ToIconString(), ref e.Cancel, true);
+                                        ImGui.PopFont();
+                                        ImGuiEx.Tooltip($"Cancel this LociData(s) once preset is no longer applied");
+                                    }
+                                    ImGui.EndTable();
+                                }
+                                ImGui.PopStyleVar();
+                            }
+
+                            FiltersSelection();
+                            var statuses = P.LociManager.GetStatuses().OrderBy(x => x.FSPath);
+                            var lociPresets = P.LociManager.GetPresets().OrderBy(x => x.FSPath);
+                            var index = 0;
+                            if(ImGuiEx.TreeNode(Colors.TabGreen, "Loci Statuses", ImGuiTreeNodeFlags.DefaultOpen))
+                            {
+                                List<(string[], Action)> items = [];
+                                foreach(var x in statuses)
+                                {
+                                    index++;
+                                    ImGui.PushID(index);
+                                    var name = x.FSPath;
+                                    if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                    if(OnlySelected[filterCnt] && !preset.LociData.Any(z => z.Guid == x.ID)) continue;
+                                    if(currentProfile.LociPathes.Count > 0 && !name.StartsWithAny(currentProfile.LociPathes)) continue;
+                                    var parts = name.SplitDirectories();
+                                    items.Add((parts[0..^1], () => ToggleLociData(Colors.TabGreen, x.ID, parts[^1])));
+                                    noresults = false;
+                                    ImGui.PopID();
+                                }
+                                Utils.DrawFolder(items);
+                                ImGui.TreePop();
+                            }
+                            if(ImGuiEx.TreeNode(Colors.TabYellow, "Loci Presets", ImGuiTreeNodeFlags.DefaultOpen))
+                            {
+                                List<(string[], Action)> items = [];
+                                foreach(var x in lociPresets)
+                                {
+                                    index++;
+                                    ImGui.PushID(index);
+                                    var name = x.FSPath;
+                                    if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                                    if(OnlySelected[filterCnt] && !preset.LociData.Any(z => z.Guid == x.ID)) continue;
+                                    if(currentProfile.LociPathes.Count > 0 && !name.StartsWithAny(currentProfile.LociPathes)) continue;
+                                    var parts = name.SplitDirectories();
+                                    items.Add((parts[0..^1], () => ToggleLociData(Colors.TabYellow, x.ID, parts[^1])));
+                                    noresults = false;
+                                    ImGui.PopID();
+                                }
+                                Utils.DrawFolder(items);
+                                ImGui.TreePop();
+                            }
+                            foreach(var x in preset.LociData)
+                            {
+                                if(statuses.Any(z => z.ID == x.Guid)) continue;
+                                if(lociPresets.Any(z => z.ID == x.Guid)) continue;
+                                Utils.CollectionSelectable(ImGuiColors.DalamudRed, $"{x}", x, preset.LociData, true);
+                            }
+                            if(noresults && Filters[filterCnt].Length == 0) OnlySelected[filterCnt] = false;
+                            ImGui.PopStyleVar();
+                            ImGui.EndCombo();
+                        }
+                        if(fullList != null) ImGuiEx.Tooltip("All of these Statuses/Presets will be applied:\n" + fullList);
+                        filterCnt++;
+
+                        // Could do events here but can also save this for later.
+                    }
+                }
+
+
                 ImGui.TableNextColumn();
 
                 //Delete

@@ -32,6 +32,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public OnlineStatusManager OnlineStatusManager;
     public List<ApplyRule> LastRule = [];
     public HashSet<Guid> MoodleCleanupQueue = [];
+    // This shouldnt be needed idealy since we have methods for this now.
+    public HashSet<Guid> LociCleanupQueue = [];
     public bool ForceUpdate = false;
     public bool SoftForceUpdate = false;
     public string MyOldDesign = null;
@@ -53,6 +55,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public CustomizePlusManager CustomizePlusManager;
     public PenumbraManager PenumbraManager;
     public MoodlesManager MoodlesManager;
+    public LociManager LociManager;
     public IpcTester IpcTester;
     public HonorificManager HonorificManager;
 
@@ -113,6 +116,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             Memory = new();
             PenumbraManager = new();
             MoodlesManager = new();
+            LociManager = new();
             HonorificManager = new();
         });
     }
@@ -499,11 +503,13 @@ public unsafe class DynamicBridge : IDalamudPlugin
                     ForceUpdate = false;
                     SoftForceUpdate = false;
                     if(C.EnableMoodles) MoodlesManager.ResetCache();
+                    if(C.EnableLoci) LociManager.ResetCache();
                     var DoNullGlamourer = true;
                     var DoNullCustomize = true;
                     var DoNullHonorific = true;
                     var DoNullPenumbra = true;
                     HashSet<Guid> moodleCleanup = [];
+                    HashSet<Guid> lociCleanup = [];
                     for(var i = 0; i < newRule.Count; i++)
                     {
                         var rule = newRule[i];
@@ -539,7 +545,10 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 {
                                     ApplyPresetMoodles(preset, moodleCleanup);
                                 }
-                            }
+                                if(C.EnableLoci)
+                                {
+                                    ApplyPresetLoci(preset, lociCleanup);
+                                }
                         }
                     }
 
@@ -578,6 +587,22 @@ public unsafe class DynamicBridge : IDalamudPlugin
                         }
                     }
                     MoodleCleanupQueue = moodleCleanup;
+
+                    foreach(var x in LociCleanupQueue)
+                    {
+                        if(!lociCleanup.Contains(x))
+                        {
+                            if(LociManager.GetStatuses().Any(z => z.ID == x))
+                            {
+                                LociManager.RemoveStatus(x);
+                            }
+                            else if(LociManager.GetPresets().Any(z => z.ID == x))
+                            {
+                                LociManager.RemovePreset(x);
+                            }
+                        }
+                    }
+                    LociCleanupQueue = lociCleanup;
 
                     void NullPenumbra()
                     {
@@ -791,6 +816,26 @@ public unsafe class DynamicBridge : IDalamudPlugin
                 PluginLog.Debug($"Applying Moodle preset {mp}");
                 MoodlesManager.ApplyPreset(x.Guid);
                 if(x.Cancel) moodleCleanup.Add(x.Guid);
+            }
+        }
+    }
+
+    private void ApplyPresetLoci(Preset preset, HashSet<Guid> lociCleanup)
+    {
+        LociManager.ResetCache();
+        foreach(var x in preset.LociData)
+        {
+            if(LociManager.GetStatuses().TryGetFirst(z => z.ID == x.Guid, out var s))
+            {
+                PluginLog.Debug($"Applying Loci status {s}");
+                LociManager.ApplyStatus(x.Guid);
+                if(x.Cancel) lociCleanup.Add(x.Guid);
+            }
+            else if(LociManager.GetPresets().TryGetFirst(z => z.ID == x.Guid, out var p))
+            {
+                PluginLog.Debug($"Applying Loci preset {p}");
+                LociManager.ApplyPreset(x.Guid);
+                if(x.Cancel) lociCleanup.Add(x.Guid);
             }
         }
     }
