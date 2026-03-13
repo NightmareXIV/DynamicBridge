@@ -10,7 +10,7 @@ public class GlamourerReflector
         {
             if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
-                var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Configuration"], []);
+                var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Config.Configuration"], []);
                 return config.GetFoP<bool>("EnableAutoDesigns");
             }
         }
@@ -27,7 +27,7 @@ public class GlamourerReflector
         {
             if(DalamudReflector.TryGetDalamudPlugin("Glamourer", out var plugin, out var context, true, true))
             {
-                var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Configuration"], []);
+                var config = plugin.GetFoP("_services").Call(context.Assemblies, "GetService", ["Glamourer.Config.Configuration"], []);
                 config.SetFoP("EnableAutoDesigns", state);
             }
         }
