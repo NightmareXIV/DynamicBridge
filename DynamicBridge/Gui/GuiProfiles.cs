@@ -133,6 +133,13 @@ public static class GuiProfiles
                         ImGui.PopID();
                         ImGui.TreePop();
                     }
+                    if(C.EnableLoci && ImGuiEx.TreeNode(Colors.TabBlue, "Loci", ImGuiTreeNodeFlags.DefaultOpen))
+                    {
+                        ImGui.PushID("Loci");
+                        DrawPathes(P.LociManager.GetCombinedPathes(), profile.LociPathes);
+                        ImGui.PopID();
+                        ImGui.TreePop();
+                    }
                     ImGui.PopStyleVar();
                     ImGui.EndCombo();
                 }

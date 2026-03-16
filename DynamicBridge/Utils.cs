@@ -116,6 +116,7 @@ public static unsafe class Utils
     {
         P.GlamourerManager.ResetCache();
         P.MoodlesManager.ResetCache();
+        P.LociManager.ResetCache();
         P.CustomizePlusManager.ResetCache();
     }
 
@@ -336,6 +337,23 @@ public static unsafe class Utils
         foreach(var x in P.MoodlesManager.GetPresets())
         {
             if(x.ID == info.Guid) return x.FullPath.Split("/")[^1];
+        }
+        success = false;
+        return info.Guid.ToString();
+    }
+
+    public static string GetLociName(this LociDataInfo info) => GetLociName(info, out _);
+
+    public static string GetLociName(this LociDataInfo info, out bool success)
+    {
+        success = true;
+        foreach(var x in P.LociManager.GetStatuses())
+        {
+            if(x.ID == info.Guid) return x.FSPath.Split("/")[^1];
+        }
+        foreach(var x in P.LociManager.GetPresets())
+        {
+            if(x.ID == info.Guid) return x.FSPath.Split("/")[^1];
         }
         success = false;
         return info.Guid.ToString();
