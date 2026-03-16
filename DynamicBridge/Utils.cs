@@ -30,6 +30,18 @@ public static unsafe class Utils
         return em;
     }
 
+    public static uint GetCurrentMountId()
+    {
+        if (!Player.Available) return 0;
+        return Player.Character->Mount.MountId;
+    }
+
+    public static string ToTitleCase(this string text)
+    {
+        if(string.IsNullOrEmpty(text)) return text;
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(text.ToLower());
+    }
+
     public static string[] SplitDirectories(this string path)
     {
         var ret = path.Split('/', StringSplitOptions.RemoveEmptyEntries);

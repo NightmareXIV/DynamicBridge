@@ -7,16 +7,20 @@ using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.Throttlers;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.IO;
 using DynamicBridge.IPC.Conditions;
 using Action = System.Action;
 using Emote = Lumina.Excel.Sheets.Emote;
+using Mount = Lumina.Excel.Sheets.Mount;
 using Weather = Lumina.Excel.Sheets.Weather;
+
 
 namespace DynamicBridge.Gui;
 
 public static unsafe class GuiRules
 {
+    
     private static Vector2 iconSize => new(24f);
 
     private static string[] Filters = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
@@ -46,7 +50,6 @@ public static unsafe class GuiRules
                     }
                 }
                 ImGuiEx.Tooltip("Add new rule");
-
                 ImGui.SameLine();
                 if(ImGuiEx.IconButton(FontAwesomeIcon.Paste))
                 {
@@ -265,6 +268,7 @@ public static unsafe class GuiRules
                 C.Cond_ZoneGroup,
                 C.Cond_Players,
                 C.Cond_OnlineStatus,
+                C.Cond_Mount,
             ];
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
@@ -299,6 +303,7 @@ public static unsafe class GuiRules
             if(C.Cond_Gearset) ImGui.TableSetupColumn("Gearset");
             if(C.Cond_Players) ImGui.TableSetupColumn("Players");
             if(C.Cond_OnlineStatus) ImGui.TableSetupColumn("Online Status");
+            if(C.Cond_Mount) ImGui.TableSetupColumn("Mount");
             if(C.Cond_Delay) ImGui.TableSetupColumn("Delays");
 
             foreach (var extraCondition in extraConditions)
@@ -808,7 +813,46 @@ public static unsafe class GuiRules
                     if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
                 }
                 filterCnt++;
-                
+
+                if(C.Cond_Mount)
+                {
+                    ImGui.TableNextColumn();
+                    //Mount
+                    ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                    if(ImGui.BeginCombo("##mount", rule.Mounts.Select(x => Svc.Data.GetExcelSheet<Mount>().GetRowOrDefault(x)?.Singular.ExtractText().ToTitleCase() ?? $"{x}").PrintRange(rule.Not.Mounts.Select(x => Svc.Data.GetExcelSheet<Mount>().GetRowOrDefault(x)?.Singular.ExtractText().ToTitleCase() ?? $"{x}"), out var fullList), C.ComboSize))
+                    {
+                        FiltersSelection();
+
+                        if(Player.Available && Utils.GetCurrentMountId() != 0)
+                        {
+                            var currentMount = Utils.GetCurrentMountId();
+                            var currentMountName = Svc.Data.GetExcelSheet<Mount>().GetRowOrDefault(currentMount)?.Singular.ExtractText().ToTitleCase() ?? $"{currentMount}";
+                            if(ImGui.Selectable($"Current: {currentMountName}"))
+                            {
+                                if(!rule.Mounts.Contains(currentMount))
+                                    rule.Mounts.Add(currentMount);
+                            }
+                            ImGui.Separator();
+                        }
+
+                        foreach(var mount in Svc.Data.GetExcelSheet<Mount>().Where(m => !m.Singular.ExtractText().IsNullOrEmpty()))
+                        {
+                            var name = mount.Singular.ExtractText().ToTitleCase() ?? "";
+                            if(Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
+                            if(OnlySelected[filterCnt] && !rule.Mounts.Contains(mount.RowId)) continue;
+                            if(ThreadLoadImageHandler.TryGetIconTextureWrap(mount.Icon, false, out var texture))
+                            {
+                                ImGui.Image(texture.Handle, iconSize);
+                                ImGui.SameLine();
+                            }
+                            DrawSelector($"{name}##{mount.RowId}", mount.RowId, rule.Mounts, rule.Not.Mounts);
+                        }
+                        ImGui.EndCombo();
+                    }
+                    if(fullList != null) ImGuiEx.Tooltip(UI.AnyNotice + fullList);
+                }
+                filterCnt++;
+
                 if(C.Cond_Delay)
                 {
                     ImGui.TableNextColumn();

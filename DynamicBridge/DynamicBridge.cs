@@ -390,6 +390,8 @@ public unsafe class DynamicBridge : IDalamudPlugin
 	                                .Where(extraCondition => C.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName])
 	                                .All(extraCondition =>
 		                                !ConditionsManager.conditions.TryGetValue(extraCondition.sourcePlugin, out var conditionsFromPlugin) || !conditionsFromPlugin.TryGetValue(extraCondition.conditionName, out var condition) || condition.IsValid(extraCondition.items, x.Not.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName]));
+                                (!C.Cond_Mount || ((x.Mounts.Count == 0 || x.Mounts.Contains(Utils.GetCurrentMountId()))
+                                && (!C.AllowNegativeConditions || !x.Not.Mounts.Contains(Utils.GetCurrentMountId()))));
 
                             if(conditionsMet)
                             {
