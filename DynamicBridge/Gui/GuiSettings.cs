@@ -1,5 +1,6 @@
 using DynamicBridge.Configuration;
 using DynamicBridge.Core;
+using DynamicBridge.IPC.Conditions;
 
 namespace DynamicBridge.Gui;
 public static class GuiSettings
@@ -145,6 +146,24 @@ public static class GuiSettings
             else
             {
                 C.Cond_Time_Precise = false;
+            }
+
+            if (P.ConditionsManager.conditions.Count > 0)
+            {
+	            ImGuiEx.TextWrapped("Enable extra conditions provided by other plugins.");
+	            ImGuiEx.EzTableColumns("extrasFromPlugins", P.ConditionsManager.conditions.SelectMany(source =>
+		            {
+			            return source.Value.Select<KeyValuePair<string, ExtraCondition>, Action>(condition =>
+			            {
+				            return () =>
+				            {
+					            bool active = C.Extra_Conditions[source.Key][condition.Key];
+					            ImGui.Checkbox(condition.Value.label, ref active);
+					            C.Extra_Conditions[source.Key][condition.Key] = active;
+				            };
+			            });
+		            }).ToArray()
+	            );
             }
             ImGuiGroup.EndGroupBox();
         }

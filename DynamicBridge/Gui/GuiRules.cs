@@ -9,6 +9,7 @@ using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.IO;
+using DynamicBridge.IPC.Conditions;
 using Action = System.Action;
 using Emote = Lumina.Excel.Sheets.Emote;
 using Mount = Lumina.Excel.Sheets.Mount;
@@ -272,7 +273,21 @@ public static unsafe class GuiRules
 
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, Utils.CellPadding);
         DragDrop.Begin();
-        if(ImGui.BeginTable($"##rules{extraID}", 3 + active.Count(x => x), ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
+
+        List<ExtraCondition> extraConditions = [];
+        foreach (var (sourcePlugin, pluginConditions) in C.Extra_Conditions)
+        {
+	        foreach (var (conditionName, conditionActive) in pluginConditions)
+	        {
+		        if (!conditionActive) continue;
+		        if (!P.ConditionsManager.conditions.TryGetValue(sourcePlugin,
+			            out var conditionsFromPlugin) ||
+		            !conditionsFromPlugin.TryGetValue(conditionName, out var extraCondition)) continue;
+		        extraConditions.Add(extraCondition);
+	        }
+        }
+        
+        if(ImGui.BeginTable($"##rules{extraID}", 3 + active.Count(x => x) + extraConditions.Count, ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable))
         {
             ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             if(C.Cond_State) ImGui.TableSetupColumn("State");
@@ -290,6 +305,12 @@ public static unsafe class GuiRules
             if(C.Cond_OnlineStatus) ImGui.TableSetupColumn("Online Status");
             if(C.Cond_Mount) ImGui.TableSetupColumn("Mount");
             if(C.Cond_Delay) ImGui.TableSetupColumn("Delays");
+
+            foreach (var extraCondition in extraConditions)
+            {
+	            ImGui.TableSetupColumn(extraCondition.label);
+            }
+            
             ImGui.TableSetupColumn("Preset");
             ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
@@ -855,6 +876,13 @@ public static unsafe class GuiRules
                     ImGuiEx.Tooltip("Set delays before rule activates or deactivates");
                 }
 
+                foreach (var extraCondition in extraConditions)
+                {
+	                ImGui.TableNextColumn();
+	                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+	                extraCondition.Draw(rule);
+                }
+
                 ImGui.TableNextColumn();
 
                 {
@@ -946,9 +974,9 @@ public static unsafe class GuiRules
         ImGuiEx.Text(nullable, arg2);
     }
 
-    private static void DrawSelector<T>(string name, T value, ICollection<T> values, ICollection<T> notValues) => DrawSelector(name, [value], values, notValues);
+    internal static void DrawSelector<T>(string name, T value, ICollection<T> values, ICollection<T> notValues) => DrawSelector(name, [value], values, notValues);
 
-    private static void DrawSelector<T>(string name, IEnumerable<T> value, ICollection<T> values, ICollection<T> notValues)
+    internal static void DrawSelector<T>(string name, IEnumerable<T> value, ICollection<T> values, ICollection<T> notValues)
     {
         var buttonSize = ImGuiHelpers.GetButtonSize(" ");
         var size = new Vector2(buttonSize.Y);

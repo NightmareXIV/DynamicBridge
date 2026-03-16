@@ -57,6 +57,8 @@ public class Config : IEzConfig
     public bool Cond_Mount = false;
     public bool Cond_Delay = false;
 
+    public Dictionary<string, Dictionary<string, bool>> Extra_Conditions = [];
+
     public bool Cond_Time_Precise = false;
     public Dictionary<ulong, List<GearsetEntry>> GearsetNameCacheCID = [];
 

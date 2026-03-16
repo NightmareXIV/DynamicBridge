@@ -20,6 +20,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System.IO;
 using System.IO.Compression;
+using DynamicBridge.IPC.Conditions;
 
 namespace DynamicBridge;
 
@@ -55,6 +56,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public MoodlesManager MoodlesManager;
     public IpcTester IpcTester;
     public HonorificManager HonorificManager;
+    public ConditionsManager ConditionsManager;
 
     private DateTime RandomizerTimer;
     private bool RandomizedRecently = false;
@@ -114,6 +116,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
             PenumbraManager = new();
             MoodlesManager = new();
             HonorificManager = new();
+            ConditionsManager = new();
         });
     }
 
@@ -382,6 +385,11 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
                                 && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
                                 &&
+                                x.Extra_Conditions.SelectMany(extraConditionsFromPlugin => extraConditionsFromPlugin
+	                                .Value.Select(extraCondition => (sourcePlugin: extraConditionsFromPlugin.Key, conditionName: extraCondition.Key, items: extraCondition.Value)))
+	                                .Where(extraCondition => C.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName])
+	                                .All(extraCondition =>
+		                                !ConditionsManager.conditions.TryGetValue(extraCondition.sourcePlugin, out var conditionsFromPlugin) || !conditionsFromPlugin.TryGetValue(extraCondition.conditionName, out var condition) || condition.IsValid(extraCondition.items, x.Not.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName]));
                                 (!C.Cond_Mount || ((x.Mounts.Count == 0 || x.Mounts.Contains(Utils.GetCurrentMountId()))
                                 && (!C.AllowNegativeConditions || !x.Not.Mounts.Contains(Utils.GetCurrentMountId()))));
 
@@ -801,6 +809,7 @@ public unsafe class DynamicBridge : IDalamudPlugin
     public void Dispose()
     {
         Memory.Dispose();
+        ConditionsManager.Dispose();
         ECommonsMain.Dispose();
         P = null;
         C = null;

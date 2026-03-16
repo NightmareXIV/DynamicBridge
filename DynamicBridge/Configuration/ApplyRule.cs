@@ -35,6 +35,9 @@ public class ApplyRule
         new TimelineSegment((float)19/24,(float)22/24,0),
         new TimelineSegment((float)22/24,(float)24/24,0)
         ];
+
+    public Dictionary<string, Dictionary<string, HashSet<string>>> Extra_Conditions = [];
+    
     public List<string> SelectedPresets = [];
     public bool Passthrough = false;
     public NotConditions Not = new();
@@ -55,6 +58,8 @@ public class ApplyRule
         public List<int> Gearsets = [];
         public List<string> Players = [];
         public List<uint> OnlineStatuses = [];
+        
+        public Dictionary<string, Dictionary<string, HashSet<string>>> Extra_Conditions = [];
         public List<uint> Mounts = [];
     }
 }
