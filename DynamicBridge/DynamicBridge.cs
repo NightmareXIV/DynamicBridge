@@ -380,7 +380,10 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
                                 &&
                                 (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
-                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))));
+                                && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
+                                &&
+                                (!C.Cond_Mount || ((x.Mounts.Count == 0 || x.Mounts.Contains(Utils.GetCurrentMountId()))
+                                && (!C.AllowNegativeConditions || !x.Not.Mounts.Contains(Utils.GetCurrentMountId()))));
 
                             if(conditionsMet)
                             {
