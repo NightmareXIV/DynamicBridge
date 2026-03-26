@@ -384,19 +384,20 @@ public unsafe class DynamicBridge : IDalamudPlugin
                                 (!C.Cond_Gearset || ((x.Gearsets.Count == 0 || x.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))
                                 && (!C.AllowNegativeConditions || !x.Not.Gearsets.Contains(RaptureGearsetModule.Instance()->CurrentGearsetIndex))))
                                 &&
-                                (!C.Cond_Players || (x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))
-                                && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f))))))
+                                (!C.Cond_Players || ((x.Players.Count == 0 || x.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))
+                                && (!C.AllowNegativeConditions || !x.Not.Players.Any(rp => GuiPlayers.SimpleNearbyPlayers().Any(sp => rp == sp.Name && C.selectedPlayers.Any(sel => sel.Name == sp.Name && (sel.Distance >= sp.Distance || sel.Distance >= 150f)))))))
                                 &&
                                 (!C.Cond_OnlineStatus || ((x.OnlineStatuses.Count == 0 || x.OnlineStatuses.Contains(Player.OnlineStatus))
                                 && (!C.AllowNegativeConditions || !x.Not.OnlineStatuses.Contains(Player.OnlineStatus))))
+                                &&
+                                (!C.Cond_Mount || ((x.Mounts.Count == 0 || x.Mounts.Contains(Utils.GetCurrentMountId()))
+                                && (!C.AllowNegativeConditions || !x.Not.Mounts.Contains(Utils.GetCurrentMountId()))))
                                 &&
                                 x.Extra_Conditions.SelectMany(extraConditionsFromPlugin => extraConditionsFromPlugin
 	                                .Value.Select(extraCondition => (sourcePlugin: extraConditionsFromPlugin.Key, conditionName: extraCondition.Key, items: extraCondition.Value)))
 	                                .Where(extraCondition => C.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName])
 	                                .All(extraCondition =>
 		                                !ConditionsManager.conditions.TryGetValue(extraCondition.sourcePlugin, out var conditionsFromPlugin) || !conditionsFromPlugin.TryGetValue(extraCondition.conditionName, out var condition) || condition.IsValid(extraCondition.items, x.Not.Extra_Conditions[extraCondition.sourcePlugin][extraCondition.conditionName]));
-                                (!C.Cond_Mount || ((x.Mounts.Count == 0 || x.Mounts.Contains(Utils.GetCurrentMountId()))
-                                && (!C.AllowNegativeConditions || !x.Not.Mounts.Contains(Utils.GetCurrentMountId()))));
 
                             if(conditionsMet)
                             {
