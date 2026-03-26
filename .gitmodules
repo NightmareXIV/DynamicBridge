@@ -12,4 +12,4 @@
 	url = https://github.com/Limiana/Penumbra.Api
 [submodule "Loci.Api"]
 	path = Loci.Api
-	url = https://github.com/CordeliaMist/Loci.Api.git
+	url = https://github.com/Limiana/Loci.Api
