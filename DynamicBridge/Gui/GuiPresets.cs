@@ -94,6 +94,20 @@ public static class GuiPresets
             }
             ImGuiEx.Tooltip("Add new preset folder");
 
+            if(C.EnableGlamourer)
+            {
+                ImGui.SameLine();
+                ImGui.PushStyleColor(ImGuiCol.Button, Colors.ButtonPurple);
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Colors.ButtonPurpleHovered);
+                ImGui.PushStyleColor(ImGuiCol.ButtonActive, Colors.ButtonPurpleActive);
+                if(ImGuiEx.IconButton(FontAwesomeIcon.WandMagicSparkles, "ImportGlamourerDesigns"))
+                {
+                    GlamourerPresetImporter.Import(currentProfile, Open != null && currentProfile.PresetsFolders.TryGetFirst(x => x.GUID == Open, out var open) ? open.Presets : currentProfile.Presets);
+                }
+                ImGui.PopStyleColor(3);
+                ImGuiEx.Tooltip($"Create a {(drawGlobalSection ? "global preset" : "preset")} for every Glamourer design, named after the design.\nDesigns that already have a same-named preset are skipped.\nIf a preset folder shares a name with the design's Glamourer folder, the preset goes there; otherwise into the default or focused folder.");
+            }
+
             ImGui.SameLine();
 
         }
